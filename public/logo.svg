@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <title>BFG Sheets segmented blade logo</title>
+    <g id="logo-blades" fill="inherit">
+        <path
+            d="M 33 3 L 44 8 L 40 25 L 37 16 L 32 12 Z"
+            transform="rotate(12 32 32)"
+        />
+        <path
+            d="M 33 3 L 44 8 L 40 25 L 37 16 L 32 12 Z"
+            transform="rotate(57 32 32)"
+        />
+        <path
+            d="M 33 3 L 44 8 L 40 25 L 37 16 L 32 12 Z"
+            transform="rotate(102 32 32)"
+        />
+        <path
+            d="M 33 3 L 44 8 L 40 25 L 37 16 L 32 12 Z"
+            transform="rotate(147 32 32)"
+        />
+        <path
+            d="M 33 3 L 44 8 L 40 25 L 37 16 L 32 12 Z"
+            transform="rotate(192 32 32)"
+        />
+        <path
+            d="M 33 3 L 44 8 L 40 25 L 37 16 L 32 12 Z"
+            transform="rotate(237 32 32)"
+        />
+        <path
+            d="M 33 3 L 44 8 L 40 25 L 37 16 L 32 12 Z"
+            transform="rotate(282 32 32)"
+        />
+        <path
+            d="M 33 3 L 44 8 L 40 25 L 37 16 L 32 12 Z"
+            transform="rotate(327 32 32)"
+        />
+    </g>
+</svg>

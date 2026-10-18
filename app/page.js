@@ -371,17 +371,13 @@ const Home = () => {
                     <svg
                         className="brand-mark"
                         viewBox="0 0 64 64"
-                        fill="currentColor"
                         aria-hidden="true"
                         focusable="false"
                     >
-                        {Array.from({ length: 8 }, (_, index) => (
-                            <path
-                                key={index}
-                                d="M 32 3 L 49 9 L 40 25 L 37 18 L 28 15 Z"
-                                transform={`rotate(${index * 45 + 12} 32 32)`}
-                            />
-                        ))}
+                        <use
+                            href="/logo.svg#logo-blades"
+                            fill="var(--accent)"
+                        />
                     </svg>
                     <span>
                         BFG Sheets<small>BATTLEFLEET GOTHIC COMPANION</small>

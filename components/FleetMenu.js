@@ -1,8 +1,38 @@
+"use client";
+
+import { useState } from "react";
+import HullWarning from "@/components/HullWarning";
+
 const FleetMenu = ({ fleet, selectedShipId, onSelect, className, battleStates, maxHull }) => {
+    const [viewMode, setViewMode] = useState("details");
+    const isCompact = viewMode === "compact";
+
     return (
-        <aside className="fleet-menu" aria-label="Fleet selection">
+        <aside
+            className="fleet-menu"
+            aria-label="Fleet selection"
+            data-view={viewMode}
+        >
             <div className="fleet-heading">
-                <p className="eyebrow">Demo fleet</p>
+                <div className="fleet-toolbar">
+                    <p className="eyebrow">Demo fleet</p>
+                    <div
+                        className="fleet-view-toggle"
+                        role="group"
+                        aria-label="Fleet display mode"
+                    >
+                        {["compact", "details"].map((mode) => (
+                            <button
+                                key={mode}
+                                type="button"
+                                aria-pressed={viewMode === mode}
+                                onClick={() => setViewMode(mode)}
+                            >
+                                {mode === "compact" ? "Compact" : "Details"}
+                            </button>
+                        ))}
+                    </div>
+                </div>
                 <h2>Fleet selection</h2>
                 <p>{fleet.length} ships · Illustrative statistics</p>
             </div>
@@ -15,11 +45,17 @@ const FleetMenu = ({ fleet, selectedShipId, onSelect, className, battleStates, m
                             aria-pressed={selectedShipId === vessel.id}
                             onClick={() => onSelect(vessel.id)}
                         >
-                            <span className="registry">{vessel.registry}</span>
+                            {!isCompact && (
+                                <span className="registry">{vessel.registry}</span>
+                            )}
                             <strong>{vessel.name}</strong>
-                            <span>{className}</span>
+                            {!isCompact && <span>{className}</span>}
                             <span className="fleet-hull">
                                 Hull {battleStates[vessel.id].hull} / {maxHull}
+                                <HullWarning
+                                    hull={battleStates[vessel.id].hull}
+                                    maxHull={maxHull}
+                                />
                             </span>
                         </button>
                     </li>

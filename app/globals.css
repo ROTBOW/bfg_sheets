@@ -1026,21 +1026,82 @@ footer {
 
 .battle-layout {
     display: grid;
-    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-columns: 300px minmax(0, 1fr);
     gap: 28px;
-    max-width: 1600px;
-    padding: 30px 32px 0;
+    max-width: none;
+    padding: 0 32px 0 0;
 }
 
 .ship-viewer {
     min-width: 0;
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding-top: 30px;
 }
 
 .fleet-menu {
+    position: sticky;
+    top: 0;
     align-self: start;
-    border: 1px solid var(--border);
-    border-radius: 5px;
+    min-height: calc(100dvh - 88px);
+    max-height: 100dvh;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
     background: light-dark(#fffdf6, #0d0f0f);
+}
+
+.fleet-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.fleet-view-toggle {
+    display: flex;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.fleet-view-toggle button {
+    min-height: 32px;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.fleet-view-toggle button:hover,
+.fleet-view-toggle button[aria-pressed="true"] {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+}
+
+.fleet-menu[data-view="compact"] .fleet-list {
+    gap: 6px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-ship {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-ship strong {
+    font-size: 14px;
+}
+
+.fleet-hull {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
 }
 
 .fleet-heading {
@@ -1102,9 +1163,9 @@ footer {
     }
 
     .battle-layout {
-        grid-template-columns: 190px minmax(0, 1fr);
+        grid-template-columns: 280px minmax(0, 1fr);
         gap: 20px;
-        padding-left: 24px;
+        padding-left: 0;
         padding-right: 24px;
     }
 
@@ -1134,11 +1195,20 @@ footer {
 @media (max-width: 760px) {
     .battle-layout {
         grid-template-columns: minmax(0, 1fr);
-        padding: 20px 18px 0;
+        padding: 0 18px 0 0;
     }
 
-    .fleet-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .fleet-menu {
+        position: static;
+        min-height: 0;
+        max-height: none;
+        border-bottom: 1px solid var(--border);
+        border-radius: 0 0 5px 0;
+    }
+
+    .ship-viewer {
+        padding-top: 0;
+        padding-left: 18px;
     }
 
     .navbar-tabs {
@@ -1153,6 +1223,11 @@ footer {
 }
 
 @media print {
+    .ship-viewer {
+        padding: 0;
+        max-width: none;
+    }
+
     .battle-layout {
         display: block;
         padding: 0;
@@ -1235,4 +1310,17 @@ footer {
     h1 {
         font-size: 36px;
     }
+}
+
+.hull-warning {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    vertical-align: middle;
+    color: light-dark(#b42318, #ff6b6b);
+}
+
+.tracker-heading .hull-warning {
+    margin-left: 7px;
 }

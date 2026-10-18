@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import HullWarning from "@/components/HullWarning";
 import FleetMenu from "@/components/FleetMenu";
 import ship from "@/public/ships/lunar-class-cruiser.json";
 
@@ -167,7 +168,7 @@ const ShipDiagram = ({ demoVessel }) => {
     );
 };
 
-const Tracker = ({ label, value, max, onChange, tone = "" }) => {
+const Tracker = ({ label, value, max, onChange, tone = "", isHull = false }) => {
     return (
         <div className={`tracker ${tone}`}>
             <div className="tracker-heading">
@@ -175,6 +176,7 @@ const Tracker = ({ label, value, max, onChange, tone = "" }) => {
                 <strong>
                     {value}
                     <small> / {max}</small>
+                    {isHull && <HullWarning hull={value} maxHull={max} />}
                 </strong>
             </div>
             <div className="tracker-controls">
@@ -397,6 +399,7 @@ const BattleTracker = () => {
                             </div>
                             <Tracker
                                 label="Hull integrity"
+                                isHull
                                 value={hull}
                                 max={shipStats.hull}
                                 onChange={(value) => updateSelectedShip({ hull: value })}

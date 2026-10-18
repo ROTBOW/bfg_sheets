@@ -1,12 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/components/Navbar";
+import FleetMenu from "@/components/FleetMenu";
 import ship from "@/public/ships/lunar-class-cruiser.json";
 
 // Import the profile directly so the initial page and trackers share the same data.
 const shipStats = ship.stats;
-const demoVessel = ship.demoVessel;
+const fleet = [
+    { id: "his-will", ...ship.demoVessel },
+    {
+        id: "steadfast",
+        name: "Steadfast",
+        registry: "IN–049",
+        profileCode: "LN–049",
+        leadership: 7,
+    },
+];
+
+const createBattleState = () => {
+    const battleState = {};
+
+    for (const vessel of fleet) {
+        battleState[vessel.id] = {
+            hull: shipStats.hull,
+            shields: shipStats.shields,
+            order: "No special orders",
+            notes: "",
+            message: "",
+        };
+    }
+
+    return battleState;
+};
 
 const characteristics = [
     ["Type", ship.type],
@@ -28,7 +53,7 @@ const getHullStatus = (hull) => {
         return "Hull depleted";
     }
 
-    if (hull <= hull / 2) {
+    if (hull <= shipStats.hull / 2) {
         return "Hull Crippled";
     }
 
@@ -39,7 +64,7 @@ const getHullStatus = (hull) => {
     return "Battle ready";
 };
 
-const ShipDiagram = () => {
+const ShipDiagram = ({ demoVessel }) => {
     return (
         <svg
             viewBox="0 0 620 250"
@@ -117,7 +142,7 @@ const ShipDiagram = () => {
             <g
                 fill="var(--muted)"
                 fontSize="9"
-                fontFamily="monospace"
+                fontFamily="inherit"
             >
                 <text
                     x="25"
@@ -183,26 +208,43 @@ const Tracker = ({ label, value, max, onChange, tone = "" }) => {
     );
 };
 
-const Home = () => {
-    const [hull, setHull] = useState(shipStats.hull);
-    const [shields, setShields] = useState(shipStats.shields);
-    const [order, setOrder] = useState("No special orders");
-    const [notes, setNotes] = useState("");
-    const [message, setMessage] = useState("");
-
+const BattleTracker = () => {
+    const [selectedShipId, setSelectedShipId] = useState(fleet[0].id);
+    const [battleStates, setBattleStates] = useState(createBattleState);
+    const demoVessel = fleet.find((vessel) => vessel.id === selectedShipId);
+    const { hull, shields, order, notes, message } = battleStates[selectedShipId];
     const hullStatus = getHullStatus(hull);
 
+    const updateSelectedShip = (changes) => {
+        setBattleStates((previousStates) => ({
+            ...previousStates,
+            [selectedShipId]: {
+                ...previousStates[selectedShipId],
+                ...changes,
+            },
+        }));
+    };
+
     const resetBattleTrackers = () => {
-        setHull(shipStats.hull);
-        setShields(shipStats.shields);
-        setOrder("No special orders");
-        setMessage("Trackers reset. Captain’s notes retained.");
+        updateSelectedShip({
+            hull: shipStats.hull,
+            shields: shipStats.shields,
+            order: "No special orders",
+            message: "Trackers reset. Captain’s notes retained.",
+        });
     };
 
     return (
-        <>
-            <Navbar isDemo={ship.isDemo} />
-            <main>
+        <main className="battle-layout">
+            <FleetMenu
+                fleet={fleet}
+                selectedShipId={selectedShipId}
+                onSelect={setSelectedShipId}
+                className={ship.className}
+                battleStates={battleStates}
+                maxHull={shipStats.hull}
+            />
+            <div className="ship-viewer">
                 <div className="breadcrumb">
                     {ship.faction} <span>/</span> {ship.type} <span>/</span>{" "}
                     Ship profile
@@ -235,7 +277,7 @@ const Home = () => {
                                     {ship.role.toUpperCase()}
                                 </span>
                             </div>
-                            <ShipDiagram />
+                            <ShipDiagram demoVessel={demoVessel} />
                             <div className="vessel-caption">
                                 <em>{ship.description}</em>
                                 <span>
@@ -335,7 +377,7 @@ const Home = () => {
                                 id="notes"
                                 value={notes}
                                 onChange={(event) =>
-                                    setNotes(event.target.value)
+                                    updateSelectedShip({ notes: event.target.value })
                                 }
                                 placeholder="Record critical damage, objectives, or a particularly heroic manoeuvre…"
                             />
@@ -357,13 +399,13 @@ const Home = () => {
                                 label="Hull integrity"
                                 value={hull}
                                 max={shipStats.hull}
-                                onChange={setHull}
+                                onChange={(value) => updateSelectedShip({ hull: value })}
                             />
                             <Tracker
                                 label="Active shields"
                                 value={shields}
                                 max={shipStats.shields}
-                                onChange={setShields}
+                                onChange={(value) => updateSelectedShip({ shields: value })}
                                 tone="shield"
                             />
                             <div className="leadership">
@@ -378,7 +420,7 @@ const Home = () => {
                                     id="order"
                                     value={order}
                                     onChange={(event) =>
-                                        setOrder(event.target.value)
+                                        updateSelectedShip({ order: event.target.value })
                                     }
                                 >
                                     {[
@@ -426,7 +468,7 @@ const Home = () => {
                             <hr />
                             <p className="demo-note">
                                 Prototype · All statistics are illustrative.
-                                Changes last until you refresh this page.
+                                Changes last until you leave or refresh this page.
                             </p>
                         </section>
                     </aside>
@@ -437,9 +479,9 @@ const Home = () => {
                     </span>
                     <span>Unofficial tabletop companion · Demo profile</span>
                 </footer>
-            </main>
-        </>
+            </div>
+        </main>
     );
 };
 
-export default Home;
+export default BattleTracker;

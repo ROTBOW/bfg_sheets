@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
     accentCookieName,
     defaultAccent,
@@ -171,7 +172,14 @@ const OptionsDropdown = () => {
     );
 };
 
-const Navbar = ({ isDemo = false }) => {
+const navigationLinks = [
+    { href: "/", label: "Battle Tracker" },
+    { href: "/fleet-creator", label: "Fleet creator" },
+    { href: "/connect", label: "Connect" },
+];
+
+const Navbar = () => {
+    const pathname = usePathname();
     return (
         <header className="topbar">
             <Link
@@ -193,8 +201,18 @@ const Navbar = ({ isDemo = false }) => {
                     BFG Sheets<small>BATTLEFLEET GOTHIC COMPANION</small>
                 </span>
             </Link>
-            <span className="topbar-label">SHIP COMMAND</span>
-            {isDemo && <span className="demo-badge">DEMO DATA</span>}
+            <nav className="navbar-tabs" aria-label="Main navigation">
+                {navigationLinks.map((link) => (
+                    <Link
+                        key={link.href}
+                        href={link.href}
+                        aria-current={pathname === link.href ? "page" : undefined}
+                    >
+                        {link.label}
+                    </Link>
+                ))}
+            </nav>
+            {pathname === "/" && <span className="demo-badge">DEMO DATA</span>}
             <OptionsDropdown />
         </header>
     );

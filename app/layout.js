@@ -1,5 +1,21 @@
+import localFont from "next/font/local";
+import Navbar from "@/components/Navbar";
 import "./globals.css";
 import { themeInitializationScript } from "./theme";
+
+const monaspaceKrypton = localFont({
+    src: "../public/fonts/MonaspaceKrypton-Variable.woff2",
+    variable: "--font-monaspace-krypton",
+    weight: "200 800",
+    display: "swap",
+});
+
+const monaspaceNeon = localFont({
+    src: "../public/fonts/MonaspaceNeon-Variable.woff2",
+    variable: "--font-monaspace-neon",
+    weight: "200 800",
+    display: "swap",
+});
 
 export const metadata = {
     title: "BFG Sheets",
@@ -17,6 +33,7 @@ const RootLayout = ({ children }) => {
     return (
         <html
             lang="en"
+            className={`${monaspaceKrypton.variable} ${monaspaceNeon.variable}`}
             suppressHydrationWarning
         >
             <head>
@@ -26,7 +43,10 @@ const RootLayout = ({ children }) => {
                     }}
                 />
             </head>
-            <body>{children}</body>
+            <body>
+                <Navbar />
+                {children}
+            </body>
         </html>
     );
 };

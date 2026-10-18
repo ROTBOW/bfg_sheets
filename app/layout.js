@@ -5,6 +5,12 @@ export const metadata = {
     title: "BFG Sheets",
     description:
         "A Battlefleet Gothic companion for ship profiles and battle bookkeeping.",
+    icons: {
+        icon: {
+            url: "/logo.svg",
+            type: "image/svg+xml",
+        },
+    },
 };
 
 const RootLayout = ({ children }) => {

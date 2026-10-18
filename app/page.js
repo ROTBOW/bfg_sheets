@@ -271,7 +271,12 @@ const OptionsDropdown = () => {
             className="options-dropdown"
             ref={dropdownRef}
             onBlur={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget)) {
+                // Label clicks can briefly clear focus before focusing their radio.
+                // Outside pointer clicks are handled by the document listener.
+                if (
+                    event.relatedTarget &&
+                    !event.currentTarget.contains(event.relatedTarget)
+                ) {
                     setIsOpen(false);
                 }
             }}
@@ -315,14 +320,17 @@ const OptionsDropdown = () => {
                             : "Dark theme enabled"}
                     </p>
                     <fieldset className="accent-picker">
-                        <legend className="eyebrow">Terminal accent</legend>
+                        <legend className="eyebrow">Accent</legend>
                         <div className="accent-options">
                             {terminalAccents.map((accent) => (
                                 <label
                                     className="accent-option"
                                     key={accent.id}
+                                    data-accent={accent.id}
+                                    htmlFor={`accent-${accent.id}`}
                                 >
                                     <input
+                                        id={`accent-${accent.id}`}
                                         type="radio"
                                         name="terminal-accent"
                                         value={accent.id}
@@ -331,7 +339,6 @@ const OptionsDropdown = () => {
                                     />
                                     <span
                                         className="accent-swatch"
-                                        data-accent={accent.id}
                                         aria-hidden="true"
                                     />
                                     <span>{accent.label}</span>

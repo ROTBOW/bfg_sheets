@@ -13,27 +13,33 @@
     color-scheme: light;
 }
 
-[data-accent="amber"] {
+[data-accent="amber"],
+:root:has(.accent-option[data-accent="amber"]:hover) {
     --accent: light-dark(#895400, #ffb000);
 }
 
-[data-accent="green"] {
+[data-accent="green"],
+:root:has(.accent-option[data-accent="green"]:hover) {
     --accent: light-dark(#246d2b, #66ff66);
 }
 
-[data-accent="cyan"] {
+[data-accent="cyan"],
+:root:has(.accent-option[data-accent="cyan"]:hover) {
     --accent: light-dark(#006b73, #55eeee);
 }
 
-[data-accent="blue"] {
+[data-accent="blue"],
+:root:has(.accent-option[data-accent="blue"]:hover) {
     --accent: light-dark(#285e9b, #80bfff);
 }
 
-[data-accent="magenta"] {
+[data-accent="magenta"],
+:root:has(.accent-option[data-accent="magenta"]:hover) {
     --accent: light-dark(#8b3589, #ff88ee);
 }
 
-[data-accent="white"] {
+[data-accent="white"],
+:root:has(.accent-option[data-accent="white"]:hover) {
     --accent: light-dark(#4c5458, #e6ecef);
 }
 
@@ -51,23 +57,39 @@
 
 .accent-options {
     display: grid;
-    gap: 4px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
 }
 
 .accent-option {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto auto;
     align-items: center;
-    gap: 10px;
-    min-height: 36px;
-    padding: 6px;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 72px;
+    padding: 10px 6px;
+    border: 1px solid var(--border);
     border-radius: 3px;
     color: var(--foreground);
     font-size: 12px;
+    text-align: center;
     cursor: pointer;
+    background: transparent;
+    transition: color 1s ease, border-color 1s ease, background-color 1s ease;
 }
 
+.accent-option > span:last-child {
+    grid-column: 1 / -1;
+}
+
+.accent-option:hover,
+.accent-option:has(input:focus-visible),
 .accent-option:has(input:checked) {
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+    border-color: var(--accent);
+    background-color: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .accent-option input {
@@ -77,6 +99,34 @@
 .accent-option input:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
+}
+
+/* Preview the page palette without changing the selected radio or its cookie. */
+.brand-mark use,
+.theme-switch,
+.demo-badge,
+.eyebrow,
+.vessel-caption strong,
+.weapon-marker,
+.leadership strong,
+.reset-message,
+.reference-card {
+    transition: color 1s ease, background-color 1s ease, border-color 1s ease, fill 1s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .accent-option,
+    .brand-mark use,
+    .theme-switch,
+    .demo-badge,
+    .eyebrow,
+    .vessel-caption strong,
+    .weapon-marker,
+    .leadership strong,
+    .reset-message,
+    .reference-card {
+        transition: none;
+    }
 }
 
 .accent-swatch {

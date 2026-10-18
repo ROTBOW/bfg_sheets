@@ -209,6 +209,12 @@ const Navbar = () => {
                         aria-current={pathname === link.href ? "page" : undefined}
                     >
                         {link.label}
+                        <span
+                            className="navbar-cursor"
+                            aria-hidden="true"
+                        >
+                        █
+                        </span>
                     </Link>
                 ))}
             </nav>

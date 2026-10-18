@@ -984,17 +984,44 @@ footer {
 }
 
 .navbar-tabs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 14px 12px;
-    border-bottom: 2px solid transparent;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 15px;
     white-space: nowrap;
 }
 
 .navbar-tabs a:hover,
 .navbar-tabs a[aria-current="page"] {
     color: var(--accent);
-    border-bottom-color: var(--accent);
+}
+
+.navbar-cursor {
+    opacity: 0;
+}
+
+.navbar-tabs a[aria-current="page"] .navbar-cursor {
+    animation: terminal-cursor-blink 1s steps(1, end) infinite;
+}
+
+@keyframes terminal-cursor-blink {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar-tabs a[aria-current="page"] .navbar-cursor {
+        animation: none;
+        opacity: 1;
+    }
 }
 
 .battle-layout {
@@ -1116,11 +1143,12 @@ footer {
 
     .navbar-tabs {
         gap: 4px;
+        overflow-x: auto;
     }
 
     .navbar-tabs a {
         padding: 12px 8px;
-        font-size: 12px;
+        font-size: 14px;
     }
 }
 

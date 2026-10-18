@@ -2,13 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ship from "@/public/ships/lunar-class-cruiser.json";
 
-const weapons = [
-    ["Port weapons battery", "Battery", "30 cm", 6, "Left"],
-    ["Starboard weapons battery", "Battery", "30 cm", 6, "Right"],
-    ["Port lance battery", "Lance", "30 cm", 2, "Left"],
-    ["Starboard lance battery", "Lance", "30 cm", 2, "Right"],
-    ["Prow torpedoes", "Torpedo", "30 cm", 6, "Front"],
+// Import the profile directly so the initial page and trackers share the same data.
+const shipStats = ship.stats;
+const demoVessel = ship.demoVessel;
+
+const characteristics = [
+    ["Type", ship.type],
+    ["Speed", shipStats.speedCm, "cm"],
+    ["Turns", shipStats.turnDegrees, "°"],
+    ["Shields", shipStats.shields],
+    ["Armour", `${shipStats.armour.front} / ${shipStats.armour.other}`],
+    ["Turrets", shipStats.turrets],
 ];
 
 const weaponMarkers = {
@@ -22,7 +28,11 @@ const getHullStatus = (hull) => {
         return "Hull depleted";
     }
 
-    if (hull < 8) {
+    if (hull <= (hull / 2)) {
+        return "Hull Crippled"
+    }
+
+    if (hull < shipStats.hull) {
         return "Hull damaged";
     }
 
@@ -113,13 +123,13 @@ const ShipDiagram = () => {
                     x="25"
                     y="25"
                 >
-                    PROFILE // LN–048
+                    PROFILE // {demoVessel.profileCode}
                 </text>
                 <text
                     x="425"
                     y="225"
                 >
-                    IMPERIAL NAVY
+                    {ship.faction.toUpperCase()}
                 </text>
                 <text
                     x="25"
@@ -174,8 +184,8 @@ const Tracker = ({ label, value, max, onChange, tone = "" }) => {
 };
 
 const Home = () => {
-    const [hull, setHull] = useState(8);
-    const [shields, setShields] = useState(2);
+    const [hull, setHull] = useState(shipStats.hull);
+    const [shields, setShields] = useState(shipStats.shields);
     const [order, setOrder] = useState("No special orders");
     const [notes, setNotes] = useState("");
     const [message, setMessage] = useState("");
@@ -183,8 +193,8 @@ const Home = () => {
     const hullStatus = getHullStatus(hull);
 
     const resetBattleTrackers = () => {
-        setHull(8);
-        setShields(2);
+        setHull(shipStats.hull);
+        setShields(shipStats.shields);
         setOrder("No special orders");
         setMessage("Trackers reset. Captain’s notes retained.");
     };
@@ -202,19 +212,21 @@ const Home = () => {
                     </span>
                 </Link>
                 <span className="topbar-label">SHIP COMMAND</span>
-                <span className="demo-badge">DEMO DATA</span>
+                {ship.isDemo && <span className="demo-badge">DEMO DATA</span>}
             </header>
             <main>
                 <div className="breadcrumb">
-                    Imperial Navy <span>/</span> Cruiser <span>/</span> Ship
-                    profile
+                    {ship.faction} <span>/</span> {ship.type} <span>/</span>{" "}
+                    Ship profile
                 </div>
                 <div className="page-heading">
                     <div>
-                        <p className="eyebrow">VESSEL RECORD · IN–048</p>
-                        <h1>His Will</h1>
+                        <p className="eyebrow">
+                            VESSEL RECORD · {demoVessel.registry}
+                        </p>
+                        <h1>{demoVessel.name}</h1>
                         <p className="subtitle">
-                            Lunar-class cruiser <span>·</span> Imperial Navy
+                            {ship.className} <span>·</span> {ship.faction}
                         </p>
                     </div>
                     <button
@@ -228,18 +240,18 @@ const Home = () => {
                     <div>
                         <section className="panel vessel">
                             <div className="panel-heading">
-                                <span className="eyebrow">LUNAR CLASS</span>
+                                <span className="eyebrow">
+                                    {ship.classLabel.toUpperCase()}
+                                </span>
                                 <span className="registry">
-                                    BATTLELINE CRUISER
+                                    {ship.role.toUpperCase()}
                                 </span>
                             </div>
                             <ShipDiagram />
                             <div className="vessel-caption">
-                                <em>
-                                    A steadfast presence in the line of battle.
-                                </em>
+                                <em>{ship.description}</em>
                                 <span>
-                                    <strong>180</strong> POINTS
+                                    <strong>{ship.points}</strong> POINTS
                                 </span>
                             </div>
                         </section>
@@ -247,14 +259,7 @@ const Home = () => {
                             className="stat-strip"
                             aria-label="Ship characteristics"
                         >
-                            {[
-                                ["Type", "Cruiser"],
-                                ["Speed", "20", "cm"],
-                                ["Turns", "45", "°"],
-                                ["Shields", "2"],
-                                ["Armour", "6+ / 5+"],
-                                ["Turrets", "2"],
-                            ].map(([label, value, unit]) => (
+                            {characteristics.map(([label, value, unit]) => (
                                 <div key={label}>
                                     <span>{label}</span>
                                     <strong>
@@ -271,7 +276,7 @@ const Home = () => {
                                     Armament
                                 </h2>
                                 <span className="registry">
-                                    5 WEAPON SYSTEMS
+                                    {ship.weapons.length} WEAPON SYSTEMS
                                 </span>
                             </div>
                             <div className="table-scroll">
@@ -285,14 +290,14 @@ const Home = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {weapons.map(
-                                            ([
+                                        {ship.weapons.map(
+                                            ({
                                                 name,
                                                 type,
-                                                range,
+                                                rangeCm,
                                                 strength,
                                                 arc,
-                                            ]) => (
+                                            }) => (
                                                 <tr key={name}>
                                                     <td>
                                                         <span
@@ -308,7 +313,7 @@ const Home = () => {
                                                         {name}
                                                         <small>{type}</small>
                                                     </td>
-                                                    <td>{range}</td>
+                                                    <td>{rangeCm} cm</td>
                                                     <td className="strength">
                                                         {strength}
                                                     </td>
@@ -356,20 +361,20 @@ const Home = () => {
                             </div>
                             <div
                                 role="status"
-                                className={`status-banner ${hull < 8 ? "damaged" : ""}`}
+                                className={`status-banner ${hull < shipStats.hull ? "damaged" : ""}`}
                             >
                                 ◇ &nbsp; {hullStatus}
                             </div>
                             <Tracker
                                 label="Hull integrity"
                                 value={hull}
-                                max={8}
+                                max={shipStats.hull}
                                 onChange={setHull}
                             />
                             <Tracker
                                 label="Active shields"
                                 value={shields}
-                                max={2}
+                                max={shipStats.shields}
                                 onChange={setShields}
                                 tone="shield"
                             />
@@ -377,7 +382,7 @@ const Home = () => {
                                 <span>
                                     Leadership<small>Assigned demo value</small>
                                 </span>
-                                <strong>8</strong>
+                                <strong>{demoVessel.leadership}</strong>
                             </div>
                             <div className="order-control">
                                 <label htmlFor="order">Special orders</label>
@@ -439,7 +444,9 @@ const Home = () => {
                     </aside>
                 </div>
                 <footer>
-                    <span>VOID LEDGER &nbsp; / &nbsp; IMPERIAL NAVY</span>
+                    <span>
+                        VOID LEDGER &nbsp; / &nbsp; {ship.faction.toUpperCase()}
+                    </span>
                     <span>Unofficial tabletop companion · Demo profile</span>
                 </footer>
             </main>

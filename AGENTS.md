@@ -1,5 +1,10 @@
 ## Project context
 
+### Reference and attribution
+
+- The Battlefleet Gothic: Remastered Imperial Navy fleet list is a major help in the creation of this site: https://battlefleet-game.org/fleet-lists/imperial-navy/
+- Keep this reference available for future ship-profile work
+
 This site automates tedious bookkeeping in the Battlefleet Gothic tabletop game. Prioritize clear ship information and fast interactions during play. The first page is a ship stat page using clearly labeled dummy data; sample statistics are not verified game rules.
 
 Here’s the portable code style prompt, without the Next.js-specific instructions:

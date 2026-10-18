@@ -1,0 +1,59 @@
+{
+    "id": "retribution-class-battleship",
+    "isDemo": true,
+    "className": "Retribution-class battleship",
+    "classLabel": "Retribution class",
+    "faction": "Imperial Navy",
+    "type": "Battleship",
+    "role": "Heavy battleline",
+    "description": "Demo profile for a heavy gunship anchoring the battleline.",
+    "points": 345,
+    "stats": {
+        "hull": 12,
+        "speedCm": 20,
+        "turnDegrees": 45,
+        "shields": 4,
+        "armour": {
+            "front": "6+",
+            "other": "5+"
+        },
+        "turrets": 4
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 12,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 12,
+            "arc": "Right"
+        },
+        {
+            "name": "Dorsal lances",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 3,
+            "arc": "Left / Front / Right"
+        },
+        {
+            "name": "Prow torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 9,
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [],
+    "demoVessel": {
+        "name": "Iron Resolve",
+        "registry": "IN–101",
+        "profileCode": "RT–101",
+        "leadership": 8
+    }
+}

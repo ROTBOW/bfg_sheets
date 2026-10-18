@@ -472,6 +472,12 @@ const BattleTracker = () => {
                         VOID LEDGER &nbsp; / &nbsp; {ship.faction.toUpperCase()}
                     </span>
                     <span>Unofficial tabletop companion · Demo profile</span>
+                    <span className="footer-credit">
+                        A major help in creating this site:{" "}
+                        <a href="https://battlefleet-game.org/fleet-lists/imperial-navy/">
+                            Battlefleet Gothic: Remastered — Imperial Navy fleet list
+                        </a>
+                    </span>
                 </footer>
             </div>
         </main>

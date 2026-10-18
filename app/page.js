@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { themeCookieName } from "./theme";
+import {
+    accentCookieName,
+    defaultAccent,
+    terminalAccents,
+    themeCookieName,
+} from "./theme";
 import ship from "@/public/ships/lunar-class-cruiser.json";
 
 // Import the profile directly so the initial page and trackers share the same data.
@@ -203,12 +208,33 @@ const toggleTheme = () => {
     window.dispatchEvent(new Event("themechange"));
 };
 
+const getAccentSnapshot = () =>
+    document.documentElement.dataset.accent || defaultAccent;
+const getServerAccentSnapshot = () => defaultAccent;
+
+const selectAccent = (accent) => {
+    if (!terminalAccents.some((option) => option.id === accent)) {
+        return;
+    }
+
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+
+    document.documentElement.dataset.accent = accent;
+    document.cookie = `${accentCookieName}=${accent}; Path=/; SameSite=Lax${secure}`;
+    window.dispatchEvent(new Event("themechange"));
+};
+
 const OptionsDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
     const isLightTheme = useSyncExternalStore(
         subscribeToTheme,
         getLightThemeSnapshot,
         getServerThemeSnapshot,
+    );
+    const selectedAccent = useSyncExternalStore(
+        subscribeToTheme,
+        getAccentSnapshot,
+        getServerAccentSnapshot,
     );
     const dropdownRef = useRef(null);
     const buttonRef = useRef(null);
@@ -288,6 +314,31 @@ const OptionsDropdown = () => {
                             ? "Light theme enabled"
                             : "Dark theme enabled"}
                     </p>
+                    <fieldset className="accent-picker">
+                        <legend className="eyebrow">Terminal accent</legend>
+                        <div className="accent-options">
+                            {terminalAccents.map((accent) => (
+                                <label
+                                    className="accent-option"
+                                    key={accent.id}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="terminal-accent"
+                                        value={accent.id}
+                                        checked={selectedAccent === accent.id}
+                                        onChange={() => selectAccent(accent.id)}
+                                    />
+                                    <span
+                                        className="accent-swatch"
+                                        data-accent={accent.id}
+                                        aria-hidden="true"
+                                    />
+                                    <span>{accent.label}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </fieldset>
                 </div>
             )}
         </div>
@@ -317,7 +368,21 @@ const Home = () => {
                     href="/"
                     className="brand"
                 >
-                    <span className="brand-mark">✦</span>
+                    <svg
+                        className="brand-mark"
+                        viewBox="0 0 64 64"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        {Array.from({ length: 8 }, (_, index) => (
+                            <path
+                                key={index}
+                                d="M 32 3 L 49 9 L 40 25 L 37 18 L 28 15 Z"
+                                transform={`rotate(${index * 45 + 12} 32 32)`}
+                            />
+                        ))}
+                    </svg>
                     <span>
                         BFG Sheets<small>BATTLEFLEET GOTHIC COMPANION</small>
                     </span>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import HullWarning from "@/components/HullWarning";
+import SpecialRules from "@/components/SpecialRules";
 import FleetMenu from "@/components/FleetMenu";
 import ship from "@/public/ships/lunar-class-cruiser.json";
 
@@ -460,20 +461,10 @@ const BattleTracker = () => {
                                 </p>
                             )}
                         </section>
-                        <section className="reference-card">
-                            <p className="eyebrow">OFFICER’S BRIEFING</p>
-                            <h3>Built for the tabletop.</h3>
-                            <p>
-                                Keep your ship’s profile close and your
-                                bookkeeping light. Adjust hull and shields as
-                                the battle unfolds.
-                            </p>
-                            <hr />
-                            <p className="demo-note">
-                                Prototype · All statistics are illustrative.
-                                Changes last until you leave or refresh this page.
-                            </p>
-                        </section>
+                        <SpecialRules
+                            rules={ship.specialRules}
+                            isDemo={ship.isDemo}
+                        />
                     </aside>
                 </div>
                 <footer>

@@ -1,0 +1,43 @@
+{
+    "id": "",
+    "isDemo": true,
+    "className": "",
+    "classLabel": "",
+    "faction": "",
+    "type": "",
+    "role": "",
+    "description": "",
+    "points": 0,
+    "stats": {
+        "hull": 0,
+        "speedCm": 0,
+        "turnDegrees": 0,
+        "shields": 0,
+        "armour": {
+            "front": "",
+            "other": ""
+        },
+        "turrets": 0
+    },
+    "weapons": [
+        {
+            "name": "",
+            "type": "",
+            "rangeCm": 0,
+            "strength": 0,
+            "arc": ""
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "",
+            "description": ""
+        }
+    ],
+    "demoVessel": {
+        "name": "",
+        "registry": "",
+        "profileCode": "",
+        "leadership": 0
+    }
+}

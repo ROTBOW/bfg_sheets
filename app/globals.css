@@ -368,7 +368,7 @@ main {
 }
 
 h1 {
-        font-weight: 400;
+    font-weight: 400;
     font-size: 52px;
     line-height: 1.1;
     margin: 10px 0 12px;
@@ -1323,4 +1323,8 @@ footer {
 
 .tracker-heading .hull-warning {
     margin-left: 7px;
+}
+
+.reference-card .special-rules-empty {
+    margin-top: 16px;
 }

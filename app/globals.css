@@ -140,8 +140,9 @@
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
+    --font-sans: var(--font-monaspace-neon);
+    --font-serif: var(--font-monaspace-krypton);
+    --font-mono: var(--font-monaspace-neon);
 }
 
 * {
@@ -152,8 +153,21 @@ body {
     margin: 0;
     background: var(--background);
     color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--font-monaspace-neon), monospace;
     font-size: 14px;
+}
+
+/* Krypton gives titles their character; Neon keeps supporting text clear. */
+h1,
+h2,
+h3,
+.brand,
+.fleet-ship strong {
+    font-family: var(--font-monaspace-krypton), monospace;
+}
+
+.brand small {
+    font-family: var(--font-monaspace-neon), monospace;
 }
 
 button,
@@ -354,8 +368,7 @@ main {
 }
 
 h1 {
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: 400;
+        font-weight: 400;
     font-size: 52px;
     line-height: 1.1;
     margin: 10px 0 12px;
@@ -409,7 +422,7 @@ h1 {
 }
 
 .registry {
-    font-family: var(--font-geist-mono), monospace;
+    font-family: var(--font-monaspace-neon), monospace;
     font-size: 9px;
     letter-spacing: 1px;
     color: light-dark(#5e584e, #839187);
@@ -433,7 +446,7 @@ h1 {
 }
 
 .vessel-caption strong {
-    font-family: Georgia, serif;
+    font-family: var(--font-monaspace-neon), monospace;
     font-size: 28px;
     color: var(--accent);
     font-weight: 400;
@@ -498,7 +511,7 @@ h2 {
 }
 
 .section-number {
-    font-family: monospace;
+    font-family: var(--font-monaspace-neon), monospace;
     font-size: 11px;
     color: light-dark(#5e584e, #778577);
     margin-right: 13px;
@@ -562,7 +575,7 @@ td small {
 }
 
 .strength {
-    font-family: monospace;
+    font-family: var(--font-monaspace-neon), monospace;
     font-size: 15px;
 }
 
@@ -789,8 +802,7 @@ td small {
 }
 
 .reference-card h3 {
-    font-family: Georgia, serif;
-    font-weight: 400;
+        font-weight: 400;
     font-size: 22px;
     margin: 16px 0 10px;
     color: light-dark(#5e584e, #d4d5bc);
@@ -964,7 +976,164 @@ footer {
     }
 }
 
+.navbar-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto;
+}
+
+.navbar-tabs a {
+    padding: 14px 12px;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.navbar-tabs a:hover,
+.navbar-tabs a[aria-current="page"] {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.battle-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 28px;
+    max-width: 1600px;
+    padding: 30px 32px 0;
+}
+
+.ship-viewer {
+    min-width: 0;
+}
+
+.fleet-menu {
+    align-self: start;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: light-dark(#fffdf6, #0d0f0f);
+}
+
+.fleet-heading {
+    padding: 20px 16px 0;
+}
+
+.fleet-heading h2 {
+    margin-top: 12px;
+}
+
+.fleet-heading > p:last-child {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.fleet-list {
+    display: grid;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 16px;
+}
+
+.fleet-ship {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    padding: 16px 12px;
+    text-align: left;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.fleet-ship strong {
+    color: var(--foreground);
+    font-size: 17px;
+}
+
+.fleet-ship:hover,
+.fleet-ship[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.fleet-hull {
+    color: var(--accent);
+}
+
+@media (max-width: 1200px) {
+    .topbar {
+        gap: 16px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .battle-layout {
+        grid-template-columns: 190px minmax(0, 1fr);
+        gap: 20px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .battle-layout .main-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .topbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .navbar-tabs {
+        order: 1;
+        width: 100%;
+    }
+
+    .topbar .options-dropdown {
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 760px) {
+    .battle-layout {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 20px 18px 0;
+    }
+
+    .fleet-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .navbar-tabs {
+        gap: 4px;
+    }
+
+    .navbar-tabs a {
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+}
+
 @media print {
+    .battle-layout {
+        display: block;
+        padding: 0;
+    }
+
+    .fleet-menu {
+        display: none;
+    }
+
     body {
         background: white;
         color: black;

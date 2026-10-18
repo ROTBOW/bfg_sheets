@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { themeCookieName } from "./theme";
 import ship from "@/public/ships/lunar-class-cruiser.json";
 
 // Import the profile directly so the initial page and trackers share the same data.
@@ -28,8 +29,8 @@ const getHullStatus = (hull) => {
         return "Hull depleted";
     }
 
-    if (hull <= (hull / 2)) {
-        return "Hull Crippled"
+    if (hull <= hull / 2) {
+        return "Hull Crippled";
     }
 
     if (hull < shipStats.hull) {
@@ -115,7 +116,7 @@ const ShipDiagram = () => {
                 <path d="M226 63 224 49 233 38 241 49 239 63M295 58 294 43 302 34 310 43 309 58M345 68V53L351 44 357 53V68" />
             </g>
             <g
-                fill="#adbcab"
+                fill="var(--muted)"
                 fontSize="9"
                 fontFamily="monospace"
             >
@@ -183,6 +184,116 @@ const Tracker = ({ label, value, max, onChange, tone = "" }) => {
     );
 };
 
+const subscribeToTheme = (onChange) => {
+    window.addEventListener("themechange", onChange);
+
+    return () => window.removeEventListener("themechange", onChange);
+};
+
+const getLightThemeSnapshot = () =>
+    document.documentElement.dataset.theme === "light";
+const getServerThemeSnapshot = () => false;
+
+const toggleTheme = () => {
+    const theme = getLightThemeSnapshot() ? "dark" : "light";
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+
+    document.documentElement.dataset.theme = theme;
+    document.cookie = `${themeCookieName}=${theme}; Path=/; SameSite=Lax${secure}`;
+    window.dispatchEvent(new Event("themechange"));
+};
+
+const OptionsDropdown = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const isLightTheme = useSyncExternalStore(
+        subscribeToTheme,
+        getLightThemeSnapshot,
+        getServerThemeSnapshot,
+    );
+    const dropdownRef = useRef(null);
+    const buttonRef = useRef(null);
+
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const closeOnOutsideClick = (event) => {
+            if (!dropdownRef.current?.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        const closeOnEscape = (event) => {
+            if (event.key === "Escape") {
+                setIsOpen(false);
+                buttonRef.current?.focus();
+            }
+        };
+
+        document.addEventListener("pointerdown", closeOnOutsideClick);
+        document.addEventListener("keydown", closeOnEscape);
+
+        return () => {
+            document.removeEventListener("pointerdown", closeOnOutsideClick);
+            document.removeEventListener("keydown", closeOnEscape);
+        };
+    }, [isOpen]);
+
+    return (
+        <div
+            className="options-dropdown"
+            ref={dropdownRef}
+            onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setIsOpen(false);
+                }
+            }}
+        >
+            <button
+                type="button"
+                className="options-button"
+                ref={buttonRef}
+                aria-expanded={isOpen}
+                aria-controls="site-options"
+                onClick={() => setIsOpen((wasOpen) => !wasOpen)}
+            >
+                <span aria-hidden="true">⚙</span>
+                Options
+                <span aria-hidden="true">▾</span>
+            </button>
+            {isOpen && (
+                <div
+                    className="options-panel"
+                    id="site-options"
+                >
+                    <p className="eyebrow">Appearance</p>
+                    <button
+                        type="button"
+                        className="theme-toggle"
+                        role="switch"
+                        aria-checked={isLightTheme}
+                        onClick={toggleTheme}
+                    >
+                        <span>Light theme</span>
+                        <span
+                            className="theme-switch"
+                            aria-hidden="true"
+                        >
+                            <span />
+                        </span>
+                    </button>
+                    <p className="theme-description">
+                        {isLightTheme
+                            ? "Light theme enabled"
+                            : "Dark theme enabled"}
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+};
+
 const Home = () => {
     const [hull, setHull] = useState(shipStats.hull);
     const [shields, setShields] = useState(shipStats.shields);
@@ -213,6 +324,7 @@ const Home = () => {
                 </Link>
                 <span className="topbar-label">SHIP COMMAND</span>
                 {ship.isDemo && <span className="demo-badge">DEMO DATA</span>}
+                <OptionsDropdown />
             </header>
             <main>
                 <div className="breadcrumb">

@@ -1,4 +1,5 @@
 import "./globals.css";
+import { themeInitializationScript } from "./theme";
 
 export const metadata = {
     title: "BFG Sheets",
@@ -8,7 +9,17 @@ export const metadata = {
 
 const RootLayout = ({ children }) => {
     return (
-        <html lang="en">
+        <html
+            lang="en"
+            suppressHydrationWarning
+        >
+            <head>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: themeInitializationScript,
+                    }}
+                />
+            </head>
             <body>{children}</body>
         </html>
     );

@@ -14,6 +14,18 @@ const FleetRoster = ({ fleet, onChange }) => {
         });
     };
 
+    const moveShip = (index, direction) => {
+        const nextIndex = index + direction;
+
+        if (nextIndex < 0 || nextIndex >= fleet.ships.length) return;
+
+        const ships = [...fleet.ships];
+        const [vessel] = ships.splice(index, 1);
+        ships.splice(nextIndex, 0, vessel);
+
+        onChange({ ships });
+    };
+
     return (
         <section className="panel builder-panel" aria-labelledby="roster-title">
             <p className="eyebrow text-lg">Ships in Fleet</p>
@@ -37,7 +49,12 @@ const FleetRoster = ({ fleet, onChange }) => {
                             <small>Faction: {ship.faction}</small>
                             {ship.reserveSource && <small>Reserve · {ship.reserveSource} fleet list</small>}
                             <label>
-                                Vessel {index + 1} name
+                                {
+                                    (index === 0) ? 
+                                    (`Flagship name`)
+                                    :
+                                    (`Vessel ${index + 1} name`)
+                                }
                                 <input
                                     value={vessel.name}
                                     maxLength={100}
@@ -62,13 +79,31 @@ const FleetRoster = ({ fleet, onChange }) => {
                             />
                             <div className="builder-row">
                                 <small>{fleet.flagshipId === vessel.id && fleet.commander !== "none" ? "Commander aboard" : `${ship.points} pts base · ${getVesselPoints(ship, vessel) - ship.points} pts options`}</small>
-                                <button
-                                    type="button"
-                                    onClick={() => removeShip(vessel.id)}
-                                    aria-label={`Remove ${vessel.name || ship.name}, vessel ${index + 1}`}
-                                >
-                                    Remove
-                                </button>
+                                <div className="builder-row">
+                                    <button
+                                        type="button"
+                                        disabled={index === 0}
+                                        onClick={() => moveShip(index, -1)}
+                                        aria-label={`Move ${vessel.name || ship.name}, vessel ${index + 1}, up`}
+                                    >
+                                        ↑ Up
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={index === fleet.ships.length - 1}
+                                        onClick={() => moveShip(index, 1)}
+                                        aria-label={`Move ${vessel.name || ship.name}, vessel ${index + 1}, down`}
+                                    >
+                                        ↓ Down
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeShip(vessel.id)}
+                                        aria-label={`Remove ${vessel.name || ship.name}, vessel ${index + 1}`}
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
                             </div>
                         </li>
                     );

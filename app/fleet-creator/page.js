@@ -5,7 +5,7 @@ import ShipCatalog from "@/components/ShipCatalog";
 import FleetRoster from "@/components/FleetRoster";
 import {
     commanders, createFleet, getFleetIssues, getFleetPoints,
-    getReserveAllowances, rerollCosts, rulesUrl, storageKey,
+    getReserveAllowances, getRerollCosts, rulesUrl, storageKey,
 } from "@/lib/fleets.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { refitsUrl, reservesUrl } from "@/lib/ship-upgrades.mjs";
@@ -110,7 +110,7 @@ const FleetCreator = () => {
         <main className="fleet-builder">
             <header className="page-heading">
                 <div>
-                    <p className="eyebrow">Imperial Navy / Gothic Sector</p>
+                    <p className="eyebrow">Imperial Navy / Space Marines</p>
                     <h1>Fleet builder</h1>
                     <p className="subtitle">Assemble your fleet. Keep your muster roll close.</p>
                 </div>
@@ -120,7 +120,8 @@ const FleetCreator = () => {
                 Based on the <a href={rulesUrl} target="_blank" rel="noreferrer">Battlefleet Gothic: Remastered fleet list ↗</a>.
                 {" "}Includes ship options, <a href={refitsUrl} target="_blank" rel="noreferrer">ordnance refits</a>, and
                 {" "}<a href={reservesUrl} target="_blank" rel="noreferrer">Bastion / Armageddon reserves</a>.
-                {" "}Bakka, Mechanicus, allies, campaign rewards and other primary fleet lists are not included.
+                {" "}<a href="https://battlefleet-game.org/fleet-lists/space-marines/" target="_blank" rel="noreferrer">Space Marine ships ↗</a> include base configurations; Codex, Crusade and Dominion eligibility and optional refits require manual review.
+                {" "}Bakka, Mechanicus, allies and campaign rewards are not automated.
                 {" "}Saved fleets are available in the Battle Tracker; illustrative profiles are marked as demo data.
             </p>
             {loadError && <p role="alert">{loadError}</p>}
@@ -203,7 +204,7 @@ const FleetCreator = () => {
                                     <FleetRoster fleet={fleet} onChange={updateFleet} />
                                     <section className="panel builder-panel" aria-labelledby="command-title">
                                         <p className="eyebrow">Fleet command</p>
-                                        <h2 id="command-title">Admiral &amp; re-rolls</h2>
+                                        <h2 id="command-title">Commander &amp; re-rolls</h2>
                                         <label>
                                             Commander
                                             <select
@@ -218,7 +219,7 @@ const FleetCreator = () => {
                                         {fleet.commander !== "none" && (
                                             <>
                                                 <label>
-                                                    Admiral’s ship
+                                                    Commander’s ship
                                                     <select value={fleet.flagshipId} onChange={(event) => updateFleet({ flagshipId: event.target.value })}>
                                                         <option value="">Choose a ship</option>
                                                         {fleet.ships.map((ship, index) => (
@@ -227,10 +228,10 @@ const FleetCreator = () => {
                                                     </select>
                                                 </label>
                                                 <label>
-                                                    Extra re-rolls (one already included)
+                                                    {fleet.commander === "master-of-the-fleet" ? "Fleet re-rolls" : "Extra re-rolls (one already included)"}
                                                     <select value={fleet.rerolls} onChange={(event) => updateFleet({ rerolls: Number(event.target.value) })}>
-                                                        {rerollCosts.map((cost, count) => (
-                                                            <option key={count} value={count}>{count} extra · {cost} pts</option>
+                                                        {getRerollCosts(fleet).map((cost, count) => (
+                                                            <option key={count} value={count}>{count} · {cost} pts</option>
                                                         ))}
                                                     </select>
                                                 </label>
@@ -240,7 +241,7 @@ const FleetCreator = () => {
                                     <section className="panel builder-panel builder-checks" aria-labelledby="checks-title">
                                         <p className="eyebrow">Composition review</p>
                                         <h2 id="checks-title">{issues.length ? `${issues.length} items to review` : "Roster checks passed"}</h2>
-                                        <h3>Reserve allowances</h3>
+                                        <h3>Imperial Navy reserve allowances</h3>
                                         <ul>
                                             {getReserveAllowances(fleet).map((allowance) => (
                                                 <li key={allowance.type}>

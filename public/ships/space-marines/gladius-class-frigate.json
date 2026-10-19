@@ -1,0 +1,50 @@
+{
+    "id": "gladius-class-frigate",
+    "isDemo": false,
+    "className": "Gladius Class Frigate",
+    "classLabel": "Gladius Class Frigate",
+    "faction": "Space Marines",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Gladius Class Frigate base configuration.",
+    "points": 45,
+    "image": {
+        "src": "/ship-images/space-marines/gladius-class-frigate.png",
+        "width": 481,
+        "height": 284,
+        "source": "https://ships.battlefleet-game.org/space-marines/gladius-class-frigate.html"
+    },
+    "source": {
+        "url": "https://ships.battlefleet-game.org/space-marines/gladius-class-frigate.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base profile transcribed from the source. Faction rules are summaries.",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/space-marines/"
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 30,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 4,
+            "arc": "Left/front/right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Space Marine crew",
+            "description": "Boarding rolls gain +2; outgoing hit-and-run rolls gain +1 and incoming hit-and-run rolls suffer −1. Generate leadership as 8, 9 or 10 on D6 results 1–2, 3–4 or 5–6 respectively."
+        }
+    ],
+    "options": []
+}

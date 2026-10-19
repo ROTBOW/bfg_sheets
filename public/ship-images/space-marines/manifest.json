@@ -1,0 +1,65 @@
+[
+    {
+        "id": "battle-barge",
+        "name": "Battle Barge",
+        "file": "battle-barge.png",
+        "source": "https://ships.battlefleet-game.org/space-marines/battle-barge.html",
+        "original": "https://ships.battlefleet-game.org/space-marines/battle-barge.png",
+        "width": 656,
+        "height": 246
+    },
+    {
+        "id": "fortress-monastery",
+        "name": "Fortress-monastery",
+        "file": "fortress-monastery.png",
+        "source": "https://ships.battlefleet-game.org/space-marines/fortress-monastery.html",
+        "original": "https://ships.battlefleet-game.org/space-marines/fortress-monastery.png",
+        "width": 376,
+        "height": 196
+    },
+    {
+        "id": "gladius-class-frigate",
+        "name": "Gladius Class Frigate",
+        "file": "gladius-class-frigate.png",
+        "source": "https://ships.battlefleet-game.org/space-marines/gladius-class-frigate.html",
+        "original": "https://ships.battlefleet-game.org/space-marines/gladius-class-frigate.png",
+        "width": 481,
+        "height": 284
+    },
+    {
+        "id": "hunter-class-destroyer",
+        "name": "Hunter Class Destroyer",
+        "file": "hunter-class-destroyer.png",
+        "source": "https://ships.battlefleet-game.org/space-marines/hunter-class-destroyer.html",
+        "original": "https://ships.battlefleet-game.org/space-marines/hunter-class-destroyer.png",
+        "width": 366,
+        "height": 235
+    },
+    {
+        "id": "nova-class-frigate",
+        "name": "Nova Class Frigate",
+        "file": "nova-class-frigate.png",
+        "source": "https://ships.battlefleet-game.org/space-marines/nova-class-frigate.html",
+        "original": "https://ships.battlefleet-game.org/space-marines/nova-class-frigate.png",
+        "width": 350,
+        "height": 175
+    },
+    {
+        "id": "seditio-opprimere-venerable-battle-barge",
+        "name": "Seditio Opprimere, Venerable Battle Barge",
+        "file": "seditio-opprimere-venerable-battle-barge.png",
+        "source": "https://ships.battlefleet-game.org/space-marines/seditio-opprimere-venerable-battle-barge.html",
+        "original": "https://ships.battlefleet-game.org/space-marines/seditio-opprimere-venerable-battle-barge.png",
+        "width": 600,
+        "height": 228
+    },
+    {
+        "id": "strike-cruiser",
+        "name": "Strike Cruiser",
+        "file": "strike-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/space-marines/strike-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/space-marines/strike-cruiser.png",
+        "width": 264,
+        "height": 124
+    }
+]

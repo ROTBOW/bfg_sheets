@@ -50,6 +50,7 @@ test("new profiles have provenance and valid stats, ranges and weapon strengths"
 test("all selectable classes now have profiles without changing fleet eligibility", () => {
     const registry = readFileSync(new URL("../lib/factions/imperial-navy/profiles.js", import.meta.url), "utf8");
     for (const ship of shipCatalog) {
+        if (ship.faction !== "Imperial Navy") continue;
         const id = getProfileUrl(ship).split("/").at(-1).replace(".html", "");
         assert.ok(profiles.has(id), `Missing profile: ${ship.id}`);
         assert.ok(registry.includes(`public/ships/imperial-navy/${id}.json`), `Unregistered: ${ship.id}`);

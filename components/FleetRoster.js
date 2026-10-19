@@ -60,7 +60,7 @@ const FleetRoster = ({ fleet, onChange }) => {
                                 onChange={(changes) => updateShip(vessel.id, changes)}
                             />
                             <div className="builder-row">
-                                <small>{fleet.flagshipId === vessel.id && fleet.commander !== "none" ? "Admiral aboard" : `${ship.points} pts base · ${getVesselPoints(ship, vessel) - ship.points} pts options`}</small>
+                                <small>{fleet.flagshipId === vessel.id && fleet.commander !== "none" ? "Commander aboard" : `${ship.points} pts base · ${getVesselPoints(ship, vessel) - ship.points} pts options`}</small>
                                 <button
                                     type="button"
                                     onClick={() => removeShip(vessel.id)}

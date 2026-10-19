@@ -19,7 +19,7 @@ const ShipCatalog = ({ onAdd }) => {
 
     return (
         <section className="panel builder-panel" aria-labelledby="catalog-title">
-            <p className="eyebrow">Imperial shipyards</p>
+            <p className="eyebrow">Fleet shipyards</p>
             <h2 id="catalog-title">Add to fleet</h2>
             <label>
                 Find a class
@@ -45,7 +45,7 @@ const ShipCatalog = ({ onAdd }) => {
             <label>
                 Ship type
                 <select value={type} onChange={(event) => setType(event.target.value)}>
-                    {["All", "Battleship", "Battlecruiser", "Grand Cruiser", "Cruiser", "Escort"].map((option) => (
+                    {["All", "Battleship", "Battlecruiser", "Grand Cruiser", "Cruiser", "Escort", "Defence"].map((option) => (
                         <option key={option}>{option}</option>
                     ))}
                 </select>
@@ -54,7 +54,7 @@ const ShipCatalog = ({ onAdd }) => {
                 Fleet selection
                 <select value={selection} onChange={(event) => setSelection(event.target.value)}>
                     <option value="All">Core ships &amp; reserves</option>
-                    <option value="Core">Gothic Sector core</option>
+                    <option value="Core">Non-reserve ships</option>
                     <option value="Reserves">Reserves</option>
                 </select>
             </label>

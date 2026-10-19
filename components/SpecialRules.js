@@ -26,6 +26,11 @@ const SpecialRules = ({ rules = [], isDemo = false, source }) => {
                 <p>
                     Base statistics and rule summaries from the{" "}
                     <a href={source.url} target="_blank" rel="noreferrer">ship profile ↗</a>.
+                    {source.factionUrl && (
+                        <>
+                            {" "}<a href={source.factionUrl} target="_blank" rel="noreferrer">Faction rules ↗</a>.
+                        </>
+                    )}
                 </p>
             )}
         </section>

@@ -1,0 +1,61 @@
+{
+    "id": "hunter-class-destroyer",
+    "isDemo": false,
+    "className": "Hunter Class Destroyer",
+    "classLabel": "Hunter Class Destroyer",
+    "faction": "Space Marines",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Hunter Class Destroyer base configuration.",
+    "points": 40,
+    "image": {
+        "src": "/ship-images/space-marines/hunter-class-destroyer.png",
+        "width": 366,
+        "height": 235,
+        "source": "https://ships.battlefleet-game.org/space-marines/hunter-class-destroyer.html"
+    },
+    "source": {
+        "url": "https://ships.battlefleet-game.org/space-marines/hunter-class-destroyer.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base profile transcribed from the source. Faction rules are summaries.",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/space-marines/"
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 35,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Front"
+        },
+        {
+            "name": "Weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 1,
+            "arc": "Left/front/right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Space Marine crew",
+            "description": "Boarding rolls gain +2; outgoing hit-and-run rolls gain +1 and incoming hit-and-run rolls suffer −1. Generate leadership as 8, 9 or 10 on D6 results 1–2, 3–4 or 5–6 respectively."
+        },
+        {
+            "name": "Boarding torpedoes",
+            "description": "Torpedo tubes may launch boarding torpedoes as well as ordinary torpedoes."
+        }
+    ],
+    "options": []
+}

@@ -30,7 +30,7 @@ test("all eleven Space Marine classes resolve to profiles and real shared images
 });
 
 test("Marine commander pricing, saved fleets and Navy reserve accounting stay distinct", () => {
-    const fleet = { ...createFleet(), commander: "master-of-the-fleet", rerolls: 2, ships: [vessel("space-marines-battle-barge")] };
+    const fleet = { ...createFleet(), selectedFaction: "Space Marines", commander: "master-of-the-fleet", rerolls: 2, ships: [vessel("space-marines-battle-barge")] };
     fleet.flagshipId = fleet.ships[0].id;
     assert.equal(getFleetPoints(fleet), 525);
     assert.deepEqual(parseFleets(JSON.stringify({ version: 1, fleets: [fleet] })), [fleet]);

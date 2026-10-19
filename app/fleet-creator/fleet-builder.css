@@ -69,8 +69,12 @@
     flex: 1 1 240px;
 }
 
-.builder-settings label:nth-child(2) {
+.builder-settings .builder-budget {
     flex: 0 1 150px;
+}
+
+.builder-settings .builder-faction {
+    flex: 1 1 260px;
 }
 
 .builder-row {

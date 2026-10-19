@@ -8,6 +8,14 @@ Fleets do not sync between devices, and clearing browser data removes them.
 On first use, a “Demo fleet” starts with the Lunar-class cruisers His Will and
 Steadfast. Existing saved fleets are preserved; new fleets start empty.
 
+Each fleet saves a `selectedFaction` (Imperial Navy or Space Marines), editable
+through **Selected Faction**. This controls faction composition checks without
+restricting which ships can be added. New fleets default to Imperial Navy.
+Older saves without this field infer Space Marines if they contain any Marine
+ships, otherwise Imperial Navy, preserving the previous commander-check behavior.
+The inferred choice is stored on the next edit; changing faction preserves ships,
+upgrades and commander selections. Ship-specific checks still follow each ship.
+
 The builder uses the selections from the
 [Remastered Imperial Navy Gothic Sector fleet list](https://battlefleet-game.org/fleet-lists/imperial-navy/#segmentum-obscurus-gothic-sector-fleet-list),
 checked October 18, 2026. It includes point totals, commanders and re-rolls,

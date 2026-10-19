@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ShipCatalog from "@/components/ShipCatalog";
 import FleetRoster from "@/components/FleetRoster";
 import {
-    commanders, createFleet, getFleetIssues, getFleetPoints,
+    commanders, createFleet, fleetFactions, getFleetIssues, getFleetPoints,
     getReserveAllowances, getRerollCosts, rulesUrl, storageKey,
 } from "@/lib/fleets.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
@@ -180,7 +180,20 @@ const FleetCreator = () => {
                                         onChange={(event) => updateFleet({ name: event.target.value })}
                                     />
                                 </label>
-                                <label>
+                                <label className="builder-faction">
+                                    Selected Faction
+                                    <select
+                                        value={fleet.selectedFaction}
+                                        aria-describedby="fleet-faction-help"
+                                        onChange={(event) => updateFleet({ selectedFaction: event.target.value })}
+                                    >
+                                        {fleetFactions.map((faction) => (
+                                            <option key={faction} value={faction}>{faction}</option>
+                                        ))}
+                                    </select>
+                                    <span id="fleet-faction-help">Sets faction rules. Ships from any faction can be added.</span>
+                                </label>
+                                <label className="builder-budget">
                                     Points budget
                                     <input
                                         type="number"
@@ -241,14 +254,18 @@ const FleetCreator = () => {
                                     <section className="panel builder-panel builder-checks" aria-labelledby="checks-title">
                                         <p className="eyebrow">Composition review</p>
                                         <h2 id="checks-title">{issues.length ? `${issues.length} items to review` : "Roster checks passed"}</h2>
-                                        <h3>Imperial Navy reserve allowances</h3>
-                                        <ul>
-                                            {getReserveAllowances(fleet).map((allowance) => (
-                                                <li key={allowance.type}>
-                                                    {allowance.type}: {allowance.used} / {allowance.allowed} reserves · {allowance.core} core
-                                                </li>
-                                            ))}
-                                        </ul>
+                                        {fleet.selectedFaction === "Imperial Navy" && (
+                                            <>
+                                                <h3>Imperial Navy reserve allowances</h3>
+                                                <ul>
+                                                    {getReserveAllowances(fleet).map((allowance) => (
+                                                        <li key={allowance.type}>
+                                                            {allowance.type}: {allowance.used} / {allowance.allowed} reserves · {allowance.core} core
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </>
+                                        )}
                                         <ul>
                                             {issues.map((issue) => <li key={issue}>{issue}</li>)}
                                         </ul>

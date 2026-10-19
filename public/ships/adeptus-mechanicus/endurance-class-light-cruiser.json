@@ -1,0 +1,87 @@
+{
+    "id": "endurance-class-light-cruiser",
+    "isDemo": false,
+    "className": "Endurance Class Light Cruiser",
+    "classLabel": "Endurance Class Light Cruiser",
+    "faction": "Adeptus Mechanicus",
+    "type": "Cruiser",
+    "role": "Light cruiser",
+    "description": "Endurance Class Light Cruiser — Adeptus Mechanicus base configuration.",
+    "points": 125,
+    "image": {
+        "src": "/ship-images/imperial-navy/endurance-class-light-cruiser.png",
+        "width": 525,
+        "height": 174,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/endurance-class-light-cruiser.html"
+    },
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/endurance-class-light-cruiser.html",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/adeptus-mechanicus/",
+        "accessedOn": "2026-10-18",
+        "note": "Source hull profile with Mechanicus fleet costs and mandatory equipment applied. Gifts and purchased refits are resolved separately."
+    },
+    "stats": {
+        "hull": 6,
+        "speedCm": 20,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 3
+    },
+    "weapons": [
+        {
+            "name": "Port lance battery",
+            "type": "Lance",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard lance battery",
+            "type": "Lance",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Right"
+        },
+        {
+            "name": "Prow weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Left/front/right"
+        },
+        {
+            "name": "Prow torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Mechanicus crew",
+            "description": "Generate Leadership from D6: 1 gives 7, 2–3 gives 8, and 4–6 gives 9. Enemy boarding and hit-and-run attackers may re-roll, accepting the second result. No Space Marine crew bonuses."
+        },
+        {
+            "name": "Repair expertise",
+            "description": "Add one repair die when resolving critical damage repairs."
+        },
+        {
+            "name": "Quest for Knowledge",
+            "description": "Roll the fleet subplot before battle; use the linked faction tables and record the outcome in notes."
+        },
+        {
+            "name": "Gifts of the Omnissiah",
+            "description": "The extra turret is included above. Determine the ship’s Gift before play using the faction table; record it in notes and apply its effects manually."
+        },
+        {
+            "name": "Defensible corridors",
+            "description": "Add 1 to boarding defence rolls."
+        }
+    ],
+    "options": []
+}

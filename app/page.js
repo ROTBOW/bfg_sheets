@@ -419,7 +419,14 @@ const BattleTracker = () => {
     const state = vessel?.profile
         ? fleetBattleStates[vessel.id] || createShipBattleState(vessel.profile)
         : null;
-    const commanderLeadership = { "fleet-admiral": 8, admiral: 9, "solar-admiral": 10, "master-of-the-fleet": 10 };
+    const commanderLeadership = {
+        "fleet-admiral": 8,
+        admiral: 9,
+        "solar-admiral": 10,
+        "master-of-the-fleet": 10,
+        "archmagos-explorator": 8,
+        "archmagos-veneratus": 9,
+    };
 
     const selectFleet = (id) => {
         setSelectedFleetId(id);

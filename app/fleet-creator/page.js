@@ -5,11 +5,16 @@ import ShipCatalog from "@/components/ShipCatalog";
 import FleetRoster from "@/components/FleetRoster";
 import {
     commanders, createFleet, fleetFactions, getFleetIssues, getFleetPoints,
-    getReserveAllowances, getRerollCosts, rulesUrl, storageKey,
+    getReserveAllowances, getRerollCosts, storageKey,
 } from "@/lib/fleets.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
-import { refitsUrl, reservesUrl } from "@/lib/ship-upgrades.mjs";
 import "./fleet-builder.css";
+
+const factionRulesUrls = {
+    "Imperial Navy": "https://battlefleet-game.org/fleet-lists/imperial-navy/",
+    "Space Marines": "https://battlefleet-game.org/fleet-lists/space-marines/",
+    "Adeptus Mechanicus": "https://battlefleet-game.org/fleet-lists/adeptus-mechanicus/",
+};
 
 const FleetCreator = () => {
     const [fleets, setFleets] = useState([]);
@@ -110,20 +115,12 @@ const FleetCreator = () => {
         <main className="fleet-builder">
             <header className="page-heading">
                 <div>
-                    <p className="eyebrow">Imperial Navy / Space Marines</p>
+                    <p className="eyebrow">Imperial Navy / Space Marines / Adeptus Mechanicus</p>
                     <h1>Fleet builder</h1>
                     <p className="subtitle">Assemble your fleet. Keep your muster roll close.</p>
                 </div>
                 <span className="demo-badge">FIRST EDITION</span>
             </header>
-            <p className="builder-reference">
-                Based on the <a className="rules-link" href={rulesUrl} target="_blank" rel="noreferrer">Battlefleet Gothic: Remastered fleet list ↗</a>.
-                {" "}Includes ship options, <a className="rules-link" href={refitsUrl} target="_blank" rel="noreferrer">ordnance refits</a>, and
-                {" "}<a className="rules-link" href={reservesUrl} target="_blank" rel="noreferrer">Bastion / Armageddon reserves</a>.
-                {" "}<a className="rules-link" href="https://battlefleet-game.org/fleet-lists/space-marines/" target="_blank" rel="noreferrer">Space Marine ships ↗</a> include base configurations; Codex, Crusade and Dominion eligibility and optional refits require manual review.
-                {" "}Bakka, Mechanicus, allies and campaign rewards are not automated.
-                {" "}Saved fleets are available in the Battle Tracker; illustrative profiles are marked as demo data.
-            </p>
             {loadError && <p role="alert">{loadError}</p>}
             {!loaded && !loadError && <p role="status">Loading saved fleets…</p>}
             {loaded && (
@@ -180,9 +177,10 @@ const FleetCreator = () => {
                                         onChange={(event) => updateFleet({ name: event.target.value })}
                                     />
                                 </label>
-                                <label className="builder-faction">
-                                    Selected Faction
+                                <div className="builder-faction">
+                                    <label htmlFor="fleet-faction">Selected Faction</label>
                                     <select
+                                        id="fleet-faction"
                                         value={fleet.selectedFaction}
                                         aria-describedby="fleet-faction-help"
                                         onChange={(event) => updateFleet({ selectedFaction: event.target.value })}
@@ -191,8 +189,16 @@ const FleetCreator = () => {
                                             <option key={faction} value={faction}>{faction}</option>
                                         ))}
                                     </select>
-                                    <span id="fleet-faction-help">Sets faction rules. Ships from any faction can be added.</span>
-                                </label>
+                                    <a
+                                        id="fleet-faction-help"
+                                        className="rules-link"
+                                        href={factionRulesUrls[fleet.selectedFaction]}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        {fleet.selectedFaction} rules ↗
+                                    </a>
+                                </div>
                                 <label className="builder-budget">
                                     Points budget
                                     <input
@@ -241,7 +247,7 @@ const FleetCreator = () => {
                                                     </select>
                                                 </label>
                                                 <label>
-                                                    {fleet.commander === "master-of-the-fleet" ? "Fleet re-rolls" : "Extra re-rolls (one already included)"}
+                                                    {fleet.commander === "master-of-the-fleet" || fleet.commander.startsWith("archmagos-") ? "Fleet re-rolls" : "Extra re-rolls (one already included)"}
                                                     <select value={fleet.rerolls} onChange={(event) => updateFleet({ rerolls: Number(event.target.value) })}>
                                                         {getRerollCosts(fleet).map((cost, count) => (
                                                             <option key={count} value={count}>{count} · {cost} pts</option>

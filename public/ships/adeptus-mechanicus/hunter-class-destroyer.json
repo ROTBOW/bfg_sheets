@@ -1,0 +1,61 @@
+{
+    "id": "hunter-class-destroyer",
+    "isDemo": false,
+    "className": "Hunter Class Destroyer",
+    "classLabel": "Hunter Class Destroyer",
+    "faction": "Adeptus Mechanicus",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Hunter Class Destroyer — Adeptus Mechanicus base configuration.",
+    "points": 35,
+    "image": {
+        "src": "/ship-images/space-marines/hunter-class-destroyer.png",
+        "width": 366,
+        "height": 235,
+        "source": "https://ships.battlefleet-game.org/space-marines/hunter-class-destroyer.html"
+    },
+    "source": {
+        "url": "https://ships.battlefleet-game.org/space-marines/hunter-class-destroyer.html",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/adeptus-mechanicus/",
+        "accessedOn": "2026-10-18",
+        "note": "Source hull profile with Mechanicus fleet costs and mandatory equipment applied. Gifts and purchased refits are resolved separately."
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 35,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Front"
+        },
+        {
+            "name": "Weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 1,
+            "arc": "Left/front/right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Mechanicus crew",
+            "description": "Generate Leadership from D6: 1 gives 7, 2–3 gives 8, and 4–6 gives 9. Enemy boarding and hit-and-run attackers may re-roll, accepting the second result. No Space Marine crew bonuses."
+        },
+        {
+            "name": "Repair expertise",
+            "description": "Add one repair die when resolving critical damage repairs."
+        }
+    ],
+    "options": []
+}

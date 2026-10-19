@@ -70,6 +70,7 @@ const ShipCatalog = ({ onAdd }) => {
                     <li key={ship.id}>
                         <div>
                             <strong>{ship.name}</strong>
+                            <small>{ship.faction}</small>
                             <small>{ship.id === "dauntless" ? "Light cruiser" : ship.type} · {ship.points} pts</small>
                             {ship.reserveSource && <small>Reserve · {ship.reserveSource}</small>}
                         </div>

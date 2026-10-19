@@ -8,7 +8,7 @@ Fleets do not sync between devices, and clearing browser data removes them.
 On first use, a “Demo fleet” starts with the Lunar-class cruisers His Will and
 Steadfast. Existing saved fleets are preserved; new fleets start empty.
 
-Each fleet saves a `selectedFaction` (Imperial Navy or Space Marines), editable
+Each fleet saves a `selectedFaction` (Imperial Navy, Space Marines or Adeptus Mechanicus), editable
 through **Selected Faction**. This controls faction composition checks without
 restricting which ships can be added. New fleets default to Imperial Navy.
 Older saves without this field infer Space Marines if they contain any Marine
@@ -35,7 +35,7 @@ grand-cruiser and rare light-cruiser restrictions. Source lists are fixed for
 these entries (Endeavour, Endurance and Defiant use the Bastion list).
 
 Existing version-1 saves remain compatible; missing upgrade fields mean base
-configuration. Bakka, Mechanicus, allies, campaign rewards/pricing and alternate
+configuration. Bakka, allies, campaign rewards/pricing and alternate
 primary fleet lists are not supported yet.
 
 The battle tracker's top-left fleet selector reads this same saved library and
@@ -53,7 +53,32 @@ images and attribution in `public/ship-images/imperial-navy/`, and imports in
 `public/ships/ship-template.json`.
 
 Run fleet calculation and saved-data validation checks with
-`node --test tests/fleets.test.mjs`.
+`node --test tests/*.test.mjs`.
+
+## Adeptus Mechanicus
+
+All 18 entries from the [Remastered Mechanicus fleet list](https://battlefleet-game.org/fleet-lists/adeptus-mechanicus/)
+are available in the builder and battle tracker, including Omnissiah’s Victory,
+three other battleships, seven cruisers and seven escorts. Profiles were checked
+October 18, 2026 against the linked hull pages. Faction costs, capital-ship extra
+turrets and full-cruiser dorsal lances are included in their base statistics.
+The Ark uses its own published equipment without an extra turret or random Gift.
+Carrier profiles exclude assault boats. Existing Navy demo profiles are unchanged.
+
+Mechanicus IDs are faction-prefixed and save in the existing version-1 format.
+Archmagos commanders and their paid re-rolls, battleship support, Ark flagship
+requirements and escort turret consistency are checked. Mixed-fleet reserve and
+ally eligibility still require review against the linked rules.
+
+Purchasable weapon exchanges, battery range, prow armour, escort turrets and
+ordnance options contribute to fleet totals and appear in the tracker’s upgrade
+list. As with existing factions, purchased refits do not change the displayed
+base statistics. Roll Gifts and Quest for Knowledge at the table, record outcomes
+in battle notes and apply their effects manually. Notes reset on page reload.
+
+Mechanicus JSONs and the image manifest live under their respective
+`adeptus-mechanicus` folders. Shared hulls reuse existing Navy/Marine illustrations;
+the Ark has its own downloaded image. All images retain source attribution.
 
 ## Development
 

@@ -1,0 +1,113 @@
+{
+    "id": "emperor-class-battleship",
+    "isDemo": false,
+    "className": "Emperor Class Battleship",
+    "classLabel": "Emperor Class Battleship",
+    "faction": "Adeptus Mechanicus",
+    "type": "Battleship",
+    "role": "Battleship",
+    "description": "Emperor Class Battleship — Adeptus Mechanicus base configuration.",
+    "points": 400,
+    "image": {
+        "src": "/ship-images/imperial-navy/emperor-class-battleship.png",
+        "width": 440,
+        "height": 181,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/emperor-class-battleship.html"
+    },
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/emperor-class-battleship.html",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/adeptus-mechanicus/",
+        "accessedOn": "2026-10-18",
+        "note": "Source hull profile with Mechanicus fleet costs and mandatory equipment applied. Gifts and purchased refits are resolved separately."
+    },
+    "stats": {
+        "hull": 12,
+        "speedCm": 15,
+        "turnDegrees": 45,
+        "shields": 4,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 6
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 6,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 6,
+            "arc": "Right"
+        },
+        {
+            "name": "Port launch bays",
+            "type": "Launch Bay",
+            "rangeCm": null,
+            "strength": 4,
+            "arc": "–",
+            "rangeLabel": "Furies: 30 cm / Starhawks: 20 cm",
+            "strengthUnit": "squadrons"
+        },
+        {
+            "name": "Starboard launch bays",
+            "type": "Launch Bay",
+            "rangeCm": null,
+            "strength": 4,
+            "arc": "–",
+            "rangeLabel": "Furies: 30 cm / Starhawks: 20 cm",
+            "strengthUnit": "squadrons"
+        },
+        {
+            "name": "Dorsal weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 5,
+            "arc": "Left/front/right"
+        },
+        {
+            "name": "Prow weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 5,
+            "arc": "Left/front/right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Mechanicus crew",
+            "description": "Generate Leadership from D6: 1 gives 7, 2–3 gives 8, and 4–6 gives 9. Enemy boarding and hit-and-run attackers may re-roll, accepting the second result. No Space Marine crew bonuses."
+        },
+        {
+            "name": "Repair expertise",
+            "description": "Add one repair die when resolving critical damage repairs."
+        },
+        {
+            "name": "Quest for Knowledge",
+            "description": "Roll the fleet subplot before battle; use the linked faction tables and record the outcome in notes."
+        },
+        {
+            "name": "Gifts of the Omnissiah",
+            "description": "The extra turret is included above. Determine the ship’s Gift before play using the faction table; record it in notes and apply its effects manually."
+        },
+        {
+            "name": "Heavy manoeuvring",
+            "description": "Cannot use Come to New Heading."
+        },
+        {
+            "name": "Sensor arrays",
+            "description": "Add 1 to this ship’s Leadership."
+        },
+        {
+            "name": "Mechanicus ordnance",
+            "description": "Launch fighters and bombers; assault boats and boarding torpedoes are unavailable."
+        }
+    ],
+    "options": []
+}

@@ -21,6 +21,9 @@ const ShipUpgrades = ({ ship, vessel, onChange }) => {
         <details className="ship-upgrades">
             <summary>Upgrades &amp; refits · {upgrades.length} selected</summary>
             <p><a className="rules-link" href={getProfileUrl(ship)} target="_blank" rel="noreferrer">Ship profile ↗</a></p>
+            {ship.factionUrl && (
+                <p><a className="rules-link" href={ship.factionUrl} target="_blank" rel="noreferrer">Faction costs &amp; rules ↗</a></p>
+            )}
             {!options.length && <p>No purchasable options for this class.</p>}
             <fieldset>
                 <legend className="sr-only">Options for {vessel.name || ship.name}</legend>

@@ -1,0 +1,114 @@
+{
+    "id": "omnissiahs-victory-ark-mechanicus",
+    "isDemo": false,
+    "className": "Omnissiah's Victory, Ark Mechanicus",
+    "classLabel": "Omnissiah's Victory, Ark Mechanicus",
+    "faction": "Adeptus Mechanicus",
+    "type": "Battleship",
+    "role": "Ark Mechanicus",
+    "description": "Omnissiah's Victory, Ark Mechanicus — Adeptus Mechanicus base configuration.",
+    "points": 415,
+    "image": {
+        "src": "/ship-images/adeptus-mechanicus/omnissiahs-victory-ark-mechanicus.png",
+        "width": 374,
+        "height": 199,
+        "source": "https://ships.battlefleet-game.org/adeptus-mechanicus/omnissiahs-victory-ark-mechanicus.html"
+    },
+    "source": {
+        "url": "https://ships.battlefleet-game.org/adeptus-mechanicus/omnissiahs-victory-ark-mechanicus.html",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/adeptus-mechanicus/",
+        "accessedOn": "2026-10-18",
+        "note": "Source hull profile with Mechanicus fleet costs and mandatory equipment applied. Gifts and purchased refits are resolved separately."
+    },
+    "stats": {
+        "hull": 12,
+        "speedCm": 20,
+        "turnDegrees": 45,
+        "shields": 4,
+        "armour": {
+            "front": "6+",
+            "other": "5+"
+        },
+        "turrets": 4
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 10,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 10,
+            "arc": "Right"
+        },
+        {
+            "name": "Port lance battery",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 2,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard lance battery",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 2,
+            "arc": "Right"
+        },
+        {
+            "name": "Dorsal lance battery",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 2,
+            "arc": "Left/front/right"
+        },
+        {
+            "name": "Prow nova cannon",
+            "type": "Nova Cannon",
+            "rangeCm": null,
+            "strength": 1,
+            "arc": "Front",
+            "rangeLabel": "30 – 150 cm"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Mechanicus crew",
+            "description": "Generate Leadership from D6: 1 gives 7, 2–3 gives 8, and 4–6 gives 9. Enemy boarding and hit-and-run attackers may re-roll, accepting the second result. No Space Marine crew bonuses."
+        },
+        {
+            "name": "Repair expertise",
+            "description": "Add one repair die when resolving critical damage repairs."
+        },
+        {
+            "name": "Quest for Knowledge",
+            "description": "Roll the fleet subplot before battle; use the linked faction tables and record the outcome in notes."
+        },
+        {
+            "name": "Heavy manoeuvring",
+            "description": "Cannot use Come to New Heading."
+        },
+        {
+            "name": "Unique flagship",
+            "description": "One Ark maximum, in a primarily Mechanicus fleet of at least 1,000 points. Embark an Archmagos Veneratus here."
+        },
+        {
+            "name": "Repulsor Shields",
+            "description": "Contact with blast markers or gas clouds does not penalize Leadership, movement or repairs until Shields Collapsed is suffered."
+        },
+        {
+            "name": "Augmented Weapon Relays",
+            "description": "Apply a left column shift to batteries before other modifiers; lance rolls of 6 score two hits."
+        },
+        {
+            "name": "Fixed equipment",
+            "description": "The listed turret strength and Gifts are already included. Only the launch-bay exchange is available as a purchased refit outside campaigns."
+        }
+    ],
+    "options": []
+}

@@ -65,8 +65,13 @@
 }
 
 .builder-library label,
-.builder-settings label:first-child {
+.builder-settings > label:first-child {
     flex: 1 1 240px;
+}
+
+.builder-settings {
+    align-items: start;
+    gap: 20px;
 }
 
 .builder-settings .builder-budget {
@@ -74,7 +79,22 @@
 }
 
 .builder-settings .builder-faction {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    font-size: 12px;
     flex: 1 1 260px;
+}
+
+.builder-faction .rules-link {
+    justify-self: start;
+    color: var(--muted);
+    text-underline-offset: 3px;
+}
+
+.builder-faction .rules-link:hover,
+.builder-faction .rules-link:focus-visible {
+    color: var(--accent);
 }
 
 .builder-row {
@@ -95,6 +115,7 @@
     display: grid;
     gap: 6px;
     margin-left: auto;
+    padding-top: 20px;
     color: var(--accent);
 }
 
@@ -299,5 +320,7 @@
     .builder-total {
         margin-left: 0;
         flex-basis: 100%;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
     }
 }

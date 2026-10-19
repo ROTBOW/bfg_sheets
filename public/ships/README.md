@@ -56,6 +56,13 @@ remain managed by `lib/ship-upgrades.mjs` and do not alter base battle statistic
 
 ## Adding another faction
 
+The `adeptus-mechanicus` profiles use verified source hull statistics with the
+Mechanicus fleet costs and mandatory equipment applied. They reuse shared hull
+images where appropriate; their manifest records the actual public asset paths.
+Gifts and purchased upgrades are separate from base profiles. Omnissiah’s Victory
+already includes its fixed Gifts and turret strength. Its profile is not modified
+by the generic capital-ship turret increase.
+
 1. Create matching folders under `public/ships/<faction>/` and
    `public/ship-images/<faction>/`.
 2. Copy the shared template into the profile folder and populate its fields.

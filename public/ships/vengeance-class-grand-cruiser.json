@@ -55,5 +55,11 @@
         "registry": "IN–102",
         "profileCode": "VG–102",
         "leadership": 8
+    },
+    "image": {
+        "src": "/ship%20images/vengeance-class-grand-cruiser.png",
+        "width": 623,
+        "height": 296,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/vengeance-class-grand-cruiser.html"
     }
 }

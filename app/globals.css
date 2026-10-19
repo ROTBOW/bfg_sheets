@@ -428,11 +428,12 @@ h1 {
     color: light-dark(#5e584e, #839187);
 }
 
-.vessel svg {
+.vessel .ship-image {
     display: block;
     width: 100%;
     height: 245px;
     padding: 0 18px;
+    object-fit: contain;
 }
 
 .vessel-caption {
@@ -942,7 +943,7 @@ footer {
         grid-template-columns: 1fr;
     }
 
-    .vessel svg {
+    .vessel .ship-image {
         height: auto;
     }
 
@@ -1065,9 +1066,45 @@ footer {
 
 .fleet-toolbar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+}
+
+.tracker-fleet-picker {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 8px;
+}
+
+.tracker-fleet-picker select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--foreground);
+    background: var(--background);
+}
+
+.ship-image-placeholder {
+    padding: 60px 24px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.tracker-upgrades {
+    margin-top: 24px;
+    padding: 20px;
+    line-height: 1.7;
+}
+
+.tracker-upgrades ul {
+    padding-left: 20px;
 }
 
 .fleet-view-toggle {
@@ -1286,7 +1323,7 @@ footer {
         color: #222 !important;
     }
 
-    .vessel svg {
+    .vessel .ship-image {
         height: 170px;
     }
 

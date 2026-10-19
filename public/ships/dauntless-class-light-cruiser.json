@@ -48,5 +48,11 @@
         "registry": "IN–105",
         "profileCode": "DT–105",
         "leadership": 8
+    },
+    "image": {
+        "src": "/ship%20images/dauntless-class-light-cruiser.png",
+        "width": 353,
+        "height": 120,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/dauntless-class-light-cruiser.html"
     }
 }

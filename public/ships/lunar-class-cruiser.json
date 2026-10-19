@@ -2,6 +2,12 @@
     "id": "lunar-class-cruiser",
     "isDemo": true,
     "className": "Lunar-class cruiser",
+    "image": {
+        "src": "/ship%20images/lunar-class-cruiser.png",
+        "width": 422,
+        "height": 166,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/lunar-class-cruiser.html"
+    },
     "classLabel": "Lunar class",
     "faction": "Imperial Navy",
     "type": "Cruiser",

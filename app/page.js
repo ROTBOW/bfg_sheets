@@ -1,171 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import HullWarning from "@/components/HullWarning";
 import SpecialRules from "@/components/SpecialRules";
 import FleetMenu from "@/components/FleetMenu";
-import ship from "@/public/ships/lunar-class-cruiser.json";
-
-// Import the profile directly so the initial page and trackers share the same data.
-const shipStats = ship.stats;
-const fleet = [
-    { id: "his-will", ...ship.demoVessel },
-    {
-        id: "steadfast",
-        name: "Steadfast",
-        registry: "IN–049",
-        profileCode: "LN–049",
-        leadership: 7,
-    },
-];
-
-const createBattleState = () => {
-    const battleState = {};
-
-    for (const vessel of fleet) {
-        battleState[vessel.id] = {
-            hull: shipStats.hull,
-            shields: shipStats.shields,
-            order: "No special orders",
-            notes: "",
-            message: "",
-        };
-    }
-
-    return battleState;
-};
-
-const characteristics = [
-    ["Type", ship.type],
-    ["Speed", shipStats.speedCm, "cm"],
-    ["Turns", shipStats.turnDegrees, "°"],
-    ["Shields", shipStats.shields],
-    ["Armour", `${shipStats.armour.front} / ${shipStats.armour.other}`],
-    ["Turrets", shipStats.turrets],
-];
+import { getShip, storageKey } from "@/lib/fleets.mjs";
+import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
+import { battleProfiles, createShipBattleState } from "@/lib/battle-profiles";
+import { getProfileUrl, getUpgradeOptions, getVesselPoints } from "@/lib/ship-upgrades.mjs";
 
 const weaponMarkers = {
     Battery: "⊞",
     Lance: "✧",
     Torpedo: "↑",
+    "Nova Cannon": "◎",
+    "Launch Bay": "◇",
 };
 
-const getHullStatus = (hull) => {
+const getHullStatus = (hull, maxHull) => {
     if (hull === 0) {
         return "Hull depleted";
     }
 
-    if (hull <= shipStats.hull / 2) {
+    if (hull <= maxHull / 2) {
         return "Hull Crippled";
     }
 
-    if (hull < shipStats.hull) {
+    if (hull < maxHull) {
         return "Hull damaged";
     }
 
     return "Battle ready";
 };
 
-const ShipDiagram = ({ demoVessel }) => {
+const ShipDiagram = ({ ship, vessel }) => {
+    if (!ship.image) {
+        return <p className="ship-image-placeholder">No ship image available yet.</p>;
+    }
+
     return (
-        <svg
-            viewBox="0 0 620 250"
-            role="img"
-            aria-label="Illustrative side profile of an Imperial cruiser"
-        >
-            <defs>
-                <pattern
-                    id="grid"
-                    width="28"
-                    height="28"
-                    patternUnits="userSpaceOnUse"
-                >
-                    <path
-                        d="M28 0H0V28"
-                        fill="none"
-                        stroke="#344238"
-                        strokeWidth=".5"
-                    />
-                </pattern>
-                <linearGradient
-                    id="metal"
-                    x2="0"
-                    y2="1"
-                >
-                    <stop stopColor="#899a8b" />
-                    <stop
-                        offset="1"
-                        stopColor="#34483f"
-                    />
-                </linearGradient>
-            </defs>
-            <rect
-                width="620"
-                height="250"
-                fill="url(#grid)"
-            />
-            <g
-                stroke="#667b6a"
-                fill="none"
-                opacity=".5"
-            >
-                <path
-                    d="M30 126H590M310 15V235"
-                    strokeDasharray="4 7"
-                />
-                <circle
-                    cx="310"
-                    cy="126"
-                    r="94"
-                />
-                <circle
-                    cx="310"
-                    cy="126"
-                    r="110"
-                    strokeDasharray="2 8"
-                />
-            </g>
-            <g
-                fill="url(#metal)"
-                stroke="#a6b199"
-                strokeWidth="1.3"
-                strokeLinejoin="round"
-            >
-                <path d="M91 109 128 97 185 97 199 83 393 83 415 99 474 99 531 119 559 134 517 153 439 155 414 170 180 170 157 156 112 156 91 145Z" />
-                <path d="M166 103H429V146H166ZM213 83V64H235V83M251 83V49H275V83M291 83V58H314V83M335 83V68H358V83M262 49V26M252 39H272M196 151H403L391 182H216ZM113 106H141V151H113ZM85 114H111V143H85M71 119H85V138H71M433 104 485 111 519 134 479 145 433 146Z" />
-                {Array.from({ length: 9 }, (_, i) => (
-                    <path
-                        key={i}
-                        d={`M${185 + i * 25} 108h13v29h-13z`}
-                    />
-                ))}
-                <path d="M226 63 224 49 233 38 241 49 239 63M295 58 294 43 302 34 310 43 309 58M345 68V53L351 44 357 53V68" />
-            </g>
-            <g
-                fill="var(--muted)"
-                fontSize="9"
-                fontFamily="inherit"
-            >
-                <text
-                    x="25"
-                    y="25"
-                >
-                    PROFILE // {demoVessel.profileCode}
-                </text>
-                <text
-                    x="425"
-                    y="225"
-                >
-                    {ship.faction.toUpperCase()}
-                </text>
-                <text
-                    x="25"
-                    y="225"
-                >
-                    SCHEMATIC · NOT TO SCALE
-                </text>
-            </g>
-        </svg>
+        <Image
+            className="ship-image"
+            src={ship.image.src}
+            width={ship.image.width}
+            height={ship.image.height}
+            alt={`${vessel.name} — ${ship.className} side profile`}
+            sizes="(max-width: 760px) 100vw, 620px"
+        />
     );
 };
 
@@ -211,22 +94,18 @@ const Tracker = ({ label, value, max, onChange, tone = "", isHull = false }) => 
     );
 };
 
-const BattleTracker = () => {
-    const [selectedShipId, setSelectedShipId] = useState(fleet[0].id);
-    const [battleStates, setBattleStates] = useState(createBattleState);
-    const demoVessel = fleet.find((vessel) => vessel.id === selectedShipId);
-    const { hull, shields, order, notes, message } = battleStates[selectedShipId];
-    const hullStatus = getHullStatus(hull);
-
-    const updateSelectedShip = (changes) => {
-        setBattleStates((previousStates) => ({
-            ...previousStates,
-            [selectedShipId]: {
-                ...previousStates[selectedShipId],
-                ...changes,
-            },
-        }));
-    };
+const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership }) => {
+    const shipStats = ship.stats;
+    const { hull, shields, order, notes, message } = battleState;
+    const hullStatus = getHullStatus(hull, shipStats.hull);
+    const characteristics = [
+        ["Type", ship.type],
+        ["Speed", shipStats.speedCm, "cm"],
+        ["Turns", shipStats.turnDegrees, "°"],
+        ["Shields", shipStats.shields],
+        ["Armour", `${shipStats.armour.front} / ${shipStats.armour.other}`],
+        ["Turrets", shipStats.turrets],
+    ];
 
     const resetBattleTrackers = () => {
         updateSelectedShip({
@@ -238,248 +117,366 @@ const BattleTracker = () => {
     };
 
     return (
+        <div className="ship-viewer">
+            <div className="breadcrumb">
+                {ship.faction} <span>/</span> {ship.type} <span>/</span>{" "}
+                Ship profile
+            </div>
+            <div className="page-heading">
+                <div>
+                    <p className="eyebrow">
+                        VESSEL RECORD · {vessel.registry}
+                    </p>
+                    <h1>{vessel.name}</h1>
+                    <p className="subtitle">
+                        {ship.className} <span>·</span> {ship.faction}
+                    </p>
+                </div>
+                <button
+                    className="secondary-button"
+                    onClick={() => window.print()}
+                >
+                    ↗ &nbsp; Print ship sheet
+                </button>
+            </div>
+            <div className="main-grid">
+                <div>
+                    <section className="panel vessel">
+                        <div className="panel-heading">
+                            <span className="eyebrow">
+                                {ship.classLabel.toUpperCase()}
+                            </span>
+                            <span className="registry">
+                                {ship.role.toUpperCase()}
+                            </span>
+                        </div>
+                        <ShipDiagram ship={ship} vessel={vessel} />
+                        <div className="vessel-caption">
+                            <em>{ship.description}</em>
+                            <span>
+                                <strong>{ship.points}</strong> POINTS
+                            </span>
+                        </div>
+                    </section>
+                    <section
+                        className="stat-strip"
+                        aria-label="Ship characteristics"
+                    >
+                        {characteristics.map(([label, value, unit]) => (
+                            <div key={label}>
+                                <span>{label}</span>
+                                <strong>
+                                    {value}
+                                    <small>{unit}</small>
+                                </strong>
+                            </div>
+                        ))}
+                    </section>
+                    <section className="panel armament">
+                        <div className="panel-heading">
+                            <h2>
+                                <span className="section-number">01</span>
+                                Armament
+                            </h2>
+                            <span className="registry">
+                                {ship.weapons.length} WEAPON SYSTEMS
+                            </span>
+                        </div>
+                        <div className="table-scroll">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Weapon system</th>
+                                        <th>Range / speed</th>
+                                        <th>Strength</th>
+                                        <th>Fire arc</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {ship.weapons.map(
+                                        ({
+                                            name,
+                                            type,
+                                            rangeCm,
+                                            rangeLabel,
+                                            strength,
+                                            strengthUnit,
+                                            arc,
+                                        }) => (
+                                            <tr key={`${name}-${rangeLabel || rangeCm}`}>
+                                                <td>
+                                                    <span
+                                                        className="weapon-marker"
+                                                        aria-hidden="true"
+                                                    >
+                                                        {
+                                                            weaponMarkers[
+                                                                type
+                                                            ]
+                                                        }
+                                                    </span>
+                                                    {name}
+                                                    <small>{type}</small>
+                                                </td>
+                                                <td>{rangeLabel || `${rangeCm} cm`}</td>
+                                                <td className="strength">
+                                                    {strength}
+                                                    {strengthUnit && <small>{strengthUnit}</small>}
+                                                </td>
+                                                <td>
+                                                    <span className="arc">
+                                                        {arc}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ),
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="panel-footnote">
+                            {ship.isDemo ? "Illustrative" : "Source"} base profile shown. Damage and purchased
+                            upgrades do not modify these weapon values yet.
+                        </div>
+                    </section>
+                    {vessel.upgrades?.length > 0 && (
+                        <section className="panel tracker-upgrades">
+                            <h2>Purchased upgrades</h2>
+                            <ul>
+                                {getUpgradeOptions(getShip(vessel.classId), vessel)
+                                    .filter((option) => vessel.upgrades.includes(option.id))
+                                    .map((option) => (
+                                        <li key={option.id}>{option.label}: {option.description}</li>
+                                    ))}
+                            </ul>
+                        </section>
+                    )}
+                    <section className="panel notes">
+                        <div className="panel-heading">
+                            <h2>
+                                <span className="section-number">02</span>
+                                <label htmlFor="notes">
+                                    Captain’s notes
+                                </label>
+                            </h2>
+                            <span className="registry">SESSION ONLY</span>
+                        </div>
+                        <textarea
+                            id="notes"
+                            value={notes}
+                            onChange={(event) =>
+                                updateSelectedShip({ notes: event.target.value })
+                            }
+                            placeholder="Record critical damage, objectives, or a particularly heroic manoeuvre…"
+                        />
+                    </section>
+                </div>
+                <aside>
+                    <section className="panel battle">
+                        <div className="panel-heading">
+                            <h2>Battle status</h2>
+                            <span className="live-dot" />
+                        </div>
+                        <div
+                            role="status"
+                            className={`status-banner ${hull < shipStats.hull ? "damaged" : ""}`}
+                        >
+                            ◇ &nbsp; {hullStatus}
+                        </div>
+                        <Tracker
+                            label="Hull integrity"
+                            isHull
+                            value={hull}
+                            max={shipStats.hull}
+                            onChange={(value) => updateSelectedShip({ hull: value })}
+                        />
+                        <Tracker
+                            label="Active shields"
+                            value={shields}
+                            max={shipStats.shields}
+                            onChange={(value) => updateSelectedShip({ shields: value })}
+                            tone="shield"
+                        />
+                        <div className="leadership">
+                            <span>
+                                Leadership<small>{leadership ? "Fleet commander" : "Determine at the table"}</small>
+                            </span>
+                            <strong>{leadership || "—"}</strong>
+                        </div>
+                        <div className="order-control">
+                            <label htmlFor="order">Special orders</label>
+                            <select
+                                id="order"
+                                value={order}
+                                onChange={(event) =>
+                                    updateSelectedShip({ order: event.target.value })
+                                }
+                            >
+                                {[
+                                    "No special orders",
+                                    "All ahead full",
+                                    "Come to new heading",
+                                    "Burn retros",
+                                    "Lock on",
+                                    "Reload ordnance",
+                                    "Brace for impact",
+                                ].map((specialOrder) => (
+                                    <option key={specialOrder}>
+                                        {specialOrder}
+                                    </option>
+                                ))}
+                            </select>
+                            <p>
+                                Record the current order after resolving it
+                                at the table.
+                            </p>
+                        </div>
+                        <button
+                            className="reset-button"
+                            onClick={resetBattleTrackers}
+                        >
+                            ↺ &nbsp; Reset battle trackers
+                        </button>
+                        {message && (
+                            <p
+                                role="status"
+                                className="reset-message"
+                            >
+                                {message}
+                            </p>
+                        )}
+                    </section>
+                    <SpecialRules
+                        rules={ship.specialRules}
+                        isDemo={ship.isDemo}
+                        source={ship.source}
+                    />
+                </aside>
+            </div>
+            <footer>
+                <span>
+                    VOID LEDGER &nbsp; / &nbsp; {ship.faction.toUpperCase()}
+                </span>
+                <span>Unofficial tabletop companion · {ship.isDemo ? "Demo profile" : "Source profile"}</span>
+                <span className="footer-credit">
+                    A major help in creating this site:{" "}
+                    <a href="https://battlefleet-game.org/fleet-lists/imperial-navy/">
+                        Battlefleet Gothic: Remastered — Imperial Navy fleet list
+                    </a>
+                </span>
+            </footer>
+        </div>
+    );
+};
+
+const BattleTracker = () => {
+    const [fleets, setFleets] = useState([]);
+    const [selectedFleetId, setSelectedFleetId] = useState("");
+    const [selectedShipId, setSelectedShipId] = useState("");
+    const [battleStates, setBattleStates] = useState({});
+    const [loaded, setLoaded] = useState(false);
+    const [storageMessage, setStorageMessage] = useState("");
+
+    useEffect(() => {
+        let active = true;
+        const loadFleets = () => {
+            if (!active) return;
+
+            try {
+                const library = loadFleetLibrary(window.localStorage);
+                setFleets(library.fleets);
+                setSelectedFleetId((previous) => (
+                    library.fleets.some((fleet) => fleet.id === previous)
+                        ? previous : getDefaultFleetId(library.fleets)
+                ));
+                setStorageMessage(library.saveError ? "Demo fleet could not be saved. Browser storage is unavailable or full." : "");
+            } catch {
+                setStorageMessage("Saved fleets could not be read. Stored data has not been changed. Check browser storage access and reload.");
+            }
+            setLoaded(true);
+        };
+        const onStorage = (event) => {
+            if (event.key === storageKey || event.key === null) loadFleets();
+        };
+
+        queueMicrotask(loadFleets);
+        window.addEventListener("storage", onStorage);
+        window.addEventListener("focus", loadFleets);
+        return () => {
+            active = false;
+            window.removeEventListener("storage", onStorage);
+            window.removeEventListener("focus", loadFleets);
+        };
+    }, []);
+
+    const fleet = fleets.find((entry) => entry.id === selectedFleetId);
+    const vessels = (fleet?.ships || []).map((vessel, index) => {
+        const catalogShip = getShip(vessel.classId);
+        const profile = battleProfiles[vessel.classId];
+        return {
+            ...vessel,
+            name: vessel.name || `${catalogShip.name} ${index + 1}`,
+            registry: `VESSEL ${String(index + 1).padStart(2, "0")}`,
+            className: profile?.className || `${catalogShip.name} · ${catalogShip.type}`,
+            profile,
+        };
+    });
+    const vessel = vessels.find((entry) => entry.id === selectedShipId) || vessels[0];
+    const fleetBattleStates = battleStates[selectedFleetId] || {};
+    const state = vessel?.profile
+        ? fleetBattleStates[vessel.id] || createShipBattleState(vessel.profile)
+        : null;
+    const commanderLeadership = { "fleet-admiral": 8, admiral: 9, "solar-admiral": 10 };
+
+    const selectFleet = (id) => {
+        setSelectedFleetId(id);
+        setSelectedShipId("");
+    };
+
+    const updateSelectedShip = (changes) => {
+        setBattleStates((previous) => ({
+            ...previous,
+            [fleet.id]: {
+                ...previous[fleet.id],
+                [vessel.id]: { ...state, ...changes },
+            },
+        }));
+    };
+
+    if (!loaded) return <main role="status">Loading saved fleets…</main>;
+
+    return (
         <main className="battle-layout">
             <FleetMenu
-                fleet={fleet}
-                selectedShipId={selectedShipId}
+                fleets={fleets}
+                selectedFleetId={selectedFleetId}
+                onSelectFleet={selectFleet}
+                fleet={vessels}
+                selectedShipId={vessel?.id}
                 onSelect={setSelectedShipId}
-                className={ship.className}
-                battleStates={battleStates}
-                maxHull={shipStats.hull}
+                battleStates={fleetBattleStates}
+                storageMessage={storageMessage}
             />
-            <div className="ship-viewer">
-                <div className="breadcrumb">
-                    {ship.faction} <span>/</span> {ship.type} <span>/</span>{" "}
-                    Ship profile
+            {vessel?.profile ? (
+                <ShipViewer
+                    ship={{ ...vessel.profile, points: getVesselPoints(getShip(vessel.classId), vessel) }}
+                    vessel={vessel}
+                    battleState={state}
+                    updateSelectedShip={updateSelectedShip}
+                    leadership={fleet.flagshipId === vessel.id ? commanderLeadership[fleet.commander] : undefined}
+                />
+            ) : (
+                <div className="ship-viewer">
+                    <h1>{vessel?.name || (fleet ? "This fleet is empty" : "No saved fleets")}</h1>
+                    {vessel ? (
+                        <>
+                            <p>{vessel.className} · {getVesselPoints(getShip(vessel.classId), vessel)} pts</p>
+                            <p>This class does not have a battle-tracker profile yet.</p>
+                            <a className="secondary-button" href={getProfileUrl(getShip(vessel.classId))} target="_blank" rel="noreferrer">Open ship rules ↗</a>
+                        </>
+                    ) : <Link className="secondary-button" href="/fleet-creator">Open fleet builder</Link>}
                 </div>
-                <div className="page-heading">
-                    <div>
-                        <p className="eyebrow">
-                            VESSEL RECORD · {demoVessel.registry}
-                        </p>
-                        <h1>{demoVessel.name}</h1>
-                        <p className="subtitle">
-                            {ship.className} <span>·</span> {ship.faction}
-                        </p>
-                    </div>
-                    <button
-                        className="secondary-button"
-                        onClick={() => window.print()}
-                    >
-                        ↗ &nbsp; Print ship sheet
-                    </button>
-                </div>
-                <div className="main-grid">
-                    <div>
-                        <section className="panel vessel">
-                            <div className="panel-heading">
-                                <span className="eyebrow">
-                                    {ship.classLabel.toUpperCase()}
-                                </span>
-                                <span className="registry">
-                                    {ship.role.toUpperCase()}
-                                </span>
-                            </div>
-                            <ShipDiagram demoVessel={demoVessel} />
-                            <div className="vessel-caption">
-                                <em>{ship.description}</em>
-                                <span>
-                                    <strong>{ship.points}</strong> POINTS
-                                </span>
-                            </div>
-                        </section>
-                        <section
-                            className="stat-strip"
-                            aria-label="Ship characteristics"
-                        >
-                            {characteristics.map(([label, value, unit]) => (
-                                <div key={label}>
-                                    <span>{label}</span>
-                                    <strong>
-                                        {value}
-                                        <small>{unit}</small>
-                                    </strong>
-                                </div>
-                            ))}
-                        </section>
-                        <section className="panel armament">
-                            <div className="panel-heading">
-                                <h2>
-                                    <span className="section-number">01</span>
-                                    Armament
-                                </h2>
-                                <span className="registry">
-                                    {ship.weapons.length} WEAPON SYSTEMS
-                                </span>
-                            </div>
-                            <div className="table-scroll">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Weapon system</th>
-                                            <th>Range / speed</th>
-                                            <th>Strength</th>
-                                            <th>Fire arc</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {ship.weapons.map(
-                                            ({
-                                                name,
-                                                type,
-                                                rangeCm,
-                                                strength,
-                                                arc,
-                                            }) => (
-                                                <tr key={name}>
-                                                    <td>
-                                                        <span
-                                                            className="weapon-marker"
-                                                            aria-hidden="true"
-                                                        >
-                                                            {
-                                                                weaponMarkers[
-                                                                    type
-                                                                ]
-                                                            }
-                                                        </span>
-                                                        {name}
-                                                        <small>{type}</small>
-                                                    </td>
-                                                    <td>{rangeCm} cm</td>
-                                                    <td className="strength">
-                                                        {strength}
-                                                    </td>
-                                                    <td>
-                                                        <span className="arc">
-                                                            {arc}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ),
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="panel-footnote">
-                                Base profile shown. Battle trackers do not
-                                modify weapon values yet.
-                            </div>
-                        </section>
-                        <section className="panel notes">
-                            <div className="panel-heading">
-                                <h2>
-                                    <span className="section-number">02</span>
-                                    <label htmlFor="notes">
-                                        Captain’s notes
-                                    </label>
-                                </h2>
-                                <span className="registry">SESSION ONLY</span>
-                            </div>
-                            <textarea
-                                id="notes"
-                                value={notes}
-                                onChange={(event) =>
-                                    updateSelectedShip({ notes: event.target.value })
-                                }
-                                placeholder="Record critical damage, objectives, or a particularly heroic manoeuvre…"
-                            />
-                        </section>
-                    </div>
-                    <aside>
-                        <section className="panel battle">
-                            <div className="panel-heading">
-                                <h2>Battle status</h2>
-                                <span className="live-dot" />
-                            </div>
-                            <div
-                                role="status"
-                                className={`status-banner ${hull < shipStats.hull ? "damaged" : ""}`}
-                            >
-                                ◇ &nbsp; {hullStatus}
-                            </div>
-                            <Tracker
-                                label="Hull integrity"
-                                isHull
-                                value={hull}
-                                max={shipStats.hull}
-                                onChange={(value) => updateSelectedShip({ hull: value })}
-                            />
-                            <Tracker
-                                label="Active shields"
-                                value={shields}
-                                max={shipStats.shields}
-                                onChange={(value) => updateSelectedShip({ shields: value })}
-                                tone="shield"
-                            />
-                            <div className="leadership">
-                                <span>
-                                    Leadership<small>Assigned demo value</small>
-                                </span>
-                                <strong>{demoVessel.leadership}</strong>
-                            </div>
-                            <div className="order-control">
-                                <label htmlFor="order">Special orders</label>
-                                <select
-                                    id="order"
-                                    value={order}
-                                    onChange={(event) =>
-                                        updateSelectedShip({ order: event.target.value })
-                                    }
-                                >
-                                    {[
-                                        "No special orders",
-                                        "All ahead full",
-                                        "Come to new heading",
-                                        "Burn retros",
-                                        "Lock on",
-                                        "Reload ordnance",
-                                        "Brace for impact",
-                                    ].map((specialOrder) => (
-                                        <option key={specialOrder}>
-                                            {specialOrder}
-                                        </option>
-                                    ))}
-                                </select>
-                                <p>
-                                    Record the current order after resolving it
-                                    at the table.
-                                </p>
-                            </div>
-                            <button
-                                className="reset-button"
-                                onClick={resetBattleTrackers}
-                            >
-                                ↺ &nbsp; Reset battle trackers
-                            </button>
-                            {message && (
-                                <p
-                                    role="status"
-                                    className="reset-message"
-                                >
-                                    {message}
-                                </p>
-                            )}
-                        </section>
-                        <SpecialRules
-                            rules={ship.specialRules}
-                            isDemo={ship.isDemo}
-                        />
-                    </aside>
-                </div>
-                <footer>
-                    <span>
-                        VOID LEDGER &nbsp; / &nbsp; {ship.faction.toUpperCase()}
-                    </span>
-                    <span>Unofficial tabletop companion · Demo profile</span>
-                    <span className="footer-credit">
-                        A major help in creating this site:{" "}
-                        <a href="https://battlefleet-game.org/fleet-lists/imperial-navy/">
-                            Battlefleet Gothic: Remastered — Imperial Navy fleet list
-                        </a>
-                    </span>
-                </footer>
-            </div>
+            )}
         </main>
     );
 };

@@ -2,6 +2,8 @@
     "id": "",
     "isDemo": true,
     "className": "",
+    "image": null,
+    "source": null,
     "classLabel": "",
     "faction": "",
     "type": "",
@@ -34,6 +36,7 @@
             "description": ""
         }
     ],
+    "options": [],
     "demoVessel": {
         "name": "",
         "registry": "",

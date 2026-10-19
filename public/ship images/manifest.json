@@ -1,0 +1,308 @@
+[
+    {
+        "id": "apocalypse-class-battleship",
+        "name": "Apocalypse Class Battleship",
+        "file": "apocalypse-class-battleship.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/apocalypse-class-battleship.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/apocalypse-class-battleship.png",
+        "width": 601,
+        "height": 296
+    },
+    {
+        "id": "armageddon-class-battlecruiser",
+        "name": "Armageddon Class Battlecruiser",
+        "file": "armageddon-class-battlecruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/armageddon-class-battlecruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/armageddon-class-battlecruiser.png",
+        "width": 643,
+        "height": 231
+    },
+    {
+        "id": "avenger-class-grand-cruiser",
+        "name": "Avenger Class Grand Cruiser",
+        "file": "avenger-class-grand-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/avenger-class-grand-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/avenger-class-grand-cruiser.png",
+        "width": 619,
+        "height": 296
+    },
+    {
+        "id": "cobra-class-destroyer",
+        "name": "Cobra Class Destroyer",
+        "file": "cobra-class-destroyer.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/cobra-class-destroyer.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/cobra-class-destroyer.png",
+        "width": 243,
+        "height": 74
+    },
+    {
+        "id": "dauntless-class-light-cruiser",
+        "name": "Dauntless Class Light Cruiser",
+        "file": "dauntless-class-light-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/dauntless-class-light-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/dauntless-class-light-cruiser.png",
+        "width": 353,
+        "height": 120
+    },
+    {
+        "id": "defiant-class-light-cruiser",
+        "name": "Defiant Class Light Cruiser",
+        "file": "defiant-class-light-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/defiant-class-light-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/defiant-class-light-cruiser.png",
+        "width": 525,
+        "height": 174
+    },
+    {
+        "id": "dictator-class-cruiser",
+        "name": "Dictator Class Cruiser",
+        "file": "dictator-class-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/dictator-class-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/dictator-class-cruiser.png",
+        "width": 440,
+        "height": 166
+    },
+    {
+        "id": "dominator-class-cruiser",
+        "name": "Dominator Class Cruiser",
+        "file": "dominator-class-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/dominator-class-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/dominator-class-cruiser.png",
+        "width": 427,
+        "height": 166
+    },
+    {
+        "id": "dominion-class-battlecruiser",
+        "name": "Dominion Class Battlecruiser",
+        "file": "dominion-class-battlecruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/dominion-class-battlecruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/dominion-class-battlecruiser.png",
+        "width": 551,
+        "height": 215
+    },
+    {
+        "id": "emperor-class-battleship",
+        "name": "Emperor Class Battleship",
+        "file": "emperor-class-battleship.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/emperor-class-battleship.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/emperor-class-battleship.png",
+        "width": 440,
+        "height": 181
+    },
+    {
+        "id": "endeavour-class-light-cruiser-bakka",
+        "name": "Endeavour Class Light Cruiser (Bakka)",
+        "file": "endeavour-class-light-cruiser-bakka.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/endeavour-class-light-cruiser-bakka.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/endeavour-class-light-cruiser-bakka.png",
+        "width": 404,
+        "height": 149
+    },
+    {
+        "id": "endeavour-class-light-cruiser",
+        "name": "Endeavour Class Light Cruiser",
+        "file": "endeavour-class-light-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/endeavour-class-light-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/endeavour-class-light-cruiser.png",
+        "width": 354,
+        "height": 117
+    },
+    {
+        "id": "endurance-class-light-cruiser-bakka",
+        "name": "Endurance Class Light Cruiser (Bakka)",
+        "file": "endurance-class-light-cruiser-bakka.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/endurance-class-light-cruiser-bakka.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/endurance-class-light-cruiser-bakka.png",
+        "width": 404,
+        "height": 149
+    },
+    {
+        "id": "endurance-class-light-cruiser",
+        "name": "Endurance Class Light Cruiser",
+        "file": "endurance-class-light-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/endurance-class-light-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/endurance-class-light-cruiser.png",
+        "width": 525,
+        "height": 174
+    },
+    {
+        "id": "exorcist-class-grand-cruiser",
+        "name": "Exorcist Class Grand Cruiser",
+        "file": "exorcist-class-grand-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/exorcist-class-grand-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/exorcist-class-grand-cruiser.png",
+        "width": 624,
+        "height": 296
+    },
+    {
+        "id": "falchion-class-frigate",
+        "name": "Falchion Class Frigate",
+        "file": "falchion-class-frigate.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/falchion-class-frigate.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/falchion-class-frigate.png",
+        "width": 366,
+        "height": 125
+    },
+    {
+        "id": "firestorm-class-frigate",
+        "name": "Firestorm Class Frigate",
+        "file": "firestorm-class-frigate.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/firestorm-class-frigate.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/firestorm-class-frigate.png",
+        "width": 340,
+        "height": 151
+    },
+    {
+        "id": "gothic-class-cruiser",
+        "name": "Gothic Class Cruiser",
+        "file": "gothic-class-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/gothic-class-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/gothic-class-cruiser.png",
+        "width": 415,
+        "height": 166
+    },
+    {
+        "id": "havoc-class-frigate",
+        "name": "Havoc Class Frigate",
+        "file": "havoc-class-frigate.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/havoc-class-frigate.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/havoc-class-frigate.png",
+        "width": 275,
+        "height": 159
+    },
+    {
+        "id": "jovian-class-battlecruiser",
+        "name": "Jovian Class Battlecruiser",
+        "file": "jovian-class-battlecruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/jovian-class-battlecruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/jovian-class-battlecruiser.png",
+        "width": 489,
+        "height": 215
+    },
+    {
+        "id": "lunar-class-cruiser",
+        "name": "Lunar Class Cruiser",
+        "file": "lunar-class-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/lunar-class-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/lunar-class-cruiser.png",
+        "width": 422,
+        "height": 166
+    },
+    {
+        "id": "mars-class-battlecruiser",
+        "name": "Mars Class Battlecruiser",
+        "file": "mars-class-battlecruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/mars-class-battlecruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/mars-class-battlecruiser.png",
+        "width": 420,
+        "height": 165
+    },
+    {
+        "id": "mercury-class-battlecruiser",
+        "name": "Mercury Class Battlecruiser",
+        "file": "mercury-class-battlecruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/mercury-class-battlecruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/mercury-class-battlecruiser.png",
+        "width": 534,
+        "height": 211
+    },
+    {
+        "id": "oberon-class-battleship",
+        "name": "Oberon Class Battleship",
+        "file": "oberon-class-battleship.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/oberon-class-battleship.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/oberon-class-battleship.png",
+        "width": 585,
+        "height": 296
+    },
+    {
+        "id": "overlord-class-battlecruiser",
+        "name": "Overlord Class Battlecruiser",
+        "file": "overlord-class-battlecruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/overlord-class-battlecruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/overlord-class-battlecruiser.png",
+        "width": 428,
+        "height": 156
+    },
+    {
+        "id": "retribution-class-battleship",
+        "name": "Retribution Class Battleship",
+        "file": "retribution-class-battleship.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/retribution-class-battleship.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/retribution-class-battleship.png",
+        "width": 432,
+        "height": 187
+    },
+    {
+        "id": "siluria-class-light-cruiser",
+        "name": "Siluria Class Light Cruiser",
+        "file": "siluria-class-light-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/siluria-class-light-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/siluria-class-light-cruiser.png",
+        "width": 587,
+        "height": 160
+    },
+    {
+        "id": "sword-class-frigate",
+        "name": "Sword Class Frigate",
+        "file": "sword-class-frigate.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/sword-class-frigate.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/sword-class-frigate.png",
+        "width": 351,
+        "height": 119
+    },
+    {
+        "id": "transport",
+        "name": "Transport",
+        "file": "transport.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/transport.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/transport.png",
+        "width": 320,
+        "height": 123
+    },
+    {
+        "id": "tyrant-class-cruiser",
+        "name": "Tyrant Class Cruiser",
+        "file": "tyrant-class-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/tyrant-class-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/tyrant-class-cruiser.png",
+        "width": 441,
+        "height": 161
+    },
+    {
+        "id": "vanquisher-class-battleship",
+        "name": "Vanquisher Class Battleship",
+        "file": "vanquisher-class-battleship.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/vanquisher-class-battleship.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/vanquisher-class-battleship.png",
+        "width": 692,
+        "height": 288
+    },
+    {
+        "id": "vengeance-class-grand-cruiser",
+        "name": "Vengeance Class Grand Cruiser",
+        "file": "vengeance-class-grand-cruiser.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/vengeance-class-grand-cruiser.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/vengeance-class-grand-cruiser.png",
+        "width": 623,
+        "height": 296
+    },
+    {
+        "id": "victory-class-battleship",
+        "name": "Victory Class Battleship",
+        "file": "victory-class-battleship.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/victory-class-battleship.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/victory-class-battleship.png",
+        "width": 650,
+        "height": 288
+    },
+    {
+        "id": "viper-class-destroyer",
+        "name": "Viper Class Destroyer",
+        "file": "viper-class-destroyer.png",
+        "source": "https://ships.battlefleet-game.org/imperial-navy/viper-class-destroyer.html",
+        "original": "https://ships.battlefleet-game.org/imperial-navy/viper-class-destroyer.png",
+        "width": 230,
+        "height": 72
+    }
+]

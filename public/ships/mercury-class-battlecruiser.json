@@ -1,0 +1,96 @@
+{
+    "id": "mercury-class-battlecruiser",
+    "isDemo": false,
+    "className": "Mercury-class Battlecruiser",
+    "image": {
+        "src": "/ship%20images/mercury-class-battlecruiser.png",
+        "width": 534,
+        "height": 211,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/mercury-class-battlecruiser.html"
+    },
+    "classLabel": "Mercury class",
+    "faction": "Imperial Navy",
+    "type": "Battlecruiser",
+    "role": "Battlecruiser",
+    "description": "Mercury Class Battlecruiser base configuration.",
+    "points": 255,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/mercury-class-battlecruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 8,
+        "speedCm": 25,
+        "turnDegrees": 45,
+        "shields": 2,
+        "armour": {
+            "front": "6+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 6,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 6,
+            "arc": "Right"
+        },
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 4,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 4,
+            "arc": "Right"
+        },
+        {
+            "name": "Dorsal lance battery",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 2,
+            "arc": "Left / Front / Right"
+        },
+        {
+            "name": "Prow nova cannon",
+            "type": "Nova Cannon",
+            "rangeCm": null,
+            "strength": 1,
+            "arc": "Front",
+            "rangeLabel": "30 – 150 cm"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Volatile engineering plant",
+            "description": "At zero hull, total 3D6 for catastrophic damage, capping the result at 12."
+        }
+    ],
+    "options": [
+        {
+            "name": "Improved batteries",
+            "points": 10,
+            "description": "Increase the 45 cm batteries to 60 cm."
+        },
+        {
+            "name": "Torpedo prow",
+            "points": -20,
+            "description": "Replace the nova cannon with strength 6 torpedoes."
+        }
+    ]
+}

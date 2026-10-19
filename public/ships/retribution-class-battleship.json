@@ -55,5 +55,11 @@
         "registry": "IN–101",
         "profileCode": "RT–101",
         "leadership": 8
+    },
+    "image": {
+        "src": "/ship%20images/retribution-class-battleship.png",
+        "width": 432,
+        "height": 187,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/retribution-class-battleship.html"
     }
 }

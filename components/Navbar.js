@@ -218,7 +218,7 @@ const Navbar = () => {
                     </Link>
                 ))}
             </nav>
-            {pathname === "/" && <span className="demo-badge">DEMO DATA</span>}
+            {pathname === "/" && <span className="demo-badge">BASE PROFILES</span>}
             <OptionsDropdown />
         </header>
     );

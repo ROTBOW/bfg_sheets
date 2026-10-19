@@ -1,0 +1,71 @@
+{
+    "id": "defiant-class-light-cruiser",
+    "isDemo": false,
+    "className": "Defiant-class Light Cruiser",
+    "image": {
+        "src": "/ship%20images/defiant-class-light-cruiser.png",
+        "width": 525,
+        "height": 174,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/defiant-class-light-cruiser.html"
+    },
+    "classLabel": "Defiant class",
+    "faction": "Imperial Navy",
+    "type": "Cruiser",
+    "role": "Light cruiser",
+    "description": "Defiant Class Light Cruiser base configuration.",
+    "points": 120,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/defiant-class-light-cruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 6,
+        "speedCm": 20,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Port launch bays",
+            "type": "Launch Bay",
+            "rangeCm": 30,
+            "strength": 1,
+            "arc": "–",
+            "strengthUnit": "squadron"
+        },
+        {
+            "name": "Starboard launch bays",
+            "type": "Launch Bay",
+            "rangeCm": 30,
+            "strength": 1,
+            "arc": "–",
+            "strengthUnit": "squadron"
+        },
+        {
+            "name": "Prow lance battery",
+            "type": "Lance",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Left / Front / Right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Compartmentalised hull",
+            "description": "Add +1 to the roll when defending a boarding action."
+        }
+    ],
+    "options": [
+        {
+            "name": "Armoured prow",
+            "points": 0,
+            "description": "Prow armour becomes 6+; turn allowance decreases to 45 degrees."
+        }
+    ]
+}

@@ -41,5 +41,11 @@
         "registry": "IN–107",
         "profileCode": "CB–107",
         "leadership": 8
+    },
+    "image": {
+        "src": "/ship%20images/cobra-class-destroyer.png",
+        "width": 243,
+        "height": 74,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/cobra-class-destroyer.html"
     }
 }

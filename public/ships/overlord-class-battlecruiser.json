@@ -55,5 +55,11 @@
         "registry": "IN–103",
         "profileCode": "OV–103",
         "leadership": 8
+    },
+    "image": {
+        "src": "/ship%20images/overlord-class-battlecruiser.png",
+        "width": 428,
+        "height": 156,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/overlord-class-battlecruiser.html"
     }
 }

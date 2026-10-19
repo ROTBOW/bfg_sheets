@@ -1,0 +1,95 @@
+{
+    "id": "mars-class-battlecruiser",
+    "isDemo": false,
+    "className": "Mars-class Battlecruiser",
+    "image": {
+        "src": "/ship%20images/mars-class-battlecruiser.png",
+        "width": 420,
+        "height": 165,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/mars-class-battlecruiser.html"
+    },
+    "classLabel": "Mars class",
+    "faction": "Imperial Navy",
+    "type": "Battlecruiser",
+    "role": "Battlecruiser",
+    "description": "Mars Class Battlecruiser base configuration.",
+    "points": 270,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/mars-class-battlecruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 8,
+        "speedCm": 20,
+        "turnDegrees": 45,
+        "shields": 2,
+        "armour": {
+            "front": "6+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Port launch bays",
+            "type": "Launch Bay",
+            "rangeCm": null,
+            "strength": 2,
+            "arc": "–",
+            "rangeLabel": "Furies: 30 cm / Starhawks: 20 cm",
+            "strengthUnit": "squadrons"
+        },
+        {
+            "name": "Starboard launch bays",
+            "type": "Launch Bay",
+            "rangeCm": null,
+            "strength": 2,
+            "arc": "–",
+            "rangeLabel": "Furies: 30 cm / Starhawks: 20 cm",
+            "strengthUnit": "squadrons"
+        },
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 6,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 6,
+            "arc": "Right"
+        },
+        {
+            "name": "Dorsal lance battery",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 2,
+            "arc": "Left / Front / Right"
+        },
+        {
+            "name": "Prow nova cannon",
+            "type": "Nova Cannon",
+            "rangeCm": null,
+            "strength": 1,
+            "arc": "Front",
+            "rangeLabel": "30 – 150 cm"
+        }
+    ],
+    "specialRules": [],
+    "options": [
+        {
+            "name": "Targeting matrix",
+            "points": 15,
+            "description": "Apply a leftward column shift to weapons-battery gunnery."
+        },
+        {
+            "name": "Third turret",
+            "points": 10,
+            "description": "Turret strength increases to 3."
+        }
+    ]
+}

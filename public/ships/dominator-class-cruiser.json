@@ -1,0 +1,65 @@
+{
+    "id": "dominator-class-cruiser",
+    "isDemo": false,
+    "className": "Dominator-class Cruiser",
+    "image": {
+        "src": "/ship%20images/dominator-class-cruiser.png",
+        "width": 427,
+        "height": 166,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/dominator-class-cruiser.html"
+    },
+    "classLabel": "Dominator class",
+    "faction": "Imperial Navy",
+    "type": "Cruiser",
+    "role": "Cruiser",
+    "description": "Dominator Class Cruiser base configuration.",
+    "points": 190,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/dominator-class-cruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 8,
+        "speedCm": 20,
+        "turnDegrees": 45,
+        "shields": 2,
+        "armour": {
+            "front": "6+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 12,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 12,
+            "arc": "Right"
+        },
+        {
+            "name": "Prow nova cannon",
+            "type": "Nova Cannon",
+            "rangeCm": null,
+            "strength": 1,
+            "arc": "Front",
+            "rangeLabel": "30 – 150 cm"
+        }
+    ],
+    "specialRules": [],
+    "options": [
+        {
+            "name": "Earlier batteries",
+            "points": -5,
+            "description": "Each broadside changes to firepower 6 with a 45 cm range."
+        }
+    ]
+}

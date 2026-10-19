@@ -34,5 +34,11 @@
         "registry": "IN–106",
         "profileCode": "SW–106",
         "leadership": 8
+    },
+    "image": {
+        "src": "/ship%20images/sword-class-frigate.png",
+        "width": 351,
+        "height": 119,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/sword-class-frigate.html"
     }
 }

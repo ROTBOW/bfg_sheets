@@ -48,5 +48,11 @@
         "registry": "IN–104",
         "profileCode": "GT–104",
         "leadership": 8
+    },
+    "image": {
+        "src": "/ship%20images/gothic-class-cruiser.png",
+        "width": 415,
+        "height": 166,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/gothic-class-cruiser.html"
     }
 }

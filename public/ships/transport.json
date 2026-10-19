@@ -1,0 +1,57 @@
+{
+    "id": "transport",
+    "isDemo": false,
+    "className": "Transport",
+    "image": {
+        "src": "/ship%20images/transport.png",
+        "width": 320,
+        "height": 123,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/transport.html"
+    },
+    "classLabel": "Transport",
+    "faction": "Imperial Navy",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Transport base configuration.",
+    "points": null,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/transport.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 15,
+        "turnDegrees": 45,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Dorsal weapons battery",
+            "type": "Battery",
+            "rangeCm": 15,
+            "strength": 2,
+            "arc": "Left / Front / Right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Transport engines",
+            "description": "All Ahead Full adds only 3D6 cm."
+        },
+        {
+            "name": "Civilian crew",
+            "description": "Subtract 1 from randomly generated leadership, giving a range of 5–8."
+        },
+        {
+            "name": "Scenario vessel",
+            "description": "No fixed points cost is listed. Use the relevant scenario or defence rules."
+        }
+    ],
+    "options": []
+}

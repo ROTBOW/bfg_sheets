@@ -3,7 +3,7 @@
 import { useState } from "react";
 import HullWarning from "@/components/HullWarning";
 
-const FleetMenu = ({ fleet, selectedShipId, onSelect, className, battleStates, maxHull }) => {
+const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, fleet, selectedShipId, onSelect, battleStates, storageMessage }) => {
     const [viewMode, setViewMode] = useState("details");
     const isCompact = viewMode === "compact";
 
@@ -15,7 +15,19 @@ const FleetMenu = ({ fleet, selectedShipId, onSelect, className, battleStates, m
         >
             <div className="fleet-heading">
                 <div className="fleet-toolbar">
-                    <p className="eyebrow">Demo fleet</p>
+                    <label className="tracker-fleet-picker">
+                        <span className="eyebrow">Fleet</span>
+                        <select
+                            value={selectedFleetId}
+                            onChange={(event) => onSelectFleet(event.target.value)}
+                            disabled={!fleets.length}
+                        >
+                            {!fleets.length && <option value="">No saved fleets</option>}
+                            {fleets.map((entry) => (
+                                <option key={entry.id} value={entry.id}>{entry.name || "Untitled fleet"}</option>
+                            ))}
+                        </select>
+                    </label>
                     <div
                         className="fleet-view-toggle"
                         role="group"
@@ -34,7 +46,8 @@ const FleetMenu = ({ fleet, selectedShipId, onSelect, className, battleStates, m
                     </div>
                 </div>
                 <h2>Fleet selection</h2>
-                <p>{fleet.length} ships · Illustrative statistics</p>
+                <p>{fleet.length} ships · Session tracking</p>
+                {storageMessage && <p role="alert">{storageMessage}</p>}
             </div>
             <ul className="fleet-list">
                 {fleet.map((vessel) => (
@@ -49,14 +62,16 @@ const FleetMenu = ({ fleet, selectedShipId, onSelect, className, battleStates, m
                                 <span className="registry">{vessel.registry}</span>
                             )}
                             <strong>{vessel.name}</strong>
-                            {!isCompact && <span>{className}</span>}
-                            <span className="fleet-hull">
-                                Hull {battleStates[vessel.id].hull} / {maxHull}
-                                <HullWarning
-                                    hull={battleStates[vessel.id].hull}
-                                    maxHull={maxHull}
-                                />
-                            </span>
+                            {!isCompact && <span>{vessel.className}</span>}
+                            {vessel.profile ? (
+                                <span className="fleet-hull">
+                                    Hull {battleStates[vessel.id]?.hull ?? vessel.profile.stats.hull} / {vessel.profile.stats.hull}
+                                    <HullWarning
+                                        hull={battleStates[vessel.id]?.hull ?? vessel.profile.stats.hull}
+                                        maxHull={vessel.profile.stats.hull}
+                                    />
+                                </span>
+                            ) : <span>Profile pending</span>}
                         </button>
                     </li>
                 ))}

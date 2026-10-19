@@ -1,0 +1,76 @@
+{
+    "id": "endurance-class-light-cruiser",
+    "isDemo": false,
+    "className": "Endurance-class Light Cruiser",
+    "image": {
+        "src": "/ship%20images/endurance-class-light-cruiser.png",
+        "width": 525,
+        "height": 174,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/endurance-class-light-cruiser.html"
+    },
+    "classLabel": "Endurance class",
+    "faction": "Imperial Navy",
+    "type": "Cruiser",
+    "role": "Light cruiser",
+    "description": "Endurance Class Light Cruiser base configuration.",
+    "points": 110,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/endurance-class-light-cruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 6,
+        "speedCm": 20,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Port lance battery",
+            "type": "Lance",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard lance battery",
+            "type": "Lance",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Right"
+        },
+        {
+            "name": "Prow weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Left / Front / Right"
+        },
+        {
+            "name": "Prow torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Compartmentalised hull",
+            "description": "Add +1 to the roll when defending a boarding action."
+        }
+    ],
+    "options": [
+        {
+            "name": "Armoured prow",
+            "points": 0,
+            "description": "Prow armour becomes 6+; turn allowance decreases to 45 degrees."
+        }
+    ]
+}

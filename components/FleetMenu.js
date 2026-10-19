@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import HullWarning from "@/components/HullWarning";
+import ShipName from "@/components/ShipName";
 
 const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, fleet, selectedShipId, onSelect, battleStates, storageMessage }) => {
     const [viewMode, setViewMode] = useState("details");
@@ -59,7 +60,12 @@ const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, fleet, selectedShip
                             onClick={() => onSelect(vessel.id)}
                         >
                             <span className="registry">{vessel.registry}</span>
-                            <strong>{vessel.name}</strong>
+                            <strong>
+                                <ShipName
+                                    name={vessel.name}
+                                    hull={battleStates[vessel.id]?.hull ?? vessel.profile?.stats.hull}
+                                />
+                            </strong>
                             <span>{vessel.className}</span>
                             {vessel.profile ? (
                                 <span className={isCompact ? undefined : "fleet-stats"}>

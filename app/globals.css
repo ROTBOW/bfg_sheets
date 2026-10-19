@@ -33,9 +33,9 @@
     --accent: light-dark(#285e9b, #80bfff);
 }
 
-[data-accent="magenta"],
-:root:has(.accent-option[data-accent="magenta"]:hover) {
-    --accent: light-dark(#8b3589, #ff88ee);
+[data-accent="red"],
+:root:has(.accent-option[data-accent="red"]:hover) {
+    --accent: light-dark(#a52a2a, #ff6666);
 }
 
 [data-accent="white"],
@@ -1429,6 +1429,19 @@ footer {
 .fleet-ship[aria-pressed="true"] {
     border-color: var(--accent);
     background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.ship-name-destroyed {
+    color: light-dark(#707070, #969696);
+}
+
+.ship-name-skull {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-left: 0.4em;
+    font-size: 0.8em;
+    vertical-align: -0.05em;
 }
 
 .fleet-hull {

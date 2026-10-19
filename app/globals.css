@@ -149,6 +149,33 @@
     box-sizing: border-box;
 }
 
+/* Keep theme colors in sync while leaving component-specific motion intact. */
+@media (prefers-reduced-motion: no-preference) {
+    :where(body, body *, body *::before, body *::after) {
+        transition:
+            background-color 350ms ease,
+            color 350ms ease,
+            border-color 350ms ease,
+            outline-color 350ms ease,
+            box-shadow 350ms ease,
+            fill 350ms ease,
+            stroke 350ms ease;
+    }
+}
+
+/* Snapshot the final palette instead of capturing intermediate color transitions. */
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+    transition: none !important;
+}
+
+html.theme-transitioning::view-transition-old(root),
+html.theme-transitioning::view-transition-new(root) {
+    animation-duration: 650ms;
+    animation-timing-function: ease-in-out;
+}
+
 body {
     margin: 0;
     background: var(--background);

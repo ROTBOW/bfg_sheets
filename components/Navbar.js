@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { flushSync } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -19,13 +20,39 @@ const getLightThemeSnapshot = () =>
     document.documentElement.dataset.theme === "light";
 const getServerThemeSnapshot = () => false;
 
-const toggleTheme = () => {
+let isThemeTransitioning = false;
+
+const toggleTheme = async () => {
+    if (isThemeTransitioning) {
+        return;
+    }
+
     const theme = getLightThemeSnapshot() ? "dark" : "light";
     const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    const applyTheme = () => {
+        document.documentElement.dataset.theme = theme;
+        document.cookie = `${themeCookieName}=${theme}; Path=/; SameSite=Lax${secure}`;
+        window.dispatchEvent(new Event("themechange"));
+    };
 
-    document.documentElement.dataset.theme = theme;
-    document.cookie = `${themeCookieName}=${theme}; Path=/; SameSite=Lax${secure}`;
-    window.dispatchEvent(new Event("themechange"));
+    if (!document.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        applyTheme();
+        return;
+    }
+
+    isThemeTransitioning = true;
+    document.documentElement.classList.add("theme-transitioning");
+
+    try {
+        // Capture complete themes, including the page canvas and native controls.
+        const transition = document.startViewTransition(() => flushSync(applyTheme));
+        await transition.finished;
+    } catch {
+        applyTheme();
+    } finally {
+        document.documentElement.classList.remove("theme-transitioning");
+        isThemeTransitioning = false;
+    }
 };
 
 const getAccentSnapshot = () =>

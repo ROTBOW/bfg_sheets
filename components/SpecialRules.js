@@ -4,10 +4,10 @@ const SpecialRules = ({ rules = [], isDemo = false, source }) => {
             <h2 id="special-rules-heading">Special rules</h2>
             {rules.length > 0 ? (
                 rules.map((rule, index) => (
-                    <div key={`${rule.name}-${index}`}>
-                        <h3>{rule.name}</h3>
+                    <details className="special-rule" key={`${rule.name}-${index}`}>
+                        <summary>{rule.name}</summary>
                         <p>{rule.description}</p>
-                    </div>
+                    </details>
                 ))
             ) : (
                 <p className="special-rules-empty">
@@ -25,10 +25,10 @@ const SpecialRules = ({ rules = [], isDemo = false, source }) => {
             {source && (
                 <p>
                     Base statistics and rule summaries from the{" "}
-                    <a href={source.url} target="_blank" rel="noreferrer">ship profile ↗</a>.
+                    <a className="rules-link" href={source.url} target="_blank" rel="noreferrer">ship profile ↗</a>.
                     {source.factionUrl && (
                         <>
-                            {" "}<a href={source.factionUrl} target="_blank" rel="noreferrer">Faction rules ↗</a>.
+                            {" "}<a className="rules-link" href={source.factionUrl} target="_blank" rel="noreferrer">Faction rules ↗</a>.
                         </>
                     )}
                 </p>

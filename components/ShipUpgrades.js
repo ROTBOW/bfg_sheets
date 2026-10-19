@@ -20,7 +20,7 @@ const ShipUpgrades = ({ ship, vessel, onChange }) => {
     return (
         <details className="ship-upgrades">
             <summary>Upgrades &amp; refits · {upgrades.length} selected</summary>
-            <p><a href={getProfileUrl(ship)} target="_blank" rel="noreferrer">Ship profile ↗</a></p>
+            <p><a className="rules-link" href={getProfileUrl(ship)} target="_blank" rel="noreferrer">Ship profile ↗</a></p>
             {!options.length && <p>No purchasable options for this class.</p>}
             <fieldset>
                 <legend className="sr-only">Options for {vessel.name || ship.name}</legend>
@@ -42,7 +42,7 @@ const ShipUpgrades = ({ ship, vessel, onChange }) => {
                                     {option.reason && <small>{option.reason}</small>}
                                 </span>
                             </label>
-                            <a href={option.source} target="_blank" rel="noreferrer" aria-label={`Rules for ${option.label}`}>Rules ↗</a>
+                            <a className="rules-link" href={option.source} target="_blank" rel="noreferrer" aria-label={`Rules for ${option.label}`}>Rules ↗</a>
                         </div>
                     );
                 })}

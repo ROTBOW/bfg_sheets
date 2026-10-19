@@ -72,7 +72,7 @@ const CriticalDamage = ({ entries, onUpdate }) => {
                 Repeated thruster hits still reduce speed by only 10 cm.
                 Hull breach (11): D3 hull damage; bulkhead collapse (12): D6.
                 Adjust stats manually.
-                {" "}<a href={criticalDamageSource} target="_blank" rel="noreferrer">Critical hit rules ↗</a>
+                {" "}<a className="rules-link" href={criticalDamageSource} target="_blank" rel="noreferrer">Critical hit rules ↗</a>
             </div>
         </section>
     );

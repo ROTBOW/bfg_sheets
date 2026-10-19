@@ -117,10 +117,10 @@ const FleetCreator = () => {
                 <span className="demo-badge">FIRST EDITION</span>
             </header>
             <p className="builder-reference">
-                Based on the <a href={rulesUrl} target="_blank" rel="noreferrer">Battlefleet Gothic: Remastered fleet list ↗</a>.
-                {" "}Includes ship options, <a href={refitsUrl} target="_blank" rel="noreferrer">ordnance refits</a>, and
-                {" "}<a href={reservesUrl} target="_blank" rel="noreferrer">Bastion / Armageddon reserves</a>.
-                {" "}<a href="https://battlefleet-game.org/fleet-lists/space-marines/" target="_blank" rel="noreferrer">Space Marine ships ↗</a> include base configurations; Codex, Crusade and Dominion eligibility and optional refits require manual review.
+                Based on the <a className="rules-link" href={rulesUrl} target="_blank" rel="noreferrer">Battlefleet Gothic: Remastered fleet list ↗</a>.
+                {" "}Includes ship options, <a className="rules-link" href={refitsUrl} target="_blank" rel="noreferrer">ordnance refits</a>, and
+                {" "}<a className="rules-link" href={reservesUrl} target="_blank" rel="noreferrer">Bastion / Armageddon reserves</a>.
+                {" "}<a className="rules-link" href="https://battlefleet-game.org/fleet-lists/space-marines/" target="_blank" rel="noreferrer">Space Marine ships ↗</a> include base configurations; Codex, Crusade and Dominion eligibility and optional refits require manual review.
                 {" "}Bakka, Mechanicus, allies and campaign rewards are not automated.
                 {" "}Saved fleets are available in the Battle Tracker; illustrative profiles are marked as demo data.
             </p>

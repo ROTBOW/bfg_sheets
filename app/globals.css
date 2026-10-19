@@ -198,6 +198,12 @@ a {
     text-decoration: none;
 }
 
+a.rules-link {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .topbar {
     height: 88px;
     border-bottom: 1px solid var(--border);

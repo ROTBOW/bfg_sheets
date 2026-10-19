@@ -74,8 +74,12 @@ const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, fleet, selectedShip
                                     {!isCompact && (
                                         <>
                                             <span className="fleet-stat">
-                                                <span>Shields</span>
-                                                <span>{battleStates[vessel.id]?.shields ?? vessel.profile.stats.shields} / {vessel.profile.stats.shields}</span>
+                                                <span>{vessel.profile.faction === "Necrons" ? "Saves" : "Shields"}</span>
+                                                <span>
+                                                    {vessel.profile.faction === "Necrons"
+                                                        ? `${vessel.profile.stats.reactiveHullSave} save`
+                                                        : `${battleStates[vessel.id]?.shields ?? vessel.profile.stats.shields} / ${vessel.profile.stats.shields}`}
+                                                </span>
                                             </span>
                                             <span className="fleet-stat">
                                                 <span>Speed</span>

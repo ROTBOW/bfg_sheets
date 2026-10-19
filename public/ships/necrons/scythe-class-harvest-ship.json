@@ -1,0 +1,99 @@
+{
+    "id": "scythe-class-harvest-ship",
+    "isDemo": false,
+    "className": "Scythe Class Harvest Ship",
+    "classLabel": "Scythe Class Harvest Ship",
+    "faction": "Necrons",
+    "type": "Cruiser",
+    "role": "Cruiser",
+    "description": "Scythe — Necron base configuration.",
+    "points": 275,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/necrons/scythe-class-harvest-ship.html",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/necrons/",
+        "accessedOn": "2026-10-19"
+    },
+    "stats": {
+        "hull": 8,
+        "speedCm": 30,
+        "turnDegrees": 45,
+        "shields": 0,
+        "reactiveHullSave": "5+",
+        "armour": {
+            "front": "6+",
+            "other": "6+"
+        },
+        "turrets": 3
+    },
+    "weapons": [
+        {
+            "name": "Lightning arc",
+            "type": "Lightning arc",
+            "rangeCm": 30,
+            "strength": 8,
+            "strengthUnit": "",
+            "arc": "Left/right"
+        },
+        {
+            "name": "Star pulse generator",
+            "type": "Star pulse generator",
+            "rangeCm": 20,
+            "strength": 1,
+            "strengthUnit": "per enemy",
+            "arc": "All around"
+        },
+        {
+            "name": "Gauss particle whip",
+            "type": "Gauss particle whip",
+            "rangeCm": 45,
+            "strength": 4,
+            "strengthUnit": "",
+            "arc": "Left/front/right"
+        },
+        {
+            "name": "Portal",
+            "type": "Portal",
+            "rangeCm": 10,
+            "strength": 2,
+            "strengthUnit": "",
+            "arc": "Left/front/right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Reactive hull",
+            "description": "Brace: save 2+, armour 4+. Repairs: 4+. Check faction rules for environmental immunities and save exceptions."
+        },
+        {
+            "name": "Inertialess drive",
+            "description": "All ahead full: +D6 × 10 cm; turn every 20 cm. Weapons remain halved."
+        },
+        {
+            "name": "Lightning arcs",
+            "description": "Battery rules; targets count as closing. Ignore holofield/shadowfield column shifts. Divide firepower between listed arcs."
+        },
+        {
+            "name": "Fade out",
+            "description": "Automatic disengagement after movement. Consult faction rules for victory-point penalties and campaign restrictions."
+        },
+        {
+            "name": "Star pulse generator",
+            "description": "Unavailable while crippled or on orders. Each non-Necron ship: nearest armour; each ordnance marker: 4+. No holofield saves."
+        },
+        {
+            "name": "Gauss particle whip",
+            "description": "Lance rules; hit rolls of 6 bypass shields and equivalent defences."
+        },
+        {
+            "name": "Portal",
+            "description": "Additional hit-and-run attacks against unshielded targets, regardless of orders or relative hull size. Halve (round down) when braced or crippled; no attacks when both. Raiders can only target ships with at most 6 hull remaining."
+        }
+    ],
+    "options": [],
+    "image": {
+        "src": "/ship-images/necrons/scythe-class-harvest-ship.png",
+        "width": 608,
+        "height": 273,
+        "source": "https://ships.battlefleet-game.org/necrons/scythe-class-harvest-ship.html"
+    }
+}

@@ -1,0 +1,75 @@
+{
+    "id": "jackal-class-raider",
+    "isDemo": false,
+    "className": "Jackal Class Raider",
+    "classLabel": "Jackal Class Raider",
+    "faction": "Necrons",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Jackal — Necron base configuration.",
+    "points": 50,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/necrons/jackal-class-raider.html",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/necrons/",
+        "accessedOn": "2026-10-19"
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 40,
+        "turnDegrees": 90,
+        "shields": 0,
+        "reactiveHullSave": "6+",
+        "armour": {
+            "front": "6+",
+            "other": "6+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Lightning arc",
+            "type": "Lightning arc",
+            "rangeCm": 30,
+            "strength": 4,
+            "strengthUnit": "",
+            "arc": "Front"
+        },
+        {
+            "name": "Portal",
+            "type": "Portal",
+            "rangeCm": 10,
+            "strength": 1,
+            "strengthUnit": "",
+            "arc": "All around"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Reactive hull",
+            "description": "Brace: save 2+, armour 4+. Repairs: 4+. Check faction rules for environmental immunities and save exceptions."
+        },
+        {
+            "name": "Inertialess drive",
+            "description": "All ahead full: +D6 × 10 cm; turn every 20 cm. Weapons remain halved."
+        },
+        {
+            "name": "Lightning arcs",
+            "description": "Battery rules; targets count as closing. Ignore holofield/shadowfield column shifts. Divide firepower between listed arcs."
+        },
+        {
+            "name": "Fade out",
+            "description": "Automatic disengagement after movement. Consult faction rules for victory-point penalties and campaign restrictions."
+        },
+        {
+            "name": "Portal",
+            "description": "Additional hit-and-run attacks against unshielded targets, regardless of orders or relative hull size. Halve (round down) when braced or crippled; no attacks when both. Raiders can only target ships with at most 6 hull remaining."
+        }
+    ],
+    "options": [],
+    "image": {
+        "src": "/ship-images/necrons/jackal-class-raider.png",
+        "width": 334,
+        "height": 188,
+        "source": "https://ships.battlefleet-game.org/necrons/jackal-class-raider.html"
+    }
+}

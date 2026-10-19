@@ -4,6 +4,7 @@
 
 - The Battlefleet Gothic: Remastered Imperial Navy fleet list is a major help in the creation of this site: https://battlefleet-game.org/fleet-lists/imperial-navy/
 - Keep this reference available for future ship-profile work
+- Necron profiles and their faction-specific critical table use https://battlefleet-game.org/fleet-lists/necrons/ and its linked ship profiles (checked 2026-10-19).
 
 This site automates tedious bookkeeping in the Battlefleet Gothic tabletop game. Prioritize clear ship information and fast interactions during play. The first page is a ship stat page using clearly labeled dummy data; sample statistics are not verified game rules.
 

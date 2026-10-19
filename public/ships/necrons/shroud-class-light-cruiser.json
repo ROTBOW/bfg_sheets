@@ -1,0 +1,67 @@
+{
+    "id": "shroud-class-light-cruiser",
+    "isDemo": false,
+    "className": "Shroud Class Light Cruiser",
+    "classLabel": "Shroud Class Light Cruiser",
+    "faction": "Necrons",
+    "type": "Cruiser",
+    "role": "Cruiser",
+    "description": "Shroud — Necron base configuration.",
+    "points": 155,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/necrons/shroud-class-light-cruiser.html",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/necrons/",
+        "accessedOn": "2026-10-19"
+    },
+    "stats": {
+        "hull": 4,
+        "speedCm": 30,
+        "turnDegrees": 45,
+        "shields": 0,
+        "reactiveHullSave": "5+",
+        "armour": {
+            "front": "6+",
+            "other": "6+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Lightning arc",
+            "type": "Lightning arc",
+            "rangeCm": 30,
+            "strength": 10,
+            "strengthUnit": "",
+            "arc": "Left/front/right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Reactive hull",
+            "description": "Brace: save 2+, armour 4+. Repairs: 4+. Check faction rules for environmental immunities and save exceptions."
+        },
+        {
+            "name": "Inertialess drive",
+            "description": "All ahead full: +D6 × 10 cm; turn every 20 cm. Weapons remain halved."
+        },
+        {
+            "name": "Lightning arcs",
+            "description": "Battery rules; targets count as closing. Ignore holofield/shadowfield column shifts. Divide firepower between listed arcs."
+        },
+        {
+            "name": "Fade out",
+            "description": "Automatic disengagement after movement. Consult faction rules for victory-point penalties and campaign restrictions."
+        },
+        {
+            "name": "Stealth and sensors",
+            "description": "While uncrippled, does not trigger orbital mines or give enemies a Command bonus for its orders. Any uncrippled Shroud grants the fleet an extra +1 Command bonus when an enemy is on orders."
+        }
+    ],
+    "options": [],
+    "image": {
+        "src": "/ship-images/necrons/shroud-class-light-cruiser.png",
+        "width": 382,
+        "height": 230,
+        "source": "https://ships.battlefleet-game.org/necrons/shroud-class-light-cruiser.html"
+    }
+}

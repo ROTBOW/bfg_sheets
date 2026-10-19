@@ -12,6 +12,7 @@ import { exportFleetJson, importFleetJson } from "@/lib/fleet-transfer.mjs";
 import "./fleet-builder.css";
 
 const factionRulesUrls = {
+    "Necrons": "https://battlefleet-game.org/fleet-lists/necrons/",
     "Imperial Navy": "https://battlefleet-game.org/fleet-lists/imperial-navy/",
     "Space Marines": "https://battlefleet-game.org/fleet-lists/space-marines/",
     "Adeptus Mechanicus": "https://battlefleet-game.org/fleet-lists/adeptus-mechanicus/",
@@ -251,7 +252,11 @@ const FleetCreator = () => {
                                         id="fleet-faction"
                                         value={fleet.selectedFaction}
                                         aria-describedby="fleet-faction-help"
-                                        onChange={(event) => updateFleet({ selectedFaction: event.target.value })}
+                                        onChange={(event) => updateFleet({
+                                            selectedFaction: event.target.value,
+                                            rerolls: 0,
+                                            ...(event.target.value === "Necrons" ? { commander: "none", flagshipId: "" } : {}),
+                                        })}
                                     >
                                         {fleetFactions.map((faction) => (
                                             <option key={faction} value={faction}>{faction}</option>
@@ -299,13 +304,19 @@ const FleetCreator = () => {
                                                 onChange={(event) => updateFleet({ commander: event.target.value, rerolls: 0, flagshipId: "" })}
                                             >
                                                 {commanders.map((commander) => (
-                                                    <option key={commander.id} value={commander.id}>{commander.name} · {commander.points} pts</option>
+                                                    <option
+                                                        key={commander.id}
+                                                        value={commander.id}
+                                                        disabled={fleet.selectedFaction === "Necrons" && commander.id !== "none"}
+                                                    >
+                                                        {commander.name} · {commander.points} pts
+                                                    </option>
                                                 ))}
                                             </select>
                                         </label>
-                                        {fleet.commander !== "none" && (
+                                        {(fleet.commander !== "none" || fleet.selectedFaction === "Necrons") && (
                                             <>
-                                                <label>
+                                                {fleet.selectedFaction !== "Necrons" && <label>
                                                     Commander’s ship
                                                     <select value={fleet.flagshipId} onChange={(event) => updateFleet({ flagshipId: event.target.value })}>
                                                         <option value="">Choose a ship</option>
@@ -313,7 +324,7 @@ const FleetCreator = () => {
                                                             <option key={ship.id} value={ship.id}>{index + 1}. {ship.name || "Unnamed vessel"}</option>
                                                         ))}
                                                     </select>
-                                                </label>
+                                                </label>}
                                                 <label>
                                                     {fleet.commander === "master-of-the-fleet" || fleet.commander.startsWith("archmagos-") ? "Fleet re-rolls" : "Extra re-rolls (one already included)"}
                                                     <select value={fleet.rerolls} onChange={(event) => updateFleet({ rerolls: Number(event.target.value) })}>

@@ -100,11 +100,12 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
     const shipStats = ship.stats;
     const { hull, shields, order, criticalDamage, message } = battleState;
     const hullStatus = getHullStatus(hull, shipStats.hull);
+    const isNecron = ship.faction === "Necrons";
     const characteristics = [
         ["Type", ship.type],
         ["Speed", shipStats.speedCm, "cm"],
         ["Turns", shipStats.turnDegrees, "°"],
-        ["Shields", shipStats.shields],
+        [isNecron ? "Saves" : "Shields", isNecron ? `${shipStats.reactiveHullSave} save` : shipStats.shields],
         ["Armour", `${shipStats.armour.front} / ${shipStats.armour.other}`],
         ["Turrets", shipStats.turrets],
     ];
@@ -282,13 +283,22 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                             max={shipStats.hull}
                             onChange={(value) => updateSelectedShip({ hull: value })}
                         />
-                        <Tracker
-                            label="Active shields"
-                            value={shields}
-                            max={shipStats.shields}
-                            onChange={(value) => updateSelectedShip({ shields: value })}
-                            tone="shield"
-                        />
+                        {isNecron ? (
+                            <div className="tracker shield">
+                                <div className="tracker-heading">
+                                    <span>Saves</span>
+                                    <strong>{shipStats.reactiveHullSave} save</strong>
+                                </div>
+                            </div>
+                        ) : (
+                            <Tracker
+                                label="Active shields"
+                                value={shields}
+                                max={shipStats.shields}
+                                onChange={(value) => updateSelectedShip({ shields: value })}
+                                tone="shield"
+                            />
+                        )}
                         <div className="leadership">
                             <span>
                                 Leadership<small>{leadership ? "Fleet commander" : "Determine at the table"}</small>

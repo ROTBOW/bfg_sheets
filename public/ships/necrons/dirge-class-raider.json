@@ -1,0 +1,63 @@
+{
+    "id": "dirge-class-raider",
+    "isDemo": false,
+    "className": "Dirge Class Raider",
+    "classLabel": "Dirge Class Raider",
+    "faction": "Necrons",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Dirge — Necron base configuration.",
+    "points": 40,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/necrons/dirge-class-raider.html",
+        "factionUrl": "https://battlefleet-game.org/fleet-lists/necrons/",
+        "accessedOn": "2026-10-19"
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 50,
+        "turnDegrees": 90,
+        "shields": 0,
+        "reactiveHullSave": "6+",
+        "armour": {
+            "front": "6+",
+            "other": "6+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Lightning arc",
+            "type": "Lightning arc",
+            "rangeCm": 30,
+            "strength": 3,
+            "strengthUnit": "",
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Reactive hull",
+            "description": "Brace: save 2+, armour 4+. Repairs: 4+. Check faction rules for environmental immunities and save exceptions."
+        },
+        {
+            "name": "Inertialess drive",
+            "description": "All ahead full: +D6 × 10 cm; turn every 20 cm. Weapons remain halved."
+        },
+        {
+            "name": "Lightning arcs",
+            "description": "Battery rules; targets count as closing. Ignore holofield/shadowfield column shifts. Divide firepower between listed arcs."
+        },
+        {
+            "name": "Fade out",
+            "description": "Automatic disengagement after movement. Consult faction rules for victory-point penalties and campaign restrictions."
+        }
+    ],
+    "options": [],
+    "image": {
+        "src": "/ship-images/necrons/dirge-class-raider.png",
+        "width": 237,
+        "height": 122,
+        "source": "https://ships.battlefleet-game.org/necrons/dirge-class-raider.html"
+    }
+}

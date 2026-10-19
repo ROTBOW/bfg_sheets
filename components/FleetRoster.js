@@ -16,7 +16,7 @@ const FleetRoster = ({ fleet, onChange }) => {
 
     return (
         <section className="panel builder-panel" aria-labelledby="roster-title">
-            <p className="eyebrow">Muster roll</p>
+            <p className="eyebrow text-lg">Ships in Fleet</p>
             <h2 id="roster-title">Fleet roster · {fleet.ships.length} ships</h2>
             {!fleet.ships.length && (
                 <div className="builder-empty">

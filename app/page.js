@@ -339,6 +339,7 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                         )}
                     </section>
                     <SpecialRules
+                        key={vessel.id}
                         rules={ship.specialRules}
                         isDemo={ship.isDemo}
                         source={ship.source}

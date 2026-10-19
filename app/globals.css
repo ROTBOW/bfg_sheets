@@ -872,11 +872,30 @@ td small {
     letter-spacing: 1.5px;
 }
 
-.reference-card h3 {
-        font-weight: 400;
-    font-size: 22px;
-    margin: 16px 0 10px;
+.special-rule {
+    margin: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.special-rule summary {
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 500;
     color: light-dark(#5e584e, #d4d5bc);
+    cursor: pointer;
+}
+
+.special-rule summary::marker {
+    color: var(--accent);
+}
+
+.special-rule summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+}
+
+.special-rule[open] {
+    padding-bottom: 12px;
 }
 
 .reference-card p {

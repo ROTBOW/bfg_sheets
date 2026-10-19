@@ -1131,6 +1131,7 @@ footer {
     gap: 28px;
     max-width: none;
     padding: 0 32px 0 0;
+    transition: grid-template-columns 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ship-viewer {
@@ -1210,6 +1211,7 @@ footer {
     background: transparent;
     color: var(--muted);
     font-size: 10px;
+    transition: background-color 180ms ease, color 180ms ease;
 }
 
 .fleet-view-toggle button:hover,
@@ -1218,20 +1220,62 @@ footer {
     color: var(--accent);
 }
 
-.fleet-menu[data-view="compact"] .fleet-list {
-    gap: 6px;
+.battle-layout:has(.fleet-menu[data-view="details"]) {
+    grid-template-columns: clamp(320px, 26vw, 400px) minmax(0, 1fr);
 }
 
-.fleet-menu[data-view="compact"] .fleet-ship {
-    flex-direction: row;
+.fleet-menu[data-view="details"] .fleet-ship {
+    padding: 22px 20px;
+}
+
+.fleet-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px 12px;
+    width: 100%;
+    margin-top: 6px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    animation: fleet-stats-enter 300ms ease-out both;
+}
+
+@keyframes fleet-stats-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fleet-stat,
+.fleet-stats .fleet-hull {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 12px;
+    gap: 6px;
+    white-space: normal;
 }
 
-.fleet-menu[data-view="compact"] .fleet-ship strong {
-    font-size: 14px;
+.fleet-stat > span:first-child,
+.fleet-stats .fleet-hull > span:first-child {
+    width: 100%;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.fleet-stat > span:last-child,
+.fleet-stats .fleet-hull > span:nth-child(2) {
+    color: var(--foreground);
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+}
+
+.fleet-ship strong {
+    overflow-wrap: anywhere;
 }
 
 .fleet-hull {
@@ -1275,6 +1319,22 @@ footer {
     background: transparent;
     color: var(--muted);
     font-size: 11px;
+    transition:
+        padding 360ms cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 180ms ease,
+        border-color 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .battle-layout,
+    .fleet-ship,
+    .fleet-view-toggle button {
+        transition: none;
+    }
+
+    .fleet-stats {
+        animation: none;
+    }
 }
 
 .fleet-ship strong {
@@ -1330,7 +1390,8 @@ footer {
 }
 
 @media (max-width: 760px) {
-    .battle-layout {
+    .battle-layout,
+    .battle-layout:has(.fleet-menu[data-view="details"]) {
         grid-template-columns: minmax(0, 1fr);
         padding: 0 18px 0 0;
     }

@@ -58,18 +58,43 @@ const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, fleet, selectedShip
                             aria-pressed={selectedShipId === vessel.id}
                             onClick={() => onSelect(vessel.id)}
                         >
-                            {!isCompact && (
-                                <span className="registry">{vessel.registry}</span>
-                            )}
+                            <span className="registry">{vessel.registry}</span>
                             <strong>{vessel.name}</strong>
-                            {!isCompact && <span>{vessel.className}</span>}
+                            <span>{vessel.className}</span>
                             {vessel.profile ? (
-                                <span className="fleet-hull">
-                                    Hull {battleStates[vessel.id]?.hull ?? vessel.profile.stats.hull} / {vessel.profile.stats.hull}
-                                    <HullWarning
-                                        hull={battleStates[vessel.id]?.hull ?? vessel.profile.stats.hull}
-                                        maxHull={vessel.profile.stats.hull}
-                                    />
+                                <span className={isCompact ? undefined : "fleet-stats"}>
+                                    <span className="fleet-hull">
+                                        <span>Hull</span>
+                                        <span>{battleStates[vessel.id]?.hull ?? vessel.profile.stats.hull} / {vessel.profile.stats.hull}</span>
+                                        <HullWarning
+                                            hull={battleStates[vessel.id]?.hull ?? vessel.profile.stats.hull}
+                                            maxHull={vessel.profile.stats.hull}
+                                        />
+                                    </span>
+                                    {!isCompact && (
+                                        <>
+                                            <span className="fleet-stat">
+                                                <span>Shields</span>
+                                                <span>{battleStates[vessel.id]?.shields ?? vessel.profile.stats.shields} / {vessel.profile.stats.shields}</span>
+                                            </span>
+                                            <span className="fleet-stat">
+                                                <span>Speed</span>
+                                                <span>{vessel.profile.stats.speedCm} cm</span>
+                                            </span>
+                                            <span className="fleet-stat">
+                                                <span>Turns</span>
+                                                <span>{vessel.profile.stats.turnDegrees}°</span>
+                                            </span>
+                                            <span className="fleet-stat">
+                                                <span>Armour <small>(front / other)</small></span>
+                                                <span>{vessel.profile.stats.armour.front} / {vessel.profile.stats.armour.other}</span>
+                                            </span>
+                                            <span className="fleet-stat">
+                                                <span>Turrets</span>
+                                                <span>{vessel.profile.stats.turrets}</span>
+                                            </span>
+                                        </>
+                                    )}
                                 </span>
                             ) : <span>Profile pending</span>}
                         </button>

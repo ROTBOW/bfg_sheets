@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import HullWarning from "@/components/HullWarning";
+import ShipName from "@/components/ShipName";
 import SpecialRules from "@/components/SpecialRules";
 import FleetMenu from "@/components/FleetMenu";
 import CriticalDamage from "@/components/CriticalDamage";
@@ -131,7 +132,9 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                     <p className="eyebrow">
                         VESSEL RECORD · {vessel.registry}
                     </p>
-                    <h1>{vessel.name}</h1>
+                    <h1>
+                        <ShipName name={vessel.name} hull={hull} />
+                    </h1>
                     <p className="subtitle">
                         {ship.className} <span>·</span> {ship.faction}
                     </p>
@@ -258,6 +261,8 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                     <CriticalDamage
                         key={vessel.id}
                         entries={criticalDamage}
+                        faction={ship.faction}
+                        hasSepulchre={vessel.upgrades?.includes("sepulchre") ?? false}
                         onUpdate={(update) => updateSelectedShip((current) => ({
                             criticalDamage: update(current.criticalDamage),
                             message: "",

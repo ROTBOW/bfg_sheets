@@ -58,6 +58,9 @@ const ShipCatalog = ({ onAdd }) => {
                     <option value="Reserves">Reserves</option>
                 </select>
             </label>
+            <p role="status" className="mt-1">
+                {matchingShips.length} {matchingShips.length === 1 ? "ship" : "ships"} shown
+            </p>
             <ul
                 className="builder-catalog"
                 aria-label="Available ships"

@@ -353,8 +353,8 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                 <span>Unofficial tabletop companion · {ship.isDemo ? "Demo profile" : "Source profile"}</span>
                 <span className="footer-credit">
                     A major help in creating this site:{" "}
-                    <a className="rules-link" href="https://battlefleet-game.org/fleet-lists/imperial-navy/">
-                        Battlefleet Gothic: Remastered — Imperial Navy fleet list
+                    <a className="rules-link" href="https://battlefleet-game.org/">
+                        Battlefleet Gothic: Remastered
                     </a>
                 </span>
             </footer>

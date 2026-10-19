@@ -34,6 +34,7 @@ const FleetRoster = ({ fleet, onChange }) => {
                                 <strong>{ship.name} · {ship.type}</strong>
                                 <span>{getVesselPoints(ship, vessel)} pts</span>
                             </div>
+                            <small>Faction: {ship.faction}</small>
                             {ship.reserveSource && <small>Reserve · {ship.reserveSource} fleet list</small>}
                             <label>
                                 Vessel {index + 1} name

@@ -1,4 +1,9 @@
 {
+    "_notes": {
+        "usage": "Authoring notes only; remove _notes from completed profiles. Omit faction-specific fields when they do not apply.",
+        "stats.reactiveHullSave": "Necrons only: base reactive hull save as a string, e.g. 4+ for Cairn, 5+ for Scythe/Shroud, or 6+ for Jackal/Dirge. Set stats.shields to 0; the UI displays Saves instead of Shields.",
+        "specialRules": "All factions: record named rule summaries here. Space Marine and Adeptus Mechanicus rules currently use this list and the shared base stats rather than additional faction-specific stat fields."
+    },
     "id": "",
     "isDemo": true,
     "className": "",
@@ -15,6 +20,7 @@
         "speedCm": 0,
         "turnDegrees": 0,
         "shields": 0,
+        "reactiveHullSave": "",
         "armour": {
             "front": "",
             "other": ""

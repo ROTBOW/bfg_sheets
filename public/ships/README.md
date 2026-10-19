@@ -39,6 +39,10 @@ of special rules and class options. These summaries do not replace the source ru
 - `source`: provenance for newly transcribed statistics; image provenance alone
   does not mean an existing demo profile's statistics have been verified.
 - `stats`: base hull, movement, shields, armour and turrets.
+- `stats.reactiveHullSave`: Necrons only. A string such as `"4+"` for Cairn,
+  `"5+"` for Scythe/Shroud, or `"6+"` for Jackal/Dirge. Keep `stats.shields`
+  at `0`; the main page and fleet menu display this value as Saves.
+  Omit this field for other factions.
 - `weapons`: numeric `rangeCm` for a single range. For range bands or mixed
   attack-craft speeds, `rangeCm` is null and `rangeLabel` is the display value,
   including units. `strengthUnit` distinguishes launch-bay squadrons.
@@ -66,6 +70,9 @@ by the generic capital-ship turret increase.
 1. Create matching folders under `public/ships/<faction>/` and
    `public/ship-images/<faction>/`.
 2. Copy the shared template into the profile folder and populate its fields.
+   Follow its `_notes` for faction-specific fields, then remove `_notes` and
+   any fields that do not apply. These notes are authoring metadata, not rules
+   displayed in the app.
    Keep image attribution and dimensions in that faction's manifest and README.
 3. Register profiles in `lib/factions/<faction>/profiles.js`, then include that
    registry in `lib/battle-profiles.js`. Registry keys must be unique across

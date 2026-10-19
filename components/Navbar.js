@@ -105,13 +105,25 @@ const OptionsDropdown = () => {
                 type="button"
                 className="options-button"
                 ref={buttonRef}
+                aria-label="Options"
+                title="Options"
                 aria-expanded={isOpen}
                 aria-controls="site-options"
                 onClick={() => setIsOpen((wasOpen) => !wasOpen)}
             >
-                <span aria-hidden="true">⚙</span>
-                Options
-                <span aria-hidden="true">▾</span>
+                <svg
+                    className="options-gear"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <path d="m9 3 .6-2h4.8l.6 2 .5 1.4 1.4.8 1.5-.3 2-.5 2.4 4.2-1.4 1.5-1 1.1v1.6l1 1.1 1.4 1.5-2.4 4.2-2-.5-1.5-.3-1.4.8L15 21l-.6 2H9.6L9 21l-.5-1.4-1.4-.8-1.5.3-2 .5-2.4-4.2 1.4-1.5 1-1.1v-1.6l-1-1.1-1.4-1.5 2.4-4.2 2 .5 1.5.3 1.4-.8Z" />
+                    <circle cx="12" cy="12" r="3.5" />
+                </svg>
             </button>
             {isOpen && (
                 <div
@@ -166,6 +178,13 @@ const OptionsDropdown = () => {
                             ))}
                         </div>
                     </fieldset>
+                    <Link
+                        href="/about"
+                        className="options-about-link"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        About BFG Sheets <span aria-hidden="true">→</span>
+                    </Link>
                 </div>
             )}
         </div>

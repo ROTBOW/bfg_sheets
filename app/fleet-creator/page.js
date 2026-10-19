@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ShipCatalog from "@/components/ShipCatalog";
 import FleetRoster from "@/components/FleetRoster";
 import {
@@ -8,6 +8,7 @@ import {
     getReserveAllowances, getRerollCosts, storageKey,
 } from "@/lib/fleets.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
+import { exportFleetJson, importFleetJson } from "@/lib/fleet-transfer.mjs";
 import "./fleet-builder.css";
 
 const factionRulesUrls = {
@@ -23,6 +24,11 @@ const FleetCreator = () => {
     const [loadError, setLoadError] = useState("");
     const [saveStatus, setSaveStatus] = useState("");
     const [pendingDelete, setPendingDelete] = useState(false);
+    const [transferStatus, setTransferStatus] = useState("");
+    const [transferError, setTransferError] = useState("");
+    const [importing, setImporting] = useState(false);
+    const importInput = useRef(null);
+    const currentFleets = useRef([]);
 
     useEffect(() => {
         let active = true;
@@ -34,6 +40,7 @@ const FleetCreator = () => {
             try {
                 const { fleets: saved, saveError } = loadFleetLibrary(window.localStorage);
                 setFleets(saved);
+                currentFleets.current = saved;
                 setSelectedId(getDefaultFleetId(saved));
                 setLoaded(true);
                 setSaveStatus("Saved on this browser only");
@@ -52,6 +59,7 @@ const FleetCreator = () => {
     const fleet = fleets.find((entry) => entry.id === selectedId);
 
     const saveFleets = (nextFleets) => {
+        currentFleets.current = nextFleets;
         setFleets(nextFleets);
 
         try {
@@ -95,6 +103,50 @@ const FleetCreator = () => {
         setPendingDelete(false);
     };
 
+    const exportFleet = () => {
+        setTransferError("");
+        setTransferStatus("");
+
+        try {
+            const blob = new Blob([exportFleetJson(fleet)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const filename = fleet.name.replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "");
+            link.href = url;
+            link.download = `${filename || "fleet"}.json`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            setTransferStatus("Fleet JSON download started.");
+        } catch {
+            setTransferError("The fleet could not be exported. Please try again.");
+        }
+    };
+
+    const importFleet = async (event) => {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+        if (!file) return;
+
+        setImporting(true);
+        setTransferError("");
+        setTransferStatus("");
+
+        try {
+            const importedFleet = importFleetJson(await file.text());
+            // File reading is asynchronous; retain edits made while it was loading.
+            saveFleets([...currentFleets.current, importedFleet]);
+            setSelectedId(importedFleet.id);
+            setPendingDelete(false);
+            setTransferStatus(`Imported “${importedFleet.name || "Untitled fleet"}”.`);
+        } catch {
+            setTransferError("Could not import this file. Choose a valid single-fleet JSON export from Fleet Creator. Existing fleets have not been changed.");
+        } finally {
+            setImporting(false);
+        }
+    };
+
     const addShip = (ship) => {
         updateFleet({
             ships: [...fleet.ships, {
@@ -115,11 +167,9 @@ const FleetCreator = () => {
         <main className="fleet-builder">
             <header className="page-heading">
                 <div>
-                    <p className="eyebrow">Imperial Navy / Space Marines / Adeptus Mechanicus</p>
-                    <h1>Fleet builder</h1>
-                    <p className="subtitle">Assemble your fleet. Keep your muster roll close.</p>
+                    <h1>Fleet Creator</h1>
+                    <p className="subtitle">Create your fleets here, or export them to use in a page on another machine</p>
                 </div>
-                <span className="demo-badge">FIRST EDITION</span>
             </header>
             {loadError && <p role="alert">{loadError}</p>}
             {!loaded && !loadError && <p role="status">Loading saved fleets…</p>}
@@ -145,7 +195,25 @@ const FleetCreator = () => {
                         <button type="button" onClick={addFleet}>+ New fleet</button>
                         {fleet && <button type="button" onClick={duplicateFleet}>Duplicate</button>}
                         {fleet && <button type="button" onClick={() => setPendingDelete(true)}>Delete fleet</button>}
+                        {fleet && <button type="button" onClick={exportFleet}>Export fleet</button>}
+                        <button
+                            type="button"
+                            disabled={importing}
+                            onClick={() => importInput.current?.click()}
+                        >
+                            {importing ? "Importing…" : "Import fleet"}
+                        </button>
+                        <input
+                            ref={importInput}
+                            type="file"
+                            accept=".json,application/json"
+                            aria-label="Import fleet JSON file"
+                            hidden
+                            onChange={importFleet}
+                        />
                     </section>
+                    {transferError && <p role="alert">{transferError}</p>}
+                    {transferStatus && <p role="status">{transferStatus}</p>}
                     <div className="builder-row builder-save">
                         <p role="status">{saveStatus}</p>
                         {saveStatus.startsWith("Not saved") && (
@@ -154,7 +222,7 @@ const FleetCreator = () => {
                     </div>
                     {pendingDelete && (
                         <div className="panel builder-confirm" role="alert">
-                            <p>Delete “{fleet.name || "Untitled fleet"}” from this browser? This cannot be undone.</p>
+                            <p>Delete “{fleet.name || "Untitled fleet"}”? This cannot be undone.</p>
                             <button type="button" onClick={deleteFleet}>Confirm deletion</button>
                             <button type="button" onClick={() => setPendingDelete(false)}>Keep fleet</button>
                         </div>

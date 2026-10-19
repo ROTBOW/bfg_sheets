@@ -1,0 +1,85 @@
+{
+    "id": "armageddon-class-battlecruiser",
+    "isDemo": false,
+    "className": "Armageddon-class Battlecruiser",
+    "image": {
+        "src": "/ship-images/imperial-navy/armageddon-class-battlecruiser.png",
+        "width": 643,
+        "height": 231,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/armageddon-class-battlecruiser.html"
+    },
+    "classLabel": "Armageddon class",
+    "faction": "Imperial Navy",
+    "type": "Battlecruiser",
+    "role": "Battlecruiser",
+    "description": "Armageddon Class Battlecruiser base configuration.",
+    "points": 235,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/armageddon-class-battlecruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 8,
+        "speedCm": 20,
+        "turnDegrees": 45,
+        "shields": 2,
+        "armour": {
+            "front": "6+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Port lance battery",
+            "type": "Lance",
+            "rangeCm": 45,
+            "strength": 2,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard lance battery",
+            "type": "Lance",
+            "rangeCm": 45,
+            "strength": 2,
+            "arc": "Right"
+        },
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 6,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 6,
+            "arc": "Right"
+        },
+        {
+            "name": "Prow torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 6,
+            "arc": "Front"
+        },
+        {
+            "name": "Dorsal lance battery",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 2,
+            "arc": "Left / Front / Right"
+        }
+    ],
+    "specialRules": [],
+    "options": [
+        {
+            "name": "Nova cannon",
+            "points": 20,
+            "description": "Exchange prow torpedo tubes for a nova cannon."
+        }
+    ]
+}

@@ -1,0 +1,80 @@
+{
+    "id": "endeavour-class-light-cruiser-bakka",
+    "isDemo": false,
+    "className": "Endeavour-class Light Cruiser (Bakka)",
+    "image": {
+        "src": "/ship-images/imperial-navy/endeavour-class-light-cruiser-bakka.png",
+        "width": 404,
+        "height": 149,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/endeavour-class-light-cruiser-bakka.html"
+    },
+    "classLabel": "Endeavour class (Bakka)",
+    "faction": "Imperial Navy",
+    "type": "Cruiser",
+    "role": "Light cruiser",
+    "description": "Endeavour Class Light Cruiser (Bakka) base configuration.",
+    "points": 115,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/endeavour-class-light-cruiser-bakka.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 6,
+        "speedCm": 20,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 3
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 6,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 6,
+            "arc": "Right"
+        },
+        {
+            "name": "Prow weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Left / Front / Right"
+        },
+        {
+            "name": "Prow torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Compartmentalised hull",
+            "description": "Add +1 to the roll when defending a boarding action."
+        },
+        {
+            "name": "Bakka turret fit",
+            "description": "The base profile includes 3 turrets; the additional Bakka turret upgrade remains available."
+        }
+    ],
+    "options": [
+        {
+            "name": "Armoured prow",
+            "points": 0,
+            "description": "Prow armour becomes 6+; turn allowance decreases to 45 degrees."
+        }
+    ]
+}

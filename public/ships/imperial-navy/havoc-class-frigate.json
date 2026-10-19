@@ -1,0 +1,51 @@
+{
+    "id": "havoc-class-frigate",
+    "isDemo": false,
+    "className": "Havoc-class Frigate",
+    "image": {
+        "src": "/ship-images/imperial-navy/havoc-class-frigate.png",
+        "width": 275,
+        "height": 159,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/havoc-class-frigate.html"
+    },
+    "classLabel": "Havoc class",
+    "faction": "Imperial Navy",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Havoc Class Frigate base configuration.",
+    "points": 35,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/havoc-class-frigate.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 25,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Dorsal weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 3,
+            "arc": "Left / Front / Right"
+        },
+        {
+            "name": "Prow weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [],
+    "options": []
+}

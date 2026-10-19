@@ -1,0 +1,51 @@
+{
+    "id": "falchion-class-frigate",
+    "isDemo": false,
+    "className": "Falchion-class Frigate",
+    "image": {
+        "src": "/ship-images/imperial-navy/falchion-class-frigate.png",
+        "width": 366,
+        "height": 125,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/falchion-class-frigate.html"
+    },
+    "classLabel": "Falchion class",
+    "faction": "Imperial Navy",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Falchion Class Frigate base configuration.",
+    "points": 35,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/falchion-class-frigate.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 25,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Prow weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 3,
+            "arc": "Left / Front / Right"
+        },
+        {
+            "name": "Prow torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 1,
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [],
+    "options": []
+}

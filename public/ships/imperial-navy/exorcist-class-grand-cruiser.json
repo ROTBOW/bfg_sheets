@@ -1,0 +1,85 @@
+{
+    "id": "exorcist-class-grand-cruiser",
+    "isDemo": false,
+    "className": "Exorcist-class Grand Cruiser",
+    "image": {
+        "src": "/ship-images/imperial-navy/exorcist-class-grand-cruiser.png",
+        "width": 624,
+        "height": 296,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/exorcist-class-grand-cruiser.html"
+    },
+    "classLabel": "Exorcist class",
+    "faction": "Imperial Navy",
+    "type": "Grand Cruiser",
+    "role": "Grand Cruiser",
+    "description": "Exorcist Class Grand Cruiser base configuration.",
+    "points": 230,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/exorcist-class-grand-cruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 10,
+        "speedCm": 20,
+        "turnDegrees": 45,
+        "shields": 3,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 3
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 8,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 8,
+            "arc": "Right"
+        },
+        {
+            "name": "Port launch bays",
+            "type": "Launch Bay",
+            "rangeCm": null,
+            "strength": 2,
+            "arc": "–",
+            "rangeLabel": "Furies: 30 cm / Starhawks: 20 cm / (Sharks: 30 cm)",
+            "strengthUnit": "squadrons"
+        },
+        {
+            "name": "Starboard launch bays",
+            "type": "Launch Bay",
+            "rangeCm": null,
+            "strength": 2,
+            "arc": "–",
+            "rangeLabel": "Furies: 30 cm / Starhawks: 20 cm / (Sharks: 30 cm)",
+            "strengthUnit": "squadrons"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "No vulnerable prow armament",
+            "description": "Ignore prow-armament critical results without escalating them. Any underlying hit still causes its normal damage."
+        }
+    ],
+    "options": [
+        {
+            "name": "Close-range batteries",
+            "points": 0,
+            "description": "Each broadside becomes firepower 10 at 30 cm."
+        },
+        {
+            "name": "Shark assault boats",
+            "points": 10,
+            "description": "Add Sharks to the available attack craft."
+        }
+    ]
+}

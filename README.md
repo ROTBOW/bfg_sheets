@@ -39,6 +39,11 @@ statistics and linked rule summaries. All 34 Imperial Navy images have matching
 profiles. Purchased options are listed but do not modify base statistics.
 See `public/ships/README.md` for the profile schema and provenance.
 
+Ship assets are grouped by faction: JSONs in `public/ships/imperial-navy/`,
+images and attribution in `public/ship-images/imperial-navy/`, and imports in
+`lib/factions/imperial-navy/profiles.js`. The shared ship template stays at
+`public/ships/ship-template.json`.
+
 Run fleet calculation and saved-data validation checks with
 `node --test tests/fleets.test.mjs`.
 

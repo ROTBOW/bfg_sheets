@@ -5,10 +5,10 @@ import { shipCatalog } from "../lib/fleets.mjs";
 import { getProfileUrl } from "../lib/ship-upgrades.mjs";
 
 const readJson = (relativePath) => JSON.parse(readFileSync(new URL(relativePath, import.meta.url), "utf8"));
-const images = readJson("../public/ship%20images/manifest.json");
+const images = readJson("../public/ship-images/imperial-navy/manifest.json");
 const profiles = new Map();
 for (const image of images) {
-    profiles.set(image.id, readJson(`../public/ships/${image.id}.json`));
+    profiles.set(image.id, readJson(`../public/ships/imperial-navy/${image.id}.json`));
 }
 
 test("every downloaded image has a matching profile with correct dimensions and a local asset", () => {
@@ -48,11 +48,11 @@ test("new profiles have provenance and valid stats, ranges and weapon strengths"
 });
 
 test("all selectable classes now have profiles without changing fleet eligibility", () => {
-    const registry = readFileSync(new URL("../lib/battle-profiles.js", import.meta.url), "utf8");
+    const registry = readFileSync(new URL("../lib/factions/imperial-navy/profiles.js", import.meta.url), "utf8");
     for (const ship of shipCatalog) {
         const id = getProfileUrl(ship).split("/").at(-1).replace(".html", "");
         assert.ok(profiles.has(id), `Missing profile: ${ship.id}`);
-        assert.ok(registry.includes(`public/ships/${id}.json`), `Unregistered: ${ship.id}`);
+        assert.ok(registry.includes(`public/ships/imperial-navy/${id}.json`), `Unregistered: ${ship.id}`);
     }
     assert.ok(!shipCatalog.some((ship) => ship.id === "jovian"));
     assert.ok(!shipCatalog.some((ship) => ship.id === "transport"));

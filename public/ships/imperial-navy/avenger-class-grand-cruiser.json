@@ -1,0 +1,56 @@
+{
+    "id": "avenger-class-grand-cruiser",
+    "isDemo": false,
+    "className": "Avenger-class Grand Cruiser",
+    "image": {
+        "src": "/ship-images/imperial-navy/avenger-class-grand-cruiser.png",
+        "width": 619,
+        "height": 296,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/avenger-class-grand-cruiser.html"
+    },
+    "classLabel": "Avenger class",
+    "faction": "Imperial Navy",
+    "type": "Grand Cruiser",
+    "role": "Grand Cruiser",
+    "description": "Avenger Class Grand Cruiser base configuration.",
+    "points": 200,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/avenger-class-grand-cruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 10,
+        "speedCm": 20,
+        "turnDegrees": 45,
+        "shields": 3,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 3
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 16,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 16,
+            "arc": "Right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "No vulnerable prow armament",
+            "description": "Ignore prow-armament critical results without escalating them. Any underlying hit still causes its normal damage."
+        }
+    ],
+    "options": []
+}

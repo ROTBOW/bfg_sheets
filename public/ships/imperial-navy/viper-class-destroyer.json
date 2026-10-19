@@ -1,0 +1,44 @@
+{
+    "id": "viper-class-destroyer",
+    "isDemo": false,
+    "className": "Viper-class Destroyer",
+    "image": {
+        "src": "/ship-images/imperial-navy/viper-class-destroyer.png",
+        "width": 230,
+        "height": 72,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/viper-class-destroyer.html"
+    },
+    "classLabel": "Viper class",
+    "faction": "Imperial Navy",
+    "type": "Escort",
+    "role": "Escort",
+    "description": "Viper Class Destroyer base configuration.",
+    "points": 35,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/viper-class-destroyer.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 1,
+        "speedCm": 30,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "4+",
+            "other": "4+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Prow torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 3,
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [],
+    "options": []
+}

@@ -1,8 +1,31 @@
 # Ship profiles
 
-There is one profile JSON per Imperial Navy image in
-[`../ship images/manifest.json`](../ship%20images/manifest.json). Bakka variants
-have distinct filenames and IDs. `ship-template.json` is a blank authoring template.
+Profiles are grouped by faction slug. Use lowercase, hyphenated folder names.
+The shared `ship-template.json` stays here as a blank authoring template.
+
+```text
+public/
+    ships/
+        ship-template.json
+        imperial-navy/
+            lunar-class-cruiser.json
+    ship-images/
+        imperial-navy/
+            lunar-class-cruiser.png
+            manifest.json
+            README.md
+lib/
+    factions/
+        imperial-navy/
+            profiles.js
+    battle-profiles.js
+```
+
+There is one profile JSON per Imperial Navy image in the
+[image manifest](../ship-images/imperial-navy/manifest.json). Bakka variants
+have distinct filenames and IDs. Image filenames in the manifest are relative
+to its faction folder; profile `image.src` values are public URLs such as
+`/ship-images/imperial-navy/lunar-class-cruiser.png`.
 
 The original eight profiles retain their illustrative statistics and
 `isDemo: true` flag. Their image metadata now points to the downloaded assets.
@@ -25,7 +48,23 @@ of special rules and class options. These summaries do not replace the source ru
 - `points`: base cost, or null for the scenario-dependent Transport.
 - `demoVessel`: optional illustrative vessel identity on the original profiles.
 
-All profiles are registered in `lib/battle-profiles.js`. Only classes allowed
+Imperial Navy imports live in `lib/factions/imperial-navy/profiles.js` and are
+combined by `lib/battle-profiles.js`. Only classes allowed
 by the existing fleet-builder catalog can be selected in a saved fleet;
 adding a profile does not expand fleet-list eligibility. Purchased upgrades
 remain managed by `lib/ship-upgrades.mjs` and do not alter base battle statistics.
+
+## Adding another faction
+
+1. Create matching folders under `public/ships/<faction>/` and
+   `public/ship-images/<faction>/`.
+2. Copy the shared template into the profile folder and populate its fields.
+   Keep image attribution and dimensions in that faction's manifest and README.
+3. Register profiles in `lib/factions/<faction>/profiles.js`, then include that
+   registry in `lib/battle-profiles.js`. Registry keys must be unique across
+   factions; use faction-prefixed keys for new classes that share names.
+4. Add fleet eligibility and upgrade rules separately before exposing new
+   classes in the fleet builder. Extend the profile tests for the new faction.
+
+Existing Imperial Navy class IDs and profile IDs are unchanged, preserving
+local-storage fleets. Moving assets does not require a fleet-data migration.

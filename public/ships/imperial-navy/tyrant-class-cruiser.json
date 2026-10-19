@@ -1,0 +1,83 @@
+{
+    "id": "tyrant-class-cruiser",
+    "isDemo": false,
+    "className": "Tyrant-class Cruiser",
+    "image": {
+        "src": "/ship-images/imperial-navy/tyrant-class-cruiser.png",
+        "width": 441,
+        "height": 161,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/tyrant-class-cruiser.html"
+    },
+    "classLabel": "Tyrant class",
+    "faction": "Imperial Navy",
+    "type": "Cruiser",
+    "role": "Cruiser",
+    "description": "Tyrant Class Cruiser base configuration.",
+    "points": 185,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/tyrant-class-cruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 8,
+        "speedCm": 20,
+        "turnDegrees": 45,
+        "shields": 2,
+        "armour": {
+            "front": "6+",
+            "other": "5+"
+        },
+        "turrets": 2
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 4,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 4,
+            "arc": "Right"
+        },
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 6,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 6,
+            "arc": "Right"
+        },
+        {
+            "name": "Prow torpedoes",
+            "type": "Torpedo",
+            "rangeCm": 30,
+            "strength": 6,
+            "arc": "Front"
+        }
+    ],
+    "specialRules": [],
+    "options": [
+        {
+            "name": "Extended batteries",
+            "points": 10,
+            "description": "Increase the 30 cm batteries to 45 cm."
+        },
+        {
+            "name": "Nova cannon",
+            "points": 20,
+            "description": "Exchange prow torpedo tubes for a nova cannon."
+        }
+    ]
+}

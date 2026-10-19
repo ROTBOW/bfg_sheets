@@ -1,0 +1,63 @@
+{
+    "id": "siluria-class-light-cruiser",
+    "isDemo": false,
+    "className": "Siluria-class Light Cruiser",
+    "image": {
+        "src": "/ship-images/imperial-navy/siluria-class-light-cruiser.png",
+        "width": 587,
+        "height": 160,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/siluria-class-light-cruiser.html"
+    },
+    "classLabel": "Siluria class",
+    "faction": "Imperial Navy",
+    "type": "Cruiser",
+    "role": "Light cruiser",
+    "description": "Siluria Class Light Cruiser base configuration.",
+    "points": 100,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/siluria-class-light-cruiser.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 6,
+        "speedCm": 25,
+        "turnDegrees": 90,
+        "shields": 1,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 1
+    },
+    "weapons": [
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 6,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 6,
+            "arc": "Right"
+        },
+        {
+            "name": "Prow weapons battery",
+            "type": "Battery",
+            "rangeCm": 30,
+            "strength": 2,
+            "arc": "Left / Front / Right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Improved thrusters",
+            "description": "All Ahead Full gains an additional D6 cm."
+        }
+    ],
+    "options": []
+}

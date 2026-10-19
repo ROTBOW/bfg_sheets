@@ -1,0 +1,112 @@
+{
+    "id": "oberon-class-battleship",
+    "isDemo": false,
+    "className": "Oberon-class Battleship",
+    "image": {
+        "src": "/ship-images/imperial-navy/oberon-class-battleship.png",
+        "width": 585,
+        "height": 296,
+        "source": "https://ships.battlefleet-game.org/imperial-navy/oberon-class-battleship.html"
+    },
+    "classLabel": "Oberon class",
+    "faction": "Imperial Navy",
+    "type": "Battleship",
+    "role": "Battleship",
+    "description": "Oberon Class Battleship base configuration.",
+    "points": 335,
+    "source": {
+        "url": "https://ships.battlefleet-game.org/imperial-navy/oberon-class-battleship.html",
+        "accessedOn": "2026-10-18",
+        "note": "Base statistics transcribed from the linked profile; rule and option descriptions are summaries."
+    },
+    "stats": {
+        "hull": 12,
+        "speedCm": 15,
+        "turnDegrees": 45,
+        "shields": 4,
+        "armour": {
+            "front": "5+",
+            "other": "5+"
+        },
+        "turrets": 5
+    },
+    "weapons": [
+        {
+            "name": "Port launch bays",
+            "type": "Launch Bay",
+            "rangeCm": null,
+            "strength": 2,
+            "arc": "–",
+            "rangeLabel": "Furies: 30 cm / Starhawks: 20 cm / (Sharks: 30 cm)",
+            "strengthUnit": "squadrons"
+        },
+        {
+            "name": "Starboard launch bays",
+            "type": "Launch Bay",
+            "rangeCm": null,
+            "strength": 2,
+            "arc": "–",
+            "rangeLabel": "Furies: 30 cm / Starhawks: 20 cm / (Sharks: 30 cm)",
+            "strengthUnit": "squadrons"
+        },
+        {
+            "name": "Port weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 6,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard weapons battery",
+            "type": "Battery",
+            "rangeCm": 60,
+            "strength": 6,
+            "arc": "Right"
+        },
+        {
+            "name": "Port lance battery",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 2,
+            "arc": "Left"
+        },
+        {
+            "name": "Starboard lance battery",
+            "type": "Lance",
+            "rangeCm": 60,
+            "strength": 2,
+            "arc": "Right"
+        },
+        {
+            "name": "Prow weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 5,
+            "arc": "Left / Front / Right"
+        },
+        {
+            "name": "Dorsal weapons battery",
+            "type": "Battery",
+            "rangeCm": 45,
+            "strength": 5,
+            "arc": "Left / Front / Right"
+        }
+    ],
+    "specialRules": [
+        {
+            "name": "Restricted orders",
+            "description": "Cannot perform the Come to New Heading order."
+        },
+        {
+            "name": "Sensor array",
+            "description": "Leadership receives a +1 modifier."
+        }
+    ],
+    "options": [
+        {
+            "name": "Shark assault boats",
+            "points": 5,
+            "description": "Add Sharks to the available attack craft."
+        }
+    ]
+}

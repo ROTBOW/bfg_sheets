@@ -266,6 +266,13 @@ a.rules-link {
     margin-top: 7px;
 }
 
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .options-dropdown {
     position: relative;
     flex-shrink: 0;
@@ -1051,7 +1058,7 @@ footer {
         gap: 15px;
     }
 
-    .options-dropdown {
+    .navbar-actions {
         margin-left: auto;
     }
 
@@ -1460,7 +1467,7 @@ footer {
         width: 100%;
     }
 
-    .topbar .options-dropdown {
+    .topbar .navbar-actions {
         margin-left: auto;
     }
 }

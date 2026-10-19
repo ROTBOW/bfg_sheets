@@ -265,7 +265,31 @@ const Navbar = () => {
                 ))}
             </nav>
             {pathname === "/" && <span className="demo-badge">BASE PROFILES</span>}
-            <OptionsDropdown />
+            <div className="navbar-actions">
+                <a
+                    href="https://github.com/ROTBOW/bfg_sheets/issues"
+                    className="options-button"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Issues / feedback on GitHub (opens in a new tab)"
+                    title="Issues / feedback on GitHub (opens in a new tab)"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-3 3V11.5a10 10 0 0 1 20 0Z" />
+                        <path d="M11 7v6m0 3h.01" />
+                    </svg>
+                </a>
+                <OptionsDropdown />
+            </div>
         </header>
     );
 };

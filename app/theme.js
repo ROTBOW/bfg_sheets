@@ -5,7 +5,7 @@ export const terminalAccents = [
     { id: "green", label: "Phosphor green" },
     { id: "cyan", label: "Cyan" },
     { id: "blue", label: "Ice blue" },
-    { id: "magenta", label: "Magenta" },
+    { id: "red", label: "Red" },
     { id: "white", label: "White" },
 ];
 

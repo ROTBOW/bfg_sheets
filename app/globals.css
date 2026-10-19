@@ -519,7 +519,7 @@ h2 {
 }
 
 .armament .panel-heading,
-.notes .panel-heading {
+.critical-damage .panel-heading {
     border-bottom: 1px solid var(--border);
 }
 
@@ -597,25 +597,89 @@ td small {
     border-top: 1px solid var(--border);
 }
 
-.notes {
+.critical-damage {
     margin-top: 25px;
 }
 
-.notes textarea {
-    width: 100%;
-    display: block;
-    min-height: 105px;
-    padding: 20px 23px;
-    resize: vertical;
-    border: 0;
-    background: transparent;
-    color: var(--foreground);
-    font-size: 12px;
-    line-height: 1.7;
+.critical-damage-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+    gap: 8px;
+    list-style: none;
+    padding: 12px;
+    margin: 0;
 }
 
-.notes textarea::placeholder {
-    color: light-dark(#5e584e, #7d8b80);
+.critical-damage-list li {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+}
+
+.critical-damage-list .is-damaged {
+    background: light-dark(#f3e2d4, #34271e);
+}
+
+.critical-damage-label strong {
+    font-size: 13px;
+}
+
+.critical-damage-label small {
+    display: block;
+    margin-top: 3px;
+    color: light-dark(#5e584e, #a6afa3);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.critical-damage-counter,
+.critical-damage-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    gap: 8px;
+    min-width: 112px;
+    font-size: 12px;
+}
+
+.critical-damage-counter button {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.critical-damage-counter button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.critical-damage-counter output {
+    min-width: 24px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.critical-damage-toggle {
+    min-height: 34px;
+    cursor: pointer;
+}
+
+.critical-damage-toggle input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--accent);
 }
 
 .battle .panel-heading {
@@ -983,7 +1047,6 @@ footer {
         line-height: 1.7;
     }
 
-    .notes textarea,
     .order-control select {
         font-size: 16px;
     }
@@ -1331,8 +1394,8 @@ footer {
         padding: 12px;
     }
 
-    .notes textarea {
-        min-height: 70px;
+    .critical-damage-counter button {
+        display: none;
     }
 
     .status-banner,

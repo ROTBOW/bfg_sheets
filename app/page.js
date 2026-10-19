@@ -6,6 +6,7 @@ import Link from "next/link";
 import HullWarning from "@/components/HullWarning";
 import SpecialRules from "@/components/SpecialRules";
 import FleetMenu from "@/components/FleetMenu";
+import CriticalDamage from "@/components/CriticalDamage";
 import { getShip, storageKey } from "@/lib/fleets.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { battleProfiles, createShipBattleState } from "@/lib/battle-profiles";
@@ -97,7 +98,7 @@ const Tracker = ({ label, value, max, onChange, tone = "", isHull = false }) => 
 
 const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership }) => {
     const shipStats = ship.stats;
-    const { hull, shields, order, notes, message } = battleState;
+    const { hull, shields, order, criticalDamage, message } = battleState;
     const hullStatus = getHullStatus(hull, shipStats.hull);
     const characteristics = [
         ["Type", ship.type],
@@ -113,7 +114,8 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
             hull: shipStats.hull,
             shields: shipStats.shields,
             order: "No special orders",
-            message: "Trackers reset. Captain’s notes retained.",
+            criticalDamage: [],
+            message: "Battle trackers reset. Critical damage cleared.",
         });
     };
 
@@ -252,25 +254,14 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                             </ul>
                         </section>
                     )}
-                    <section className="panel notes">
-                        <div className="panel-heading">
-                            <h2>
-                                <span className="section-number">02</span>
-                                <label htmlFor="notes">
-                                    Captain’s notes
-                                </label>
-                            </h2>
-                            <span className="registry">SESSION ONLY</span>
-                        </div>
-                        <textarea
-                            id="notes"
-                            value={notes}
-                            onChange={(event) =>
-                                updateSelectedShip({ notes: event.target.value })
-                            }
-                            placeholder="Record critical damage, objectives, or a particularly heroic manoeuvre…"
-                        />
-                    </section>
+                    <CriticalDamage
+                        key={vessel.id}
+                        entries={criticalDamage}
+                        onUpdate={(update) => updateSelectedShip((current) => ({
+                            criticalDamage: update(current.criticalDamage),
+                            message: "",
+                        }))}
+                    />
                 </div>
                 <aside>
                     <section className="panel battle">
@@ -356,7 +347,7 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
             </div>
             <footer>
                 <span>
-                    VOID LEDGER &nbsp; / &nbsp; {ship.faction.toUpperCase()}
+                    BFG Sheets &nbsp; / &nbsp; {ship.faction.toUpperCase()}
                 </span>
                 <span>Unofficial tabletop companion · {ship.isDemo ? "Demo profile" : "Source profile"}</span>
                 <span className="footer-credit">
@@ -435,13 +426,18 @@ const BattleTracker = () => {
     };
 
     const updateSelectedShip = (changes) => {
-        setBattleStates((previous) => ({
-            ...previous,
-            [fleet.id]: {
-                ...previous[fleet.id],
-                [vessel.id]: { ...state, ...changes },
-            },
-        }));
+        setBattleStates((previous) => {
+            const current = previous[fleet.id]?.[vessel.id] || createShipBattleState(vessel.profile);
+            const updates = typeof changes === "function" ? changes(current) : changes;
+
+            return {
+                ...previous,
+                [fleet.id]: {
+                    ...previous[fleet.id],
+                    [vessel.id]: { ...current, ...updates },
+                },
+            };
+        });
     };
 
     if (!loaded) return <main role="status">Loading saved fleets…</main>;
@@ -460,6 +456,7 @@ const BattleTracker = () => {
             />
             {vessel?.profile ? (
                 <ShipViewer
+                    key={fleet.id}
                     ship={{ ...vessel.profile, points: getVesselPoints(getShip(vessel.classId), vessel) }}
                     vessel={vessel}
                     battleState={state}

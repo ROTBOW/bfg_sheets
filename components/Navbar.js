@@ -10,6 +10,23 @@ import {
     terminalAccents,
     themeCookieName,
 } from "@/app/theme";
+import {
+    getActiveRoomId,
+    getServerActiveRoomId,
+    subscribeToActiveRoom,
+} from "@/firebase/active-room";
+
+/**
+ * Formats the first 32 bits of a room ID for the compact navbar badge.
+ *
+ * @param {string} roomId Full active room identifier.
+ * @returns {string} Grouped uppercase shorthand, or an empty string.
+ */
+const formatRoomShorthand = (roomId) => {
+    if (!roomId) return "";
+    return `${roomId.slice(0, 4)}-${roomId.slice(4, 8)}`.toUpperCase();
+};
+
 const subscribeToTheme = (onChange) => {
     window.addEventListener("themechange", onChange);
 
@@ -226,6 +243,15 @@ const navigationLinks = [
 
 const Navbar = () => {
     const pathname = usePathname();
+    const activeRoomId = useSyncExternalStore(
+        subscribeToActiveRoom,
+        getActiveRoomId,
+        getServerActiveRoomId,
+    );
+    const trackerBadge = activeRoomId
+        ? `ROOM ${formatRoomShorthand(activeRoomId)}`
+        : "BASE PROFILES";
+
     return (
         <header className="topbar">
             <Link
@@ -264,7 +290,9 @@ const Navbar = () => {
                     </Link>
                 ))}
             </nav>
-            {pathname === "/" && <span className="demo-badge">BASE PROFILES</span>}
+            {(activeRoomId || pathname === "/") && (
+                <span className="demo-badge">{trackerBadge}</span>
+            )}
             <div className="navbar-actions">
                 <a
                     href="https://github.com/ROTBOW/bfg_sheets/issues"

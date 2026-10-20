@@ -11,6 +11,7 @@ import {
     subscribeToFirebaseConnection,
     subscribeToRoom,
 } from "@/firebase/room-service";
+import { clearActiveRoomId, setActiveRoomId } from "@/firebase/active-room";
 import { getRoomSideForUser } from "@/firebase/room-schema.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { getFleetPoints } from "@/lib/fleets.mjs";
@@ -106,6 +107,7 @@ const Connect = () => {
                 setRoom(nextRoom);
 
                 if (!nextRoom && !isLeaving.current) {
+                    clearActiveRoomId();
                     setErrorMessage("The host ended this battle room.");
                     setRoomId("");
                     setCurrentUid("");
@@ -160,6 +162,7 @@ const Connect = () => {
             const result = await createRoom({ fleet, displayName });
             setRoomId(result.roomId);
             setCurrentUid(result.user.uid);
+            setActiveRoomId(result.roomId);
             setRoomInput(formatRoomId(result.roomId));
             window.history.replaceState(null, "", `/connect?room=${result.roomId}`);
         } catch (error) {
@@ -192,6 +195,7 @@ const Connect = () => {
             });
             setRoomId(result.roomId);
             setCurrentUid(result.user.uid);
+            setActiveRoomId(result.roomId);
             window.history.replaceState(null, "", `/connect?room=${result.roomId}`);
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : String(error));
@@ -226,6 +230,7 @@ const Connect = () => {
             setRoom(null);
             setRoomId("");
             setCurrentUid("");
+            clearActiveRoomId();
             window.history.replaceState(null, "", "/connect");
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : String(error));

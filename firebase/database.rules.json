@@ -175,7 +175,7 @@
                     ".validate": "newData.isNumber() && (!data.exists() || newData.val() === data.val())"
                 },
                 "expiresAt": {
-                    ".validate": "newData.isNumber() && newData.val() > newData.parent().child('createdAt').val() && newData.val() <= newData.parent().child('createdAt').val() + 86400000"
+                    ".validate": "newData.isNumber() && newData.val() > newData.parent().child('createdAt').val() && newData.val() <= newData.parent().child('createdAt').val() + 90000000"
                 },
                 "participants": {
                     "$uid": {

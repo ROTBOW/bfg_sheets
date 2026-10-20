@@ -17,6 +17,18 @@ import { createRoomId, normalizeDisplayName } from "./room-schema.mjs";
 const connectionTestLifetimeMs = 24 * 60 * 60 * 1000;
 
 /**
+ * Adds operation context to Firebase permission errors that otherwise look identical.
+ *
+ * @param {unknown} error Firebase SDK error.
+ * @param {string} action Human-readable operation that failed.
+ * @returns {Error} Contextual error safe to display in the connection-test UI.
+ */
+const describeConnectionTestError = (error, action) => {
+    const message = error instanceof Error ? error.message : String(error);
+    return new Error(`${action} failed: ${message}`, { cause: error });
+};
+
+/**
  * Returns the database path for an isolated two-machine connection test.
  *
  * @param {string} roomId Secure room identifier.
@@ -72,8 +84,17 @@ export const createConnectionTest = async (displayName) => {
         },
     };
 
-    await set(ref(database, connectionTestPath(roomId)), room);
-    await registerConnectionTestPresence(roomId, user.uid);
+    try {
+        await set(ref(database, connectionTestPath(roomId)), room);
+    } catch (error) {
+        throw describeConnectionTestError(error, "Room creation");
+    }
+
+    try {
+        await registerConnectionTestPresence(roomId, user.uid);
+    } catch (error) {
+        throw describeConnectionTestError(error, "Host presence registration");
+    }
 
     return { roomId, user };
 };
@@ -122,8 +143,17 @@ export const joinConnectionTest = async (roomId, displayName) => {
         updates.guestUid = user.uid;
     }
 
-    await update(roomReference, updates);
-    await registerConnectionTestPresence(roomId, user.uid);
+    try {
+        await update(roomReference, updates);
+    } catch (error) {
+        throw describeConnectionTestError(error, "Guest slot claim");
+    }
+
+    try {
+        await registerConnectionTestPresence(roomId, user.uid);
+    } catch (error) {
+        throw describeConnectionTestError(error, "Guest presence registration");
+    }
 
     return { roomId, user };
 };

@@ -52,6 +52,25 @@ images and attribution in `public/ship-images/imperial-navy/`, and imports in
 `lib/factions/imperial-navy/profiles.js`. The shared ship template stays at
 `public/ships/ship-template.json`.
 
+## Firebase multiplayer foundation
+
+Firebase client code, room helpers and Realtime Database rules live in the
+top-level `firebase/` directory. Saved fleet libraries remain local to each
+browser; Firebase rooms receive a detached snapshot of the fleet selected for
+a battle.
+
+Copy `.env.example` to `.env.local` and provide the web-app configuration. The
+Realtime Database URL is required in addition to the standard Firebase web
+configuration. Enable Anonymous Authentication and create the database in
+locked mode before connecting the UI. The committed rules deny root access,
+give each authenticated player write access only to their own side, and reserve
+room lifecycle changes for the host.
+
+Set `NEXT_PUBLIC_FIREBASE_USE_EMULATORS=true` to connect the browser to the
+Auth emulator on port 9099 and the Realtime Database emulator on port 9000.
+The root `firebase.json` points deployments and local emulators at
+`firebase/database.rules.json`.
+
 Run fleet calculation and saved-data validation checks with
 `node --test tests/*.test.mjs`.
 

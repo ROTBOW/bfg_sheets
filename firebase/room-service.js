@@ -131,6 +131,34 @@ export const subscribeToRoom = (roomId, onRoom, onError) => {
 };
 
 /**
+ * Restores presence for a participant who already owns a side in a room.
+ *
+ * @param {string} roomId Previously active room identifier.
+ * @returns {Promise<{ room: object, side: "host"|"guest", user: import("firebase/auth").User }>} Restored room identity.
+ * @throws {Error} When the room no longer exists or this browser does not own a side.
+ */
+export const reconnectToRoom = async (roomId) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+    const snapshot = await get(ref(database, roomPath(roomId)));
+
+    if (!snapshot.exists()) {
+        throw new Error("This battle room no longer exists.");
+    }
+
+    const room = snapshot.val();
+    const side = getRoomSideForUser(room, user.uid);
+
+    if (!side) {
+        throw new Error("This browser no longer owns a fleet in that battle room.");
+    }
+
+    await registerPresence(roomId, user.uid);
+
+    return { room, side, user };
+};
+
+/**
  * Subscribes to this browser's connection to Firebase Realtime Database.
  *
  * @param {(isConnected: boolean) => void} onChange Connection-state callback.

@@ -7,11 +7,17 @@ import {
     deleteRoom,
     disconnectFromRoom,
     joinRoom,
+    reconnectToRoom,
     sendRoomHandshake,
     subscribeToFirebaseConnection,
     subscribeToRoom,
 } from "@/firebase/room-service";
-import { clearActiveRoomId, setActiveRoomId } from "@/firebase/active-room";
+import {
+    clearActiveRoomId,
+    getActiveRoomFleetId,
+    getActiveRoomId,
+    setActiveRoomId,
+} from "@/firebase/active-room";
 import { getRoomSideForUser } from "@/firebase/room-schema.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { getFleetPoints } from "@/lib/fleets.mjs";
@@ -61,11 +67,18 @@ const Connect = () => {
     useEffect(() => {
         const searchParams = new URLSearchParams(window.location.search);
         const inviteRoomId = normalizeRoomId(searchParams.get("room") || "");
-        const initializePage = window.requestAnimationFrame(() => {
+        const initializePage = window.requestAnimationFrame(async () => {
+            const activeRoomId = getActiveRoomId();
+            const activeFleetId = getActiveRoomFleetId();
+
             try {
                 const library = loadFleetLibrary(window.localStorage);
                 setFleets(library.fleets);
-                setSelectedFleetId(getDefaultFleetId(library.fleets));
+                setSelectedFleetId(
+                    library.fleets.some((fleet) => fleet.id === activeFleetId)
+                        ? activeFleetId
+                        : getDefaultFleetId(library.fleets),
+                );
 
                 if (library.saveError) {
                     setErrorMessage("Your starter fleet could not be saved in this browser.");
@@ -78,6 +91,25 @@ const Connect = () => {
 
             if (inviteRoomId) {
                 setRoomInput(formatRoomId(inviteRoomId));
+            }
+
+            if (activeRoomId) {
+                setRoomId(activeRoomId);
+                setRoomInput(formatRoomId(activeRoomId));
+                setIsWorking(true);
+
+                try {
+                    const result = await reconnectToRoom(activeRoomId);
+                    setRoom(result.room);
+                    setCurrentUid(result.user.uid);
+                    setErrorMessage("");
+                } catch (error) {
+                    setErrorMessage(
+                        `${error instanceof Error ? error.message : String(error)} You can keep waiting or stop reconnecting below.`,
+                    );
+                } finally {
+                    setIsWorking(false);
+                }
             }
         });
         let unsubscribe;
@@ -97,7 +129,7 @@ const Connect = () => {
     }, []);
 
     useEffect(() => {
-        if (!roomId) {
+        if (!roomId || !currentUid) {
             return undefined;
         }
 
@@ -115,7 +147,7 @@ const Connect = () => {
             },
             (error) => setErrorMessage(error.message),
         );
-    }, [roomId]);
+    }, [currentUid, roomId]);
 
     const selectedFleet = useMemo(
         () => fleets.find((fleet) => fleet.id === selectedFleetId) || null,
@@ -221,7 +253,9 @@ const Connect = () => {
         setErrorMessage("");
 
         try {
-            if (isHost) {
+            if (!room || !currentSide || !isFirebaseConnected) {
+                // There may be no reachable server session to update while reconnecting.
+            } else if (isHost) {
                 await deleteRoom(roomId);
             } else {
                 await disconnectFromRoom(roomId);
@@ -355,7 +389,11 @@ const Connect = () => {
                             disabled={isWorking}
                             onClick={leaveBattle}
                         >
-                            {isHost ? "End battle room" : "Leave battle room"}
+                            {!room || !currentSide || !isFirebaseConnected
+                                ? "Stop reconnecting"
+                                : isHost
+                                    ? "End battle room"
+                                    : "Leave battle room"}
                         </button>
                     </div>
                 </section>

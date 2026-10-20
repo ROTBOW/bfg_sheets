@@ -784,6 +784,14 @@ td small {
     padding: 7px 9px;
 }
 
+.weapon-attack-note {
+    margin: 0;
+    padding: 0 18px 14px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
 .weapon-roll-button {
     width: calc(100% - 36px);
     margin: 0 18px 14px;

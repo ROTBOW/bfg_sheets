@@ -184,6 +184,9 @@
                                         "damage": {
                                             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
                                         },
+                                        "shieldBypassingDamage": {
+                                            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('damage').val()"
+                                        },
                                         "accuracy": {
                                             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
                                         },

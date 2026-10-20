@@ -27,10 +27,11 @@ import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { battleProfiles, createShipBattleState } from "@/lib/battle-profiles";
 import { rollLeadership } from "@/lib/leadership.mjs";
 import {
-    getGunneryDice,
+    getWeaponAttackProfile,
     gunneryDirections,
     gunneryTable,
     parseDiceResults,
+    resolveWeaponRolls,
     rollDice,
 } from "@/lib/gunnery.mjs";
 import { getProfileUrl, getUpgradeOptions, getVesselPoints } from "@/lib/ship-upgrades.mjs";
@@ -160,39 +161,30 @@ const GunneryReference = () => (
 
 /** Resolves and records one selected weapon firing at the selected enemy vessel. */
 const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round, turnSide, onRecord, onClose }) => {
-    const isBattery = weapon.type === "Battery" || weapon.type === "Lightning arc";
-    const isLance = weapon.type === "Lance";
-    const supportsDigitalRoll = isBattery || isLance;
     const [direction, setDirection] = useState("closing");
-    const [mode, setMode] = useState(supportsDigitalRoll ? "digital" : "manual");
+    const initialAttackProfile = getWeaponAttackProfile(weapon, targetShip, "closing");
+    const [mode, setMode] = useState(initialAttackProfile.supportsDigitalRoll ? "digital" : "manual");
     const [manualRolls, setManualRolls] = useState("");
     const [manualHits, setManualHits] = useState(0);
     const [damage, setDamage] = useState(0);
     const [result, setResult] = useState(null);
     const [error, setError] = useState("");
     const [isRecording, setIsRecording] = useState(false);
-    const effectiveDirection = weapon.type === "Lightning arc" ? "closing" : direction;
-    const targetArmour = effectiveDirection === "closing"
-        ? targetShip.stats.armour.front
-        : targetShip.stats.armour.other;
-    const hitThreshold = isLance ? 4 : Number.parseInt(targetArmour, 10);
-    const diceCount = isBattery
-        ? getGunneryDice(weapon.strength, effectiveDirection, targetShip.type)
-        : isLance
-            ? weapon.strength
-            : weapon.strength;
+    const attackProfile = getWeaponAttackProfile(weapon, targetShip, direction);
+    const { supportsDigitalRoll, diceCount, hitThreshold } = attackProfile;
 
     const resolveRolls = (rolls) => {
-        const hits = supportsDigitalRoll
-            ? rolls.filter((roll) => roll >= hitThreshold).length
-            : Number(manualHits);
+        const resolvedAttack = supportsDigitalRoll
+            ? resolveWeaponRolls(rolls, attackProfile)
+            : { hits: Number(manualHits), shieldBypassingHits: 0 };
+        const { hits } = resolvedAttack;
 
         if (!Number.isInteger(hits) || hits < 0 || hits > rolls.length) {
             setError("Resolved hits must be a whole number no greater than the dice entered.");
             return;
         }
 
-        setResult({ rolls, hits });
+        setResult({ rolls, ...resolvedAttack });
         setDamage(hits);
         setError("");
     };
@@ -242,6 +234,7 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
                 shots,
                 hits: result.hits,
                 damage: recordedDamage,
+                shieldBypassingDamage: Math.min(result.shieldBypassingHits, recordedDamage),
                 accuracy: shots ? result.hits / shots : 0,
                 createdAt: Date.now(),
             });
@@ -278,6 +271,7 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
                     </select>
                 </label>
             </div>
+            <p className="weapon-attack-note">{attackProfile.note}</p>
             {mode === "digital" && supportsDigitalRoll ? (
                 <button type="button" className="weapon-roll-button" onClick={rollAttack}>
                     Roll {diceCount}D6 · hits on {hitThreshold}+
@@ -308,6 +302,9 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
                 <div className="weapon-result" role="status">
                     <span>Rolls: {result.rolls.join(", ")}</span>
                     <strong>{result.hits} hits</strong>
+                    {result.shieldBypassingHits > 0 && (
+                        <span>{result.shieldBypassingHits} bypass shields</span>
+                    )}
                     <label>
                         Damage inflicted
                         <input
@@ -1125,6 +1122,10 @@ const BattleTracker = () => {
             return;
         }
 
+        const bypassMessage = entry.shieldBypassingDamage
+            ? ` ${entry.shieldBypassingDamage} bypassed shields.`
+            : "";
+
         await damageEnemyShip({
             roomId: activeRoomId,
             targetSide: enemySide,
@@ -1132,7 +1133,8 @@ const BattleTracker = () => {
             damage: entry.damage,
             maximumHull: enemyVessel.profile.stats.hull,
             maximumShields: enemyVessel.profile.stats.shields,
-            message: `${vessel.name}'s ${entry.weaponName} inflicted ${entry.damage} damage.`,
+            shieldBypassingDamage: entry.shieldBypassingDamage,
+            message: `${vessel.name}'s ${entry.weaponName} inflicted ${entry.damage} damage.${bypassMessage}`,
         });
     };
 

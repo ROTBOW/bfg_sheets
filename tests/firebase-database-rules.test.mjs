@@ -31,3 +31,13 @@ test("opponent damage permission is limited to attack result fields", async () =
     assert.match(shipRules.hull[".validate"], /newData\.val\(\) <= data\.val\(\)/);
     assert.match(shipRules.shields[".validate"], /newData\.val\(\) <= data\.val\(\)/);
 });
+
+test("weapon-fire records bound shield-bypassing damage to total damage", async () => {
+    const rules = await loadRules();
+    const entryRules = rules.rules.rooms.$roomId.sides.$sideId.battle.$shipId.weaponFire.$entryIndex;
+
+    assert.match(
+        entryRules.shieldBypassingDamage[".validate"],
+        /newData\.val\(\) <= newData\.parent\(\)\.child\('damage'\)\.val\(\)/,
+    );
+});

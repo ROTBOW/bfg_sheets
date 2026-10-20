@@ -3,7 +3,9 @@ import test from "node:test";
 import {
     getGunneryColumn,
     getGunneryDice,
+    getWeaponAttackProfile,
     parseDiceResults,
+    resolveWeaponRolls,
     rollDice,
 } from "../lib/gunnery.mjs";
 
@@ -24,4 +26,44 @@ test("physical and digital dice results normalize to D6 values", () => {
     assert.deepEqual(parseDiceResults("6, 4  2"), [6, 4, 2]);
     assert.deepEqual(rollDice(3, () => 0), [1, 1, 1]);
     assert.throws(() => parseDiceResults("6, 7"));
+});
+
+test("Necron lightning arcs always use the closing gunnery column", () => {
+    const target = { type: "Cruiser", stats: { armour: { front: "6+", other: "5+" } } };
+    const profile = getWeaponAttackProfile(
+        { type: "Lightning arc", strength: 10 },
+        target,
+        "abeam",
+    );
+
+    assert.equal(profile.diceCount, 7);
+    assert.equal(profile.hitThreshold, 5);
+});
+
+test("Gauss particle whips use lance rolls and sixes bypass shields", () => {
+    const target = { type: "Cruiser", stats: { armour: { front: "6+", other: "5+" } } };
+    const profile = getWeaponAttackProfile(
+        { type: "Gauss particle whip", strength: 4 },
+        target,
+        "closing",
+    );
+
+    assert.equal(profile.diceCount, 4);
+    assert.equal(profile.hitThreshold, 4);
+    assert.deepEqual(resolveWeaponRolls([3, 4, 5, 6], profile), {
+        hits: 3,
+        shieldBypassingHits: 1,
+    });
+});
+
+test("star pulse generators roll once against the selected armour", () => {
+    const target = { type: "Cruiser", stats: { armour: { front: "6+", other: "5+" } } };
+    const profile = getWeaponAttackProfile(
+        { type: "Star pulse generator", strength: 1 },
+        target,
+        "abeam",
+    );
+
+    assert.equal(profile.diceCount, 1);
+    assert.equal(profile.hitThreshold, 5);
 });

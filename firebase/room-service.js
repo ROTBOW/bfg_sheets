@@ -263,6 +263,7 @@ export const updateShipBattleState = async ({ roomId, side, shipId, changes }) =
  * @param {number} options.damage Damage inflicted by the recorded attack.
  * @param {number} options.maximumHull Target profile's starting hull.
  * @param {number} options.maximumShields Target profile's starting shields.
+ * @param {number} options.shieldBypassingDamage Damage applied directly to hull.
  * @param {string} options.message Short attack summary for the target's tracker.
  * @returns {Promise<void>} Resolves after Firebase commits the damage.
  */
@@ -273,6 +274,7 @@ export const damageEnemyShip = async ({
     damage,
     maximumHull,
     maximumShields,
+    shieldBypassingDamage,
     message,
 }) => {
     const user = await ensureAnonymousUser();
@@ -282,6 +284,7 @@ export const damageEnemyShip = async ({
     const defenses = applyWeaponDamage(snapshot.val(), damage, {
         hull: maximumHull,
         shields: maximumShields,
+        shieldBypassingDamage,
     });
 
     await update(battleReference, {

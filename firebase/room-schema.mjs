@@ -10,7 +10,7 @@ const roomIdBytes = 16;
  *
  * @param {object|null} battleState Current stored battle state.
  * @param {number} damage Non-negative whole-number damage to apply.
- * @param {object} maximums Ship profile hull and shield maximums.
+ * @param {object} maximums Ship profile maximums and shield-bypassing damage.
  * @returns {{ hull: number, shields: number }} Updated defensive values.
  */
 export const applyWeaponDamage = (battleState, damage, maximums) => {
@@ -19,11 +19,17 @@ export const applyWeaponDamage = (battleState, damage, maximums) => {
     const currentHull = Math.min(maximumHull, Math.max(0, Number(battleState?.hull ?? maximumHull)));
     const currentShields = Math.min(maximumShields, Math.max(0, Number(battleState?.shields ?? maximumShields)));
     const incomingDamage = Number.isInteger(damage) && damage > 0 ? damage : 0;
-    const shieldDamage = Math.min(currentShields, incomingDamage);
-    const hullDamage = incomingDamage - shieldDamage;
+    const requestedBypassingDamage = Number(maximums?.shieldBypassingDamage);
+    const shieldBypassingDamage = Number.isInteger(requestedBypassingDamage)
+        ? Math.min(incomingDamage, Math.max(0, requestedBypassingDamage))
+        : 0;
+    const hullAfterBypassingDamage = Math.max(0, currentHull - shieldBypassingDamage);
+    const remainingDamage = incomingDamage - shieldBypassingDamage;
+    const shieldDamage = Math.min(currentShields, remainingDamage);
+    const hullDamage = remainingDamage - shieldDamage;
 
     return {
-        hull: Math.max(0, currentHull - hullDamage),
+        hull: Math.max(0, hullAfterBypassingDamage - hullDamage),
         shields: currentShields - shieldDamage,
     };
 };

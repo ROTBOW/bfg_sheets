@@ -105,3 +105,22 @@ test("weapon damage uses profile defaults and cannot reduce hull below zero", ()
         { hull: 4, shields: 0 },
     );
 });
+
+test("shield-bypassing weapon damage strikes hull before normal damage reaches shields", () => {
+    assert.deepEqual(
+        applyWeaponDamage(
+            { hull: 8, shields: 2 },
+            3,
+            { hull: 8, shields: 2, shieldBypassingDamage: 1 },
+        ),
+        { hull: 7, shields: 0 },
+    );
+    assert.deepEqual(
+        applyWeaponDamage(
+            { hull: 8, shields: 2 },
+            2,
+            { hull: 8, shields: 2, shieldBypassingDamage: 5 },
+        ),
+        { hull: 6, shields: 2 },
+    );
+});

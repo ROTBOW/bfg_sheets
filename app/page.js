@@ -25,6 +25,13 @@ import { getShip, storageKey } from "@/lib/fleets.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { battleProfiles, createShipBattleState } from "@/lib/battle-profiles";
 import { rollLeadership } from "@/lib/leadership.mjs";
+import {
+    getGunneryDice,
+    gunneryDirections,
+    gunneryTable,
+    parseDiceResults,
+    rollDice,
+} from "@/lib/gunnery.mjs";
 import { getProfileUrl, getUpgradeOptions, getVesselPoints } from "@/lib/ship-upgrades.mjs";
 
 const weaponMarkers = {
@@ -34,6 +41,10 @@ const weaponMarkers = {
     "Nova Cannon": "◎",
     "Launch Bay": "◇",
     "Bombardment Cannon": "⊞",
+    "Lightning arc": "⊞",
+    "Gauss particle whip": "✧",
+    "Star pulse generator": "◎",
+    Portal: "◇",
 };
 
 const getHullStatus = (hull, maxHull) => {
@@ -108,6 +119,201 @@ const Tracker = ({ label, value, max, onChange, tone = "", isHull = false, isRea
                 </button>
             </div>
         </div>
+    );
+};
+
+/** Rules reference for resolving weapon-battery fire. */
+const GunneryReference = () => (
+    <section className="gunnery-reference" aria-labelledby="gunnery-table-title">
+        <div className="panel-heading">
+            <h2 id="gunnery-table-title">Gunnery table</h2>
+        </div>
+        <div className="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>FP</th>
+                        <th>Defences</th>
+                        <th>Closing capital</th>
+                        <th>Closing escort / Away capital</th>
+                        <th>Away escort / Abeam capital</th>
+                        <th>Abeam escort</th>
+                        <th>Ordnance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {gunneryTable.map((row, index) => (
+                        <tr key={index + 1}>
+                            <th scope="row">{index + 1}</th>
+                            {row.map((dice, column) => <td key={column}>{dice}</td>)}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+        <p>
+            Within 15 cm shifts one column left. Over 30 cm or intervening Blast Markers each shift one column right.
+        </p>
+    </section>
+);
+
+/** Resolves and records one selected weapon firing at the selected enemy vessel. */
+const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round, turnSide, onRecord, onClose }) => {
+    const isBattery = weapon.type === "Battery" || weapon.type === "Lightning arc";
+    const isLance = weapon.type === "Lance";
+    const supportsDigitalRoll = isBattery || isLance;
+    const [direction, setDirection] = useState("closing");
+    const [mode, setMode] = useState(supportsDigitalRoll ? "digital" : "manual");
+    const [manualRolls, setManualRolls] = useState("");
+    const [manualHits, setManualHits] = useState(0);
+    const [damage, setDamage] = useState(0);
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState("");
+    const effectiveDirection = weapon.type === "Lightning arc" ? "closing" : direction;
+    const targetArmour = effectiveDirection === "closing"
+        ? targetShip.stats.armour.front
+        : targetShip.stats.armour.other;
+    const hitThreshold = isLance ? 4 : Number.parseInt(targetArmour, 10);
+    const diceCount = isBattery
+        ? getGunneryDice(weapon.strength, effectiveDirection, targetShip.type)
+        : isLance
+            ? weapon.strength
+            : weapon.strength;
+
+    const resolveRolls = (rolls) => {
+        const hits = supportsDigitalRoll
+            ? rolls.filter((roll) => roll >= hitThreshold).length
+            : Number(manualHits);
+
+        if (!Number.isInteger(hits) || hits < 0 || hits > rolls.length) {
+            setError("Resolved hits must be a whole number no greater than the dice entered.");
+            return;
+        }
+
+        setResult({ rolls, hits });
+        setDamage(hits);
+        setError("");
+    };
+
+    const rollAttack = () => {
+        resolveRolls(rollDice(diceCount));
+    };
+
+    const usePhysicalRoll = () => {
+        try {
+            resolveRolls(parseDiceResults(manualRolls));
+        } catch (rollError) {
+            setError(rollError instanceof Error ? rollError.message : String(rollError));
+        }
+    };
+
+    const recordAttack = () => {
+        if (!result) {
+            setError("Roll the attack or enter the physical dice before recording it.");
+            return;
+        }
+
+        const shots = result.rolls.length;
+        const recordedDamage = Number(damage);
+
+        if (!Number.isInteger(recordedDamage) || recordedDamage < 0 || recordedDamage > 100) {
+            setError("Damage must be a whole number from 0 to 100.");
+            return;
+        }
+
+        onRecord({
+            id: crypto.randomUUID(),
+            weaponIndex,
+            weaponName: weapon.name,
+            weaponType: weapon.type,
+            round,
+            turnSide,
+            targetShipId: target.id,
+            targetName: target.name,
+            direction,
+            mode,
+            rolls: result.rolls,
+            shots,
+            hits: result.hits,
+            damage: recordedDamage,
+            accuracy: shots ? result.hits / shots : 0,
+            createdAt: Date.now(),
+        });
+    };
+
+    return (
+        <section className="weapon-attack" aria-label={`Fire ${weapon.name}`}>
+            <div className="weapon-attack-heading">
+                <div>
+                    <span className="eyebrow">FIRE WEAPON</span>
+                    <h3>{weapon.name}</h3>
+                    <small>{attacker.name} → {target.name}</small>
+                </div>
+                <button type="button" onClick={onClose} aria-label="Close weapon attack">×</button>
+            </div>
+            <div className="weapon-attack-fields">
+                <label>
+                    Target direction
+                    <select value={direction} onChange={(event) => { setDirection(event.target.value); setResult(null); }}>
+                        {gunneryDirections.map((option) => (
+                            <option key={option.id} value={option.id}>{option.label}</option>
+                        ))}
+                    </select>
+                </label>
+                <label>
+                    Dice method
+                    <select value={mode} onChange={(event) => { setMode(event.target.value); setResult(null); }}>
+                        {supportsDigitalRoll && <option value="digital">Roll digitally</option>}
+                        <option value="manual">Enter physical dice</option>
+                    </select>
+                </label>
+            </div>
+            {mode === "digital" && supportsDigitalRoll ? (
+                <button type="button" className="weapon-roll-button" onClick={rollAttack}>
+                    Roll {diceCount}D6 · hits on {hitThreshold}+
+                </button>
+            ) : (
+                <div className="physical-roll-fields">
+                    <label>
+                        D6 results
+                        <input value={manualRolls} placeholder="6, 4, 2" onChange={(event) => setManualRolls(event.target.value)} />
+                    </label>
+                    {!supportsDigitalRoll && (
+                        <label>
+                            Resolved hits
+                        <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value={manualHits}
+                            onChange={(event) => setManualHits(event.target.value)}
+                        />
+                        </label>
+                    )}
+                    <button type="button" onClick={usePhysicalRoll}>Use entered roll</button>
+                </div>
+            )}
+            {result && (
+                <div className="weapon-result" role="status">
+                    <span>Rolls: {result.rolls.join(", ")}</span>
+                    <strong>{result.hits} hits</strong>
+                    <label>
+                        Damage inflicted
+                        <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value={damage}
+                            onChange={(event) => setDamage(event.target.value)}
+                        />
+                    </label>
+                    <button type="button" onClick={recordAttack}>Record firing</button>
+                </div>
+            )}
+            {error && <p className="weapon-attack-error" role="alert">{error}</p>}
+        </section>
     );
 };
 
@@ -220,7 +426,7 @@ const BattleStatus = ({ ship, vessel, battleState, leadership, onUpdate, isReadO
                 </select>
             </div>
             {!isReadOnly && (
-                <button className="reset-button" onClick={resetBattleTrackers}>
+                <button className="reset-button mt-4" onClick={resetBattleTrackers}>
                     ↺ &nbsp; Reset battle trackers
                 </button>
             )}
@@ -230,7 +436,20 @@ const BattleStatus = ({ ship, vessel, battleState, leadership, onUpdate, isReadO
 };
 
 /** Compact ship record used for each half of a connected mirrored battle. */
-const MirroredShip = ({ ship, vessel, battleState, leadership, onUpdate, isEnemy = false }) => {
+const MirroredShip = ({
+    ship,
+    vessel,
+    battleState,
+    leadership,
+    onUpdate,
+    isEnemy = false,
+    target,
+    targetShip,
+    round = 1,
+    turnSide = "",
+    isActiveTurn = false,
+}) => {
+    const [selectedWeaponIndex, setSelectedWeaponIndex] = useState(null);
     const isNecron = ship.faction === "Necrons";
     const shipNameLength = vessel.name.length;
     const shipNameClass = shipNameLength > 42
@@ -288,27 +507,83 @@ const MirroredShip = ({ ship, vessel, battleState, leadership, onUpdate, isEnemy
                     <table>
                         <thead><tr><th>Weapon system</th><th>Range</th><th>Strength</th><th>Arc</th></tr></thead>
                         <tbody>
-                            {ship.weapons.map((weapon) => (
-                                <tr key={`${weapon.name}-${weapon.rangeLabel || weapon.rangeCm}`}>
-                                    <td><span className="weapon-marker" aria-hidden="true">{weaponMarkers[weapon.type]}</span>{weapon.name}<small>{weapon.type}</small></td>
-                                    <td>{weapon.rangeLabel || `${weapon.rangeCm} cm`}</td>
-                                    <td className="strength">{weapon.strength}{weapon.strengthUnit && <small>{weapon.strengthUnit}</small>}</td>
-                                    <td><span className="arc">{weapon.arc}</span></td>
-                                </tr>
-                            ))}
+                            {ship.weapons.map((weapon, weaponIndex) => {
+                                const hasFired = battleState.weaponFire.some((entry) => (
+                                    entry.weaponIndex === weaponIndex
+                                    && entry.round === round
+                                    && entry.turnSide === turnSide
+                                ));
+                                const isSelected = selectedWeaponIndex === weaponIndex;
+                                const canSelect = !isEnemy && isActiveTurn && !hasFired && Boolean(target);
+                                const weaponRowClass = [
+                                    canSelect ? "weapon-row-selectable" : "",
+                                    isSelected ? "weapon-row-selected" : "",
+                                ].filter(Boolean).join(" ");
+
+                                return (
+                                    <tr
+                                        key={`${weapon.name}-${weapon.rangeLabel || weapon.rangeCm}`}
+                                        className={weaponRowClass}
+                                    >
+                                        <td>
+                                            <span className="weapon-marker" aria-hidden="true">{weaponMarkers[weapon.type]}</span>
+                                            {!isEnemy ? (
+                                                <button
+                                                    type="button"
+                                                    className="weapon-select-button"
+                                                    disabled={!canSelect}
+                                                    aria-pressed={isSelected}
+                                                    onClick={() => setSelectedWeaponIndex(weaponIndex)}
+                                                >
+                                                    {weapon.name}
+                                                    {hasFired && <span> · Fired</span>}
+                                                </button>
+                                            ) : weapon.name}
+                                            <small>{weapon.type}</small>
+                                        </td>
+                                        <td>{weapon.rangeLabel || `${weapon.rangeCm} cm`}</td>
+                                        <td className="strength">{weapon.strength}{weapon.strengthUnit && <small>{weapon.strengthUnit}</small>}</td>
+                                        <td><span className="arc">{weapon.arc}</span></td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
             </section>
+            {!isEnemy && selectedWeaponIndex != null && target && (
+                <WeaponAttack
+                    key={`${vessel.id}-${selectedWeaponIndex}-${target.id}`}
+                    weapon={ship.weapons[selectedWeaponIndex]}
+                    weaponIndex={selectedWeaponIndex}
+                    attacker={vessel}
+                    target={target}
+                    targetShip={targetShip}
+                    round={round}
+                    turnSide={turnSide}
+                    onClose={() => setSelectedWeaponIndex(null)}
+                    onRecord={(entry) => {
+                        onUpdate((current) => ({
+                            weaponFire: [...current.weaponFire, entry],
+                            message: `${entry.weaponName} recorded: ${entry.hits} hits, ${entry.damage} damage.`,
+                        }));
+                        setSelectedWeaponIndex(null);
+                    }}
+                />
+            )}
         </article>
     );
 };
 
-/** Center controls that reveal either ship's critical damage or special rules. */
+/** Center controls that reveal ship references and the shared Gunnery table. */
 const ShipDrawers = ({ friendlyShip, enemyShip }) => {
     const [openDrawer, setOpenDrawer] = useState("");
     const [drawerType, drawerSide] = openDrawer.split("-");
-    const activeShip = drawerSide === "friendly" ? friendlyShip : enemyShip;
+    const activeShip = drawerSide === "friendly"
+        ? friendlyShip
+        : drawerSide === "enemy"
+            ? enemyShip
+            : null;
 
     const toggleDrawer = (type, side) => {
         const drawerId = `${type}-${side}`;
@@ -328,7 +603,21 @@ const ShipDrawers = ({ friendlyShip, enemyShip }) => {
                 <span>RULES</span>
                 <button type="button" title="Enemy special rules" aria-label="Show enemy special rules" aria-expanded={openDrawer === "rules-enemy"} onClick={() => toggleDrawer("rules", "enemy")}>▷</button>
             </div>
-            {openDrawer && activeShip && (
+            <button
+                type="button"
+                className="gunnery-drawer-trigger"
+                aria-expanded={openDrawer === "gunnery"}
+                onClick={() => setOpenDrawer((current) => current === "gunnery" ? "" : "gunnery")}
+            >
+                GUNNERY TABLE
+            </button>
+            {openDrawer === "gunnery" && (
+                <div className="rules-drawer rules-drawer-gunnery">
+                    <button type="button" className="rules-drawer-close" onClick={() => setOpenDrawer("")} aria-label="Close Gunnery table">×</button>
+                    <GunneryReference />
+                </div>
+            )}
+            {openDrawer && openDrawer !== "gunnery" && activeShip && (
                 <div className={`rules-drawer rules-drawer-${drawerSide}`}>
                     <button type="button" className="rules-drawer-close" onClick={() => setOpenDrawer("")} aria-label={`Close ${drawerType === "critical" ? "critical damage" : "special rules"}`}>×</button>
                     {drawerType === "critical" ? (
@@ -857,6 +1146,11 @@ const BattleTracker = () => {
                         battleState={state}
                         leadership={fleet.flagshipId === vessel.id ? commanderLeadership[fleet.commander] : undefined}
                         onUpdate={updateSelectedShip}
+                        target={enemyVessel}
+                        targetShip={enemyShip}
+                        round={connectedRoom.turn?.round || 1}
+                        turnSide={connectedRoom.turn?.activeSide || ""}
+                        isActiveTurn={connectedRoom.turn?.activeSide === connectedLocalSide}
                     />
                     <ShipDrawers
                         friendlyShip={{ ship: friendlyShip, vessel, battleState: state, onUpdate: updateSelectedShip }}

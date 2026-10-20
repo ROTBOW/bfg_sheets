@@ -657,11 +657,201 @@ td small {
     margin-top: 5px;
 }
 
+.weapon-row-selectable {
+    position: relative;
+    cursor: pointer;
+}
+
+.weapon-row-selectable td {
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.weapon-row-selectable:hover td,
+.weapon-row-selectable:focus-within td {
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.weapon-row-selected td {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: light-dark(#302c25, #f4f7f2);
+}
+
+.weapon-row-selected td:first-child {
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
 .weapon-marker {
     display: inline-block;
     width: 29px;
     color: var(--accent);
     font-size: 16px;
+}
+
+.weapon-select-button {
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.weapon-select-button:not(:disabled)::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+}
+
+.weapon-select-button:hover:not(:disabled),
+.weapon-select-button:focus-visible {
+    color: var(--accent);
+}
+
+.weapon-select-button:disabled {
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+.weapon-attack {
+    margin-top: 12px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: light-dark(#f4f0e6, #0b0f0d);
+    box-shadow: 0 14px 38px #0005;
+}
+
+.weapon-attack-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.weapon-attack-heading h3 {
+    margin: 4px 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.weapon-attack-heading small {
+    color: var(--muted);
+}
+
+.weapon-attack-heading > button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+}
+
+.weapon-attack-fields,
+.physical-roll-fields,
+.weapon-result {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 14px 18px;
+}
+
+.weapon-attack label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
+
+.weapon-attack input,
+.weapon-attack select,
+.weapon-attack button {
+    min-height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--background);
+    color: var(--foreground);
+    font: inherit;
+}
+
+.weapon-attack input,
+.weapon-attack select {
+    width: 100%;
+    padding: 7px 9px;
+}
+
+.weapon-roll-button {
+    width: calc(100% - 36px);
+    margin: 0 18px 14px;
+    color: var(--accent) !important;
+}
+
+.physical-roll-fields button,
+.weapon-result button {
+    align-self: end;
+    color: var(--accent);
+}
+
+.weapon-result {
+    align-items: end;
+    border-top: 1px solid var(--border);
+}
+
+.weapon-result > span,
+.weapon-result > strong {
+    align-self: center;
+}
+
+.weapon-result > span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.weapon-result > strong {
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.weapon-attack-error {
+    margin: 0;
+    padding: 0 18px 14px;
+    color: #e8917c;
+    font-size: 11px;
+}
+
+.gunnery-reference .panel-heading {
+    border-bottom: 1px solid var(--border);
+}
+
+.gunnery-reference table {
+    min-width: 720px;
+}
+
+.gunnery-reference th,
+.gunnery-reference td {
+    padding: 7px 9px;
+    text-align: center;
+}
+
+.gunnery-reference > p {
+    margin: 0;
+    padding: 10px 18px 14px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+    .weapon-attack-fields,
+    .physical-roll-fields,
+    .weapon-result {
+        grid-template-columns: 1fr;
+    }
 }
 
 .strength {
@@ -2068,9 +2258,26 @@ footer {
     background: color-mix(in srgb, var(--accent) 12%, var(--background));
 }
 
+.gunnery-drawer-trigger {
+    width: 100%;
+    min-height: 28px;
+    padding: 4px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--background);
+    font-size: 7px;
+    letter-spacing: 0.5px;
+}
+
+.gunnery-drawer-trigger[aria-expanded="true"] {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, var(--background));
+}
+
 .rules-drawer {
     position: absolute;
-    top: 94px;
+    top: 130px;
     width: min(560px, 42vw);
     max-height: 60vh;
     overflow-y: auto;
@@ -2088,6 +2295,12 @@ footer {
     left: 27px;
 }
 
+.rules-drawer-gunnery {
+    left: 50%;
+    width: min(760px, 64vw);
+    transform: translateX(-50%);
+}
+
 .rules-drawer .reference-card {
     margin: 0;
     border-left: 0;
@@ -2095,6 +2308,10 @@ footer {
 
 .rules-drawer .critical-damage {
     margin: 0;
+    border: 0;
+}
+
+.rules-drawer .gunnery-reference {
     border: 0;
 }
 
@@ -2204,6 +2421,10 @@ footer {
         inset: 15vh 18px auto;
         width: auto;
         max-height: 70vh;
+    }
+
+    .rules-drawer-gunnery {
+        transform: none;
     }
 
     .mirrored-ship.is-enemy {

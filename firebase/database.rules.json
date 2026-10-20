@@ -135,6 +135,64 @@
                                         ".validate": "$entryIndex.matches(/^([0-9]|[1-4][0-9])$/) && newData.hasChildren(['id', 'typeId', 'source', 'status']) && newData.child('id').isString() && newData.child('id').val().length <= 128 && newData.child('typeId').isString() && newData.child('typeId').val().length <= 64 && newData.child('source').val() === 'manual' && (newData.child('status').val() === 'active' || newData.child('status').val() === 'repaired')"
                                     }
                                 },
+                                "weaponFire": {
+                                    "$entryIndex": {
+                                        ".validate": "$entryIndex.matches(/^([0-9]|[1-9][0-9]|1[0-9][0-9])$/) && newData.hasChildren(['id', 'weaponIndex', 'weaponName', 'weaponType', 'round', 'turnSide', 'targetShipId', 'targetName', 'direction', 'mode', 'rolls', 'shots', 'hits', 'damage', 'accuracy', 'createdAt'])",
+                                        "id": {
+                                            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+                                        },
+                                        "weaponIndex": {
+                                            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+                                        },
+                                        "weaponName": {
+                                            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+                                        },
+                                        "weaponType": {
+                                            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 64"
+                                        },
+                                        "round": {
+                                            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+                                        },
+                                        "turnSide": {
+                                            ".validate": "newData.isString() && (newData.val() === 'host' || newData.val() === 'guest')"
+                                        },
+                                        "targetShipId": {
+                                            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+                                        },
+                                        "targetName": {
+                                            ".validate": "newData.isString() && newData.val().length <= 100"
+                                        },
+                                        "direction": {
+                                            ".validate": "newData.isString() && (newData.val() === 'closing' || newData.val() === 'moving-away' || newData.val() === 'abeam')"
+                                        },
+                                        "mode": {
+                                            ".validate": "newData.isString() && (newData.val() === 'digital' || newData.val() === 'manual')"
+                                        },
+                                        "rolls": {
+                                            "$rollIndex": {
+                                                ".validate": "$rollIndex.matches(/^([0-9]|[1-9][0-9])$/) && newData.isNumber() && newData.val() >= 1 && newData.val() <= 6"
+                                            }
+                                        },
+                                        "shots": {
+                                            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
+                                        },
+                                        "hits": {
+                                            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('shots').val()"
+                                        },
+                                        "damage": {
+                                            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+                                        },
+                                        "accuracy": {
+                                            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+                                        },
+                                        "createdAt": {
+                                            ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= now + 60000"
+                                        },
+                                        "$other": {
+                                            ".validate": false
+                                        }
+                                    }
+                                },
                                 "message": {
                                     ".validate": "newData.isString() && newData.val().length <= 500"
                                 },

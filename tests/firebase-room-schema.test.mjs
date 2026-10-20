@@ -4,11 +4,13 @@ import {
     createFleetSnapshot,
     createRoomId,
     createRoomRecord,
+    advanceBattleTurn,
     getRoomSideForUser,
     maximumShipsPerFleet,
     normalizeDisplayName,
     roomLifetimeMs,
     roomSchemaVersion,
+    startBattleTurn,
 } from "../firebase/room-schema.mjs";
 
 const fleet = {
@@ -65,7 +67,18 @@ test("new rooms assign the host and use the versioned room format", () => {
         assert.equal(room.sides.host.ownerUid, "host-uid");
         assert.equal(getRoomSideForUser(room, "host-uid"), "host");
         assert.equal(getRoomSideForUser(room, "stranger"), "");
+        assert.deepEqual(room.turn, { round: 1, firstSide: "", activeSide: "" });
     } finally {
         Date.now = originalNow;
     }
+});
+
+test("a game round advances only after both players complete a turn", () => {
+    const firstTurn = startBattleTurn("guest");
+    const secondPlayerTurn = advanceBattleTurn(firstTurn);
+    const nextRound = advanceBattleTurn(secondPlayerTurn);
+
+    assert.deepEqual(firstTurn, { round: 1, firstSide: "guest", activeSide: "guest" });
+    assert.deepEqual(secondPlayerTurn, { round: 1, firstSide: "guest", activeSide: "host" });
+    assert.deepEqual(nextRound, { round: 2, firstSide: "guest", activeSide: "guest" });
 });

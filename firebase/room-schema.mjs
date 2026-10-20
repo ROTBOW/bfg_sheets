@@ -104,7 +104,44 @@ export const createRoomRecord = ({ hostUid, displayName, fleet, timestamp }) => 
                 battle: {},
             },
         },
+        turn: {
+            round: 1,
+            firstSide: "",
+            activeSide: "",
+        },
     };
+};
+
+/** Creates round one after the players determine which side takes the first turn. */
+export const startBattleTurn = (firstSide) => {
+    if (firstSide !== "host" && firstSide !== "guest") {
+        throw new Error("Choose the host or guest fleet to take the first turn.");
+    }
+
+    return {
+        round: 1,
+        firstSide,
+        activeSide: firstSide,
+    };
+};
+
+/** Advances one player turn, increasing the round after both players have acted. */
+export const advanceBattleTurn = (turn) => {
+    const firstSide = turn?.firstSide;
+    const activeSide = turn?.activeSide;
+    const round = Number.isInteger(turn?.round) && turn.round > 0 ? turn.round : 1;
+
+    if (!firstSide || !activeSide) {
+        throw new Error("Choose which fleet takes the first turn before advancing.");
+    }
+
+    const secondSide = firstSide === "host" ? "guest" : "host";
+
+    if (activeSide === firstSide) {
+        return { round, firstSide, activeSide: secondSide };
+    }
+
+    return { round: round + 1, firstSide, activeSide: firstSide };
 };
 
 /**

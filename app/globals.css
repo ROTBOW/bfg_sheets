@@ -1806,6 +1806,125 @@ footer {
     padding: 24px clamp(14px, 1.5vw, 28px) 48px;
 }
 
+.turn-counter {
+    position: sticky;
+    top: 10px;
+    z-index: 20;
+    grid-column: 1 / -1;
+    align-self: start;
+    justify-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: min(100%, 440px);
+    height: 46px;
+    min-height: 46px;
+    padding: 4px 34px 7px;
+    border: 1px solid var(--border);
+    border-top: 0;
+    border-radius: 0 0 10px 10px;
+    background: light-dark(#fffdf6, #0d0f0f);
+    box-shadow: 0 8px 22px light-dark(#29272214, #0007);
+    text-align: center;
+}
+
+.turn-counter > .eyebrow,
+.turn-counter > small:not(.turn-counter-error) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.turn-counter::before,
+.turn-counter::after {
+    position: absolute;
+    top: 0;
+    width: 110px;
+    height: 12px;
+    border-top: 1px solid var(--border);
+    content: "";
+}
+
+.turn-counter::before {
+    right: 100%;
+    border-right: 1px solid var(--border);
+    transform: skewX(35deg);
+    transform-origin: top right;
+}
+
+.turn-counter::after {
+    left: 100%;
+    border-left: 1px solid var(--border);
+    transform: skewX(-35deg);
+    transform-origin: top left;
+}
+
+.turn-counter h2 {
+    color: var(--accent);
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.turn-counter > strong {
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.turn-counter > small {
+    color: var(--muted);
+    font-size: 8px;
+}
+
+.turn-counter button {
+    min-height: 28px;
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--foreground);
+    background: var(--background);
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.turn-counter button:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.first-turn-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.turn-counter .turn-counter-error {
+    color: light-dark(#9f241d, #ff8b84);
+}
+
+/* The unique class prevents stale development CSS from restoring the old stacked card. */
+.turn-counter.turn-counter-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: min(100%, 440px);
+    height: 46px;
+    min-height: 46px;
+    padding: 4px 34px 7px;
+}
+
+.turn-counter.turn-counter-compact h2,
+.turn-counter.turn-counter-compact > strong {
+    margin: 0;
+}
+
 .mirrored-ship {
     min-width: 0;
 }
@@ -2064,6 +2183,13 @@ footer {
     .mirrored-ship-heading {
         height: auto;
         min-height: 140px;
+    }
+
+    .turn-counter {
+        gap: 7px;
+        width: 100%;
+        padding-right: 18px;
+        padding-left: 18px;
     }
 
     .rules-drawers {

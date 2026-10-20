@@ -175,6 +175,22 @@
                         }
                     }
                 },
+                "turn": {
+                    ".write": "auth != null && data.parent().child('players/' + auth.uid).exists()",
+                    ".validate": "newData.hasChildren(['round', 'firstSide', 'activeSide'])",
+                    "round": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+                    },
+                    "firstSide": {
+                        ".validate": "newData.isString() && (newData.val() === '' || newData.val() === 'host' || newData.val() === 'guest')"
+                    },
+                    "activeSide": {
+                        ".validate": "newData.isString() && (newData.val() === '' || newData.val() === 'host' || newData.val() === 'guest')"
+                    },
+                    "$other": {
+                        ".validate": false
+                    }
+                },
                 "$other": {
                     ".validate": false
                 }

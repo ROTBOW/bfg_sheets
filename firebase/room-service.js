@@ -6,6 +6,7 @@ import {
     onValue,
     ref,
     remove,
+    runTransaction,
     serverTimestamp,
     set,
     update,
@@ -18,6 +19,8 @@ import {
     createRoomRecord,
     getRoomSideForUser,
     normalizeDisplayName,
+    advanceBattleTurn,
+    startBattleTurn,
 } from "./room-schema.mjs";
 
 /**
@@ -245,6 +248,29 @@ export const updateShipBattleState = async ({ roomId, side, shipId, changes }) =
         ...changes,
         updatedAt: serverTimestamp(),
         updatedBy: user.uid,
+    });
+};
+
+/**
+ * Selects the first player or advances the shared player-turn counter atomically.
+ *
+ * @param {object} options Turn update.
+ * @param {string} options.roomId Active room identifier.
+ * @param {"start"|"advance"} options.action Requested transition.
+ * @param {"host"|"guest"} [options.firstSide] Side chosen to act first.
+ * @returns {Promise<void>} Resolves after Firebase commits the transition.
+ */
+export const updateBattleTurn = async ({ roomId, action, firstSide }) => {
+    await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+    const turnReference = ref(database, `${roomPath(roomId)}/turn`);
+
+    await runTransaction(turnReference, (currentTurn) => {
+        if (action === "start") {
+            return startBattleTurn(firstSide);
+        }
+
+        return advanceBattleTurn(currentTurn);
     });
 };
 

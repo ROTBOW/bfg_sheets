@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+    applyWeaponDamage,
     createFleetSnapshot,
     createRoomId,
     createRoomRecord,
@@ -81,4 +82,26 @@ test("a game round advances only after both players complete a turn", () => {
     assert.deepEqual(firstTurn, { round: 1, firstSide: "guest", activeSide: "guest" });
     assert.deepEqual(secondPlayerTurn, { round: 1, firstSide: "guest", activeSide: "host" });
     assert.deepEqual(nextRound, { round: 2, firstSide: "guest", activeSide: "guest" });
+});
+
+test("weapon damage consumes shields before reducing hull", () => {
+    assert.deepEqual(
+        applyWeaponDamage({ hull: 8, shields: 2 }, 1, { hull: 8, shields: 2 }),
+        { hull: 8, shields: 1 },
+    );
+    assert.deepEqual(
+        applyWeaponDamage({ hull: 8, shields: 1 }, 3, { hull: 8, shields: 2 }),
+        { hull: 6, shields: 0 },
+    );
+});
+
+test("weapon damage uses profile defaults and cannot reduce hull below zero", () => {
+    assert.deepEqual(
+        applyWeaponDamage(null, 20, { hull: 6, shields: 1 }),
+        { hull: 0, shields: 0 },
+    );
+    assert.deepEqual(
+        applyWeaponDamage({ hull: 4, shields: 0 }, 0, { hull: 6, shields: 1 }),
+        { hull: 4, shields: 0 },
+    );
 });

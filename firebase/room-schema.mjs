@@ -6,6 +6,29 @@ export const maximumShipsPerFleet = 100;
 const roomIdBytes = 16;
 
 /**
+ * Applies incoming weapon damage to shields before hull without exceeding ship limits.
+ *
+ * @param {object|null} battleState Current stored battle state.
+ * @param {number} damage Non-negative whole-number damage to apply.
+ * @param {object} maximums Ship profile hull and shield maximums.
+ * @returns {{ hull: number, shields: number }} Updated defensive values.
+ */
+export const applyWeaponDamage = (battleState, damage, maximums) => {
+    const maximumHull = Math.max(0, Number(maximums?.hull) || 0);
+    const maximumShields = Math.max(0, Number(maximums?.shields) || 0);
+    const currentHull = Math.min(maximumHull, Math.max(0, Number(battleState?.hull ?? maximumHull)));
+    const currentShields = Math.min(maximumShields, Math.max(0, Number(battleState?.shields ?? maximumShields)));
+    const incomingDamage = Number.isInteger(damage) && damage > 0 ? damage : 0;
+    const shieldDamage = Math.min(currentShields, incomingDamage);
+    const hullDamage = incomingDamage - shieldDamage;
+
+    return {
+        hull: Math.max(0, currentHull - hullDamage),
+        shields: currentShields - shieldDamage,
+    };
+};
+
+/**
  * Creates an unguessable 128-bit room identifier encoded as lowercase hex.
  *
  * @param {Crypto} [cryptoApi=globalThis.crypto] Cryptographic source; injectable for tests.

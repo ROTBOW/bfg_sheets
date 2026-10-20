@@ -14,6 +14,7 @@ import {
 import { ensureAnonymousUser } from "./auth";
 import { getFirebaseServices } from "./client";
 import {
+    applyWeaponDamage,
     createFleetSnapshot,
     createRoomId,
     createRoomRecord,
@@ -246,6 +247,46 @@ export const updateShipBattleState = async ({ roomId, side, shipId, changes }) =
 
     await update(battleReference, {
         ...changes,
+        updatedAt: serverTimestamp(),
+        updatedBy: user.uid,
+    });
+};
+
+/**
+ * Applies an attack to an opposing ship, consuming shields before hull.
+ * Security Rules limit this cross-side write to the player whose turn is active.
+ *
+ * @param {object} options Incoming attack details.
+ * @param {string} options.roomId Active room identifier.
+ * @param {"host"|"guest"} options.targetSide Opposing side receiving damage.
+ * @param {string} options.shipId Target ship identifier.
+ * @param {number} options.damage Damage inflicted by the recorded attack.
+ * @param {number} options.maximumHull Target profile's starting hull.
+ * @param {number} options.maximumShields Target profile's starting shields.
+ * @param {string} options.message Short attack summary for the target's tracker.
+ * @returns {Promise<void>} Resolves after Firebase commits the damage.
+ */
+export const damageEnemyShip = async ({
+    roomId,
+    targetSide,
+    shipId,
+    damage,
+    maximumHull,
+    maximumShields,
+    message,
+}) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+    const battleReference = ref(database, `${roomPath(roomId)}/sides/${targetSide}/battle/${shipId}`);
+    const snapshot = await get(battleReference);
+    const defenses = applyWeaponDamage(snapshot.val(), damage, {
+        hull: maximumHull,
+        shields: maximumShields,
+    });
+
+    await update(battleReference, {
+        ...defenses,
+        message,
         updatedAt: serverTimestamp(),
         updatedBy: user.uid,
     });

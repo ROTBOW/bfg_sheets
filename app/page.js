@@ -16,6 +16,7 @@ import {
 } from "@/firebase/active-room";
 import { ensureAnonymousUser } from "@/firebase/auth";
 import {
+    damageEnemyShip,
     subscribeToRoom,
     updateBattleTurn,
     updateShipBattleState,
@@ -169,6 +170,7 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
     const [damage, setDamage] = useState(0);
     const [result, setResult] = useState(null);
     const [error, setError] = useState("");
+    const [isRecording, setIsRecording] = useState(false);
     const effectiveDirection = weapon.type === "Lightning arc" ? "closing" : direction;
     const targetArmour = effectiveDirection === "closing"
         ? targetShip.stats.armour.front
@@ -207,7 +209,7 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
         }
     };
 
-    const recordAttack = () => {
+    const recordAttack = async () => {
         if (!result) {
             setError("Roll the attack or enter the physical dice before recording it.");
             return;
@@ -221,24 +223,32 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
             return;
         }
 
-        onRecord({
-            id: crypto.randomUUID(),
-            weaponIndex,
-            weaponName: weapon.name,
-            weaponType: weapon.type,
-            round,
-            turnSide,
-            targetShipId: target.id,
-            targetName: target.name,
-            direction,
-            mode,
-            rolls: result.rolls,
-            shots,
-            hits: result.hits,
-            damage: recordedDamage,
-            accuracy: shots ? result.hits / shots : 0,
-            createdAt: Date.now(),
-        });
+        setIsRecording(true);
+        setError("");
+
+        try {
+            await onRecord({
+                id: crypto.randomUUID(),
+                weaponIndex,
+                weaponName: weapon.name,
+                weaponType: weapon.type,
+                round,
+                turnSide,
+                targetShipId: target.id,
+                targetName: target.name,
+                direction,
+                mode,
+                rolls: result.rolls,
+                shots,
+                hits: result.hits,
+                damage: recordedDamage,
+                accuracy: shots ? result.hits / shots : 0,
+                createdAt: Date.now(),
+            });
+        } catch {
+            setError("Damage could not be sent to your opponent. Check your connection and try again.");
+            setIsRecording(false);
+        }
     };
 
     return (
@@ -309,7 +319,9 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
                             onChange={(event) => setDamage(event.target.value)}
                         />
                     </label>
-                    <button type="button" onClick={recordAttack}>Record firing</button>
+                    <button type="button" disabled={isRecording} onClick={recordAttack}>
+                        {isRecording ? "Sending damage…" : "Record firing"}
+                    </button>
                 </div>
             )}
             {error && <p className="weapon-attack-error" role="alert">{error}</p>}
@@ -442,6 +454,7 @@ const MirroredShip = ({
     battleState,
     leadership,
     onUpdate,
+    onDamageTarget,
     isEnemy = false,
     target,
     targetShip,
@@ -562,7 +575,8 @@ const MirroredShip = ({
                     round={round}
                     turnSide={turnSide}
                     onClose={() => setSelectedWeaponIndex(null)}
-                    onRecord={(entry) => {
+                    onRecord={async (entry) => {
+                        await onDamageTarget(entry);
                         onUpdate((current) => ({
                             weaponFire: [...current.weaponFire, entry],
                             message: `${entry.weaponName} recorded: ${entry.hits} hits, ${entry.damage} damage.`,
@@ -1105,6 +1119,23 @@ const BattleTracker = () => {
         updateSelectedShip({ targetId: shipId });
     };
 
+    /** Sends inflicted damage to the selected opposing ship in the shared room. */
+    const damageSelectedEnemyShip = async (entry) => {
+        if (!entry.damage) {
+            return;
+        }
+
+        await damageEnemyShip({
+            roomId: activeRoomId,
+            targetSide: enemySide,
+            shipId: enemyVessel.id,
+            damage: entry.damage,
+            maximumHull: enemyVessel.profile.stats.hull,
+            maximumShields: enemyVessel.profile.stats.shields,
+            message: `${vessel.name}'s ${entry.weaponName} inflicted ${entry.damage} damage.`,
+        });
+    };
+
     if (!loaded) return <main role="status">Loading saved fleets…</main>;
 
     if (activeRoomId && enemyFleet && vessel?.profile && enemyVessel?.profile) {
@@ -1146,6 +1177,7 @@ const BattleTracker = () => {
                         battleState={state}
                         leadership={fleet.flagshipId === vessel.id ? commanderLeadership[fleet.commander] : undefined}
                         onUpdate={updateSelectedShip}
+                        onDamageTarget={damageSelectedEnemyShip}
                         target={enemyVessel}
                         targetShip={enemyShip}
                         round={connectedRoom.turn?.round || 1}

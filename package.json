@@ -21,6 +21,8 @@
     "tailwindcss": "^4"
   },
   "overrides": {
+    "@firebase/app": "0.16.2",
+    "@firebase/app-compat": "0.5.18",
     "@grpc/grpc-js": "1.14.6"
   }
 }

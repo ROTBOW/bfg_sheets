@@ -886,6 +886,45 @@ td small {
     color: var(--accent);
 }
 
+.leadership-controls {
+    display: flex;
+    align-items: stretch;
+    gap: 7px;
+}
+
+.leadership-controls input {
+    width: 58px;
+    min-height: 40px;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--accent);
+    background: var(--background);
+    font-size: 22px;
+    text-align: center;
+}
+
+.leadership-controls button {
+    min-height: 40px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--foreground);
+    background: light-dark(#eee9dd, #171a19);
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.leadership-controls button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.battle-read-only .leadership-controls input {
+    border-color: transparent;
+    opacity: 1;
+}
+
 .leadership small {
     display: block;
     font-size: 10px;
@@ -1307,8 +1346,94 @@ footer {
     grid-template-columns: clamp(320px, 26vw, 400px) minmax(0, 1fr);
 }
 
+.battle-layout:has(.fleet-menu[data-view="compact"]) {
+    grid-template-columns: 156px minmax(0, 1fr);
+}
+
 .fleet-menu[data-view="details"] .fleet-ship {
     padding: 22px 20px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-heading {
+    padding: 12px 8px 0;
+}
+
+.fleet-menu[data-view="compact"] .fleet-toolbar {
+    gap: 6px;
+}
+
+.fleet-menu[data-view="compact"] .tracker-fleet-picker {
+    margin-bottom: 0;
+}
+
+.fleet-menu[data-view="compact"] .tracker-fleet-picker select {
+    min-height: 36px;
+    padding: 6px;
+    font-size: 10px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-view-toggle {
+    width: 100%;
+}
+
+.fleet-menu[data-view="compact"] .fleet-view-toggle button {
+    flex: 1;
+    min-width: 0;
+    padding: 5px 2px;
+    font-size: 8px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-heading h2,
+.fleet-menu[data-view="compact"] .fleet-heading > p {
+    display: none;
+}
+
+.fleet-menu[data-view="compact"] .fleet-list {
+    gap: 6px;
+    padding: 8px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-ship {
+    gap: 6px;
+    min-height: 86px;
+    padding: 10px 8px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-ship .registry {
+    font-size: 7px;
+    letter-spacing: 0.5px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-ship strong {
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+.compact-ship-status {
+    display: block;
+    margin-top: auto;
+    padding-top: 7px;
+    border-top: 1px solid var(--border);
+}
+
+.compact-ship-status .fleet-hull {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    width: 100%;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.compact-ship-status .fleet-hull > span:nth-child(2) {
+    color: var(--foreground);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.compact-ship-status .hull-warning {
+    width: 13px;
+    height: 13px;
 }
 
 .fleet-stats {
@@ -1621,4 +1746,341 @@ footer {
 
 .reference-card .special-rules-empty {
     margin-top: 16px;
+}
+
+.connected-battle-layout {
+    --friendly-fleet-width: clamp(260px, 18vw, 360px);
+    --enemy-fleet-width: clamp(260px, 18vw, 360px);
+    display: grid;
+    grid-template-columns: var(--friendly-fleet-width) minmax(0, 1fr) var(--enemy-fleet-width);
+    width: 100%;
+    max-width: none;
+    min-height: calc(100dvh - 88px);
+    margin: 0;
+    padding: 0;
+}
+
+.connected-battle-layout:has(> .fleet-menu:first-child[data-view="compact"]) {
+    --friendly-fleet-width: 124px;
+}
+
+.connected-battle-layout:has(> .fleet-menu:last-child[data-view="compact"]) {
+    --enemy-fleet-width: 124px;
+}
+
+.connected-battle-layout > .fleet-menu[data-view="compact"] .tracker-fleet-picker,
+.connected-battle-layout > .fleet-menu[data-view="compact"] .tracker-fleet-name {
+    display: none;
+}
+
+.connected-battle-layout > .fleet-menu:last-child {
+    border-right: 0;
+    border-left: 1px solid var(--border);
+}
+
+.tracker-fleet-name {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.tracker-fleet-name strong {
+    overflow-wrap: anywhere;
+    font-size: 13px;
+}
+
+.fleet-menu[data-side="enemy"] .fleet-ship[aria-pressed="true"] {
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.mirrored-battlefield {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr);
+    gap: 18px;
+    min-width: 0;
+    width: 100%;
+    padding: 24px clamp(14px, 1.5vw, 28px) 48px;
+}
+
+.mirrored-ship {
+    min-width: 0;
+}
+
+.mirrored-ship.is-enemy {
+    direction: rtl;
+}
+
+.mirrored-ship.is-enemy > * {
+    direction: ltr;
+}
+
+.mirrored-ship.is-enemy .ship-image {
+    transform: scaleX(-1);
+}
+
+.mirrored-ship-heading {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 168px;
+    margin-bottom: 18px;
+}
+
+.mirrored-ship-heading h1 {
+    margin: 8px 0;
+    font-size: clamp(28px, 3vw, 48px);
+    line-height: 0.95;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+}
+
+.mirrored-ship-heading h1.ship-title-long {
+    font-size: clamp(25px, 2.35vw, 38px);
+    line-height: 1;
+}
+
+.mirrored-ship-heading h1.ship-title-extra-long {
+    font-size: clamp(21px, 1.85vw, 31px);
+    line-height: 1.05;
+}
+
+.mirrored-ship.is-enemy .mirrored-ship-heading {
+    text-align: right;
+}
+
+.mirrored-ship .vessel .ship-image {
+    height: clamp(150px, 17vw, 260px);
+}
+
+.mirrored-ship .vessel-caption {
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.mirrored-ship .stat-strip {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.mirrored-ship .stat-strip > div:nth-child(3) {
+    border-right: 0;
+}
+
+.mirrored-ship .battle,
+.ship-viewer .main-grid > div > .battle {
+    margin: 24px 0;
+}
+
+.mirrored-ship .battle {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mirrored-ship .battle .panel-heading,
+.mirrored-ship .battle .status-banner,
+.mirrored-ship .battle .leadership,
+.mirrored-ship .battle .order-control,
+.mirrored-ship .battle .reset-button,
+.mirrored-ship .battle .reset-message {
+    grid-column: 1 / -1;
+}
+
+.mirrored-ship .battle .tracker {
+    min-width: 0;
+}
+
+.mirrored-ship .battle .tracker:nth-of-type(2) {
+    border-left: 1px solid var(--border);
+}
+
+.battle-read-only .tracker-controls button {
+    display: none;
+}
+
+.battle-read-only .order-control {
+    padding-bottom: 22px;
+}
+
+.mirrored-ship .armament {
+    margin-top: 24px;
+}
+
+.mirrored-ship .table-scroll table {
+    min-width: 500px;
+}
+
+.rules-drawers {
+    position: sticky;
+    top: 45vh;
+    z-index: 10;
+    display: grid;
+    align-self: start;
+    gap: 8px;
+}
+
+.drawer-trigger-row {
+    display: grid;
+    grid-template-columns: 20px 1fr 20px;
+    align-items: center;
+    gap: 3px;
+}
+
+.drawer-trigger-row span {
+    color: var(--muted);
+    font-size: 7px;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.drawer-trigger-row button {
+    width: 20px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    background: var(--background);
+}
+
+.drawer-trigger-row button[aria-expanded="true"] {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, var(--background));
+}
+
+.rules-drawer {
+    position: absolute;
+    top: 94px;
+    width: min(560px, 42vw);
+    max-height: 60vh;
+    overflow-y: auto;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: var(--background);
+    box-shadow: 0 18px 50px #0008;
+}
+
+.rules-drawer-friendly {
+    right: 27px;
+}
+
+.rules-drawer-enemy {
+    left: 27px;
+}
+
+.rules-drawer .reference-card {
+    margin: 0;
+    border-left: 0;
+}
+
+.rules-drawer .critical-damage {
+    margin: 0;
+    border: 0;
+}
+
+.rules-drawer-close {
+    position: sticky;
+    top: 8px;
+    z-index: 1;
+    float: right;
+    width: 32px;
+    height: 32px;
+    margin: 8px 8px -40px 0;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--foreground);
+    background: var(--background);
+}
+
+@media (max-width: 1400px) {
+    .connected-battle-layout {
+        --friendly-fleet-width: 240px;
+        --enemy-fleet-width: 240px;
+    }
+
+    .connected-battle-layout:has(> .fleet-menu:first-child[data-view="compact"]) {
+        --friendly-fleet-width: 112px;
+    }
+
+    .connected-battle-layout:has(> .fleet-menu:last-child[data-view="compact"]) {
+        --enemy-fleet-width: 112px;
+    }
+
+    .mirrored-battlefield {
+        gap: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .mirrored-ship .battle {
+        grid-template-columns: 1fr;
+    }
+
+    .mirrored-ship .battle > * {
+        grid-column: 1;
+    }
+
+    .mirrored-ship .battle .tracker:nth-of-type(2) {
+        border-left: 0;
+    }
+}
+
+@media (max-width: 1000px) {
+    .connected-battle-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .connected-battle-layout > .fleet-menu {
+        position: static;
+        grid-row: 1;
+        min-height: 0;
+        max-height: 440px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .mirrored-battlefield {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+}
+
+@media (max-width: 700px) {
+    .connected-battle-layout {
+        display: block;
+    }
+
+    .connected-battle-layout > .fleet-menu {
+        max-height: none;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .mirrored-battlefield {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 18px;
+    }
+
+    .mirrored-ship-heading {
+        height: auto;
+        min-height: 140px;
+    }
+
+    .rules-drawers {
+        position: relative;
+        top: auto;
+        grid-row: 2;
+        padding: 8px 0;
+    }
+
+    .rules-drawer {
+        position: fixed;
+        inset: 15vh 18px auto;
+        width: auto;
+        max-height: 70vh;
+    }
+
+    .mirrored-ship.is-enemy {
+        grid-row: 3;
+    }
 }

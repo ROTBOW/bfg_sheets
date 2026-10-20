@@ -9,12 +9,14 @@ import {
     getCriticalDamageCount,
 } from "@/lib/critical-damage.mjs";
 
-const CriticalDamage = ({ entries, onUpdate, faction, hasSepulchre = false }) => {
+const CriticalDamage = ({ entries, onUpdate, faction, hasSepulchre = false, isReadOnly = false }) => {
     const isNecron = faction === "Necrons";
     const types = getCriticalDamageTable(faction);
     const activeCount = entries.filter((entry) => entry.status === "active").length;
 
     const changeDamage = (typeId, delta) => {
+        if (isReadOnly) return;
+
         const id = crypto.randomUUID();
         onUpdate((current) => changeCriticalDamage(current, typeId, delta, id, faction));
     };
@@ -45,7 +47,7 @@ const CriticalDamage = ({ entries, onUpdate, faction, hasSepulchre = false }) =>
                                     {type.repairable && (
                                         <button
                                             type="button"
-                                            disabled={count === 0}
+                                            disabled={isReadOnly || count === 0}
                                             onClick={() => onUpdate((current) => repairNecronCritical(current, type.id))}
                                             aria-label={`Repair one ${type.label} critical`}
                                         >
@@ -55,7 +57,7 @@ const CriticalDamage = ({ entries, onUpdate, faction, hasSepulchre = false }) =>
                                     <output aria-label={`${type.label} active criticals`}>{count}</output>
                                     <button
                                         type="button"
-                                        disabled={type.id === "necron-sepulchre" && !hasSepulchre}
+                                            disabled={isReadOnly || (type.id === "necron-sepulchre" && !hasSepulchre)}
                                         onClick={() => changeDamage(type.id, 1)}
                                         aria-label={`Add ${type.label} critical`}
                                     >
@@ -63,7 +65,7 @@ const CriticalDamage = ({ entries, onUpdate, faction, hasSepulchre = false }) =>
                                     </button>
                                     <button
                                         type="button"
-                                        disabled={!entries.some((entry) => entry.typeId === type.id)}
+                                            disabled={isReadOnly || !entries.some((entry) => entry.typeId === type.id)}
                                         onClick={() => onUpdate((current) => removeCriticalEntry(current, type.id))}
                                         aria-label={`Undo last ${type.label} entry including permanent penalty`}
                                         title="Correct last entry, including its permanent penalty"
@@ -75,7 +77,7 @@ const CriticalDamage = ({ entries, onUpdate, faction, hasSepulchre = false }) =>
                                 <div className="critical-damage-counter">
                                     <button
                                         type="button"
-                                        disabled={count === 0}
+                                        disabled={isReadOnly || count === 0}
                                         onClick={() => changeDamage(type.id, -1)}
                                         aria-label={`Repair or remove one ${type.label} critical`}
                                     >
@@ -84,6 +86,7 @@ const CriticalDamage = ({ entries, onUpdate, faction, hasSepulchre = false }) =>
                                     <output aria-label={`${type.label} active criticals`}>{count}</output>
                                     <button
                                         type="button"
+                                        disabled={isReadOnly}
                                         onClick={() => changeDamage(type.id, 1)}
                                         aria-label={`Add ${type.label} critical`}
                                     >
@@ -95,6 +98,7 @@ const CriticalDamage = ({ entries, onUpdate, faction, hasSepulchre = false }) =>
                                     <input
                                         type="checkbox"
                                         checked={count > 0}
+                                        disabled={isReadOnly}
                                         onChange={(event) => changeDamage(type.id, event.target.checked ? 1 : -1)}
                                         aria-label={`${type.label} damaged (uncheck to correct entry)`}
                                     />

@@ -4,32 +4,54 @@ import { useState } from "react";
 import HullWarning from "@/components/HullWarning";
 import ShipName from "@/components/ShipName";
 
-const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, isFleetSelectionLocked, fleet, selectedShipId, onSelect, battleStates, storageMessage }) => {
+const FleetMenu = ({
+    fleets = [],
+    selectedFleetId = "",
+    onSelectFleet,
+    isFleetSelectionLocked = false,
+    fleet,
+    selectedShipId,
+    onSelect,
+    battleStates,
+    storageMessage,
+    title = "Fleet selection",
+    label = "Fleet",
+    fleetName = "",
+    side = "friendly",
+}) => {
     const [viewMode, setViewMode] = useState("details");
     const isCompact = viewMode === "compact";
 
     return (
         <aside
             className="fleet-menu"
-            aria-label="Fleet selection"
+            aria-label={title}
             data-view={viewMode}
+            data-side={side}
         >
             <div className="fleet-heading">
                 <div className="fleet-toolbar">
-                    <label className="tracker-fleet-picker">
-                        <span className="eyebrow">Fleet</span>
-                        <select
-                            value={selectedFleetId}
-                            onChange={(event) => onSelectFleet(event.target.value)}
-                            disabled={!fleets.length || isFleetSelectionLocked}
-                            title={isFleetSelectionLocked ? "Fleet selection is locked while connected to a room." : undefined}
-                        >
-                            {!fleets.length && <option value="">No saved fleets</option>}
-                            {fleets.map((entry) => (
-                                <option key={entry.id} value={entry.id}>{entry.name || "Untitled fleet"}</option>
-                            ))}
-                        </select>
-                    </label>
+                    {onSelectFleet ? (
+                        <label className="tracker-fleet-picker">
+                            <span className="eyebrow">{label}</span>
+                            <select
+                                value={selectedFleetId}
+                                onChange={(event) => onSelectFleet(event.target.value)}
+                                disabled={!fleets.length || isFleetSelectionLocked}
+                                title={isFleetSelectionLocked ? "Fleet selection is locked while connected to a room." : undefined}
+                            >
+                                {!fleets.length && <option value="">No saved fleets</option>}
+                                {fleets.map((entry) => (
+                                    <option key={entry.id} value={entry.id}>{entry.name || "Untitled fleet"}</option>
+                                ))}
+                            </select>
+                        </label>
+                    ) : (
+                        <div className="tracker-fleet-name">
+                            <span className="eyebrow">{label}</span>
+                            <strong>{fleetName || "Awaiting opponent"}</strong>
+                        </div>
+                    )}
                     <div
                         className="fleet-view-toggle"
                         role="group"
@@ -47,7 +69,7 @@ const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, isFleetSelectionLoc
                         ))}
                     </div>
                 </div>
-                <h2>Fleet selection</h2>
+                <h2>{title}</h2>
                 <p>{fleet.length} ships · Session tracking</p>
                 {storageMessage && <p role="alert">{storageMessage}</p>}
             </div>
@@ -67,11 +89,11 @@ const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, isFleetSelectionLoc
                                     hull={battleStates[vessel.id]?.hull ?? vessel.profile?.stats.hull}
                                 />
                             </strong>
-                            <span>{vessel.className}</span>
+                            {!isCompact && <span>{vessel.className}</span>}
                             {vessel.profile ? (
-                                <span className={isCompact ? undefined : "fleet-stats"}>
+                                <span className={isCompact ? "compact-ship-status" : "fleet-stats"}>
                                     <span className="fleet-hull">
-                                        <span>Hull</span>
+                                        <span>{isCompact ? "H" : "Hull"}</span>
                                         <span>{battleStates[vessel.id]?.hull ?? vessel.profile.stats.hull} / {vessel.profile.stats.hull}</span>
                                         <HullWarning
                                             hull={battleStates[vessel.id]?.hull ?? vessel.profile.stats.hull}

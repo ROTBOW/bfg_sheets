@@ -131,6 +131,54 @@ export const subscribeToRoom = (roomId, onRoom, onError) => {
 };
 
 /**
+ * Subscribes to this browser's connection to Firebase Realtime Database.
+ *
+ * @param {(isConnected: boolean) => void} onChange Connection-state callback.
+ * @returns {() => void} Function that detaches the connection listener.
+ */
+export const subscribeToFirebaseConnection = (onChange) => {
+    const { database } = getFirebaseServices();
+
+    return onValue(
+        ref(database, ".info/connected"),
+        (snapshot) => onChange(snapshot.val() === true),
+    );
+};
+
+/**
+ * Sends a per-player realtime handshake that the other participant can observe.
+ *
+ * @param {string} roomId Active room identifier.
+ * @returns {Promise<void>} Resolves after Firebase accepts the handshake.
+ */
+export const sendRoomHandshake = async (roomId) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+
+    await set(ref(database, `${roomPath(roomId)}/signals/${user.uid}`), {
+        id: createRoomId(),
+        sentAt: serverTimestamp(),
+    });
+};
+
+/**
+ * Marks the current participant offline without discarding their claimed side.
+ * This lets the same anonymous browser identity reconnect to the battle later.
+ *
+ * @param {string} roomId Room to leave.
+ * @returns {Promise<void>} Resolves after the offline state is stored.
+ */
+export const disconnectFromRoom = async (roomId) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+
+    await update(ref(database, `${roomPath(roomId)}/players/${user.uid}`), {
+        connected: false,
+        lastSeenAt: serverTimestamp(),
+    });
+};
+
+/**
  * Marks a participant online and schedules server-side offline timestamps.
  *
  * @param {string} roomId Room containing the participant.

@@ -4,7 +4,7 @@ import { useState } from "react";
 import HullWarning from "@/components/HullWarning";
 import ShipName from "@/components/ShipName";
 
-const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, fleet, selectedShipId, onSelect, battleStates, storageMessage }) => {
+const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, isFleetSelectionLocked, fleet, selectedShipId, onSelect, battleStates, storageMessage }) => {
     const [viewMode, setViewMode] = useState("details");
     const isCompact = viewMode === "compact";
 
@@ -21,7 +21,8 @@ const FleetMenu = ({ fleets, selectedFleetId, onSelectFleet, fleet, selectedShip
                         <select
                             value={selectedFleetId}
                             onChange={(event) => onSelectFleet(event.target.value)}
-                            disabled={!fleets.length}
+                            disabled={!fleets.length || isFleetSelectionLocked}
+                            title={isFleetSelectionLocked ? "Fleet selection is locked while connected to a room." : undefined}
                         >
                             {!fleets.length && <option value="">No saved fleets</option>}
                             {fleets.map((entry) => (

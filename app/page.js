@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import HullWarning from "@/components/HullWarning";
@@ -8,6 +8,12 @@ import ShipName from "@/components/ShipName";
 import SpecialRules from "@/components/SpecialRules";
 import FleetMenu from "@/components/FleetMenu";
 import CriticalDamage from "@/components/CriticalDamage";
+import {
+    getActiveRoomFleetId,
+    getActiveRoomId,
+    getServerActiveRoomId,
+    subscribeToActiveRoom,
+} from "@/firebase/active-room";
 import { getShip, storageKey } from "@/lib/fleets.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { battleProfiles, createShipBattleState } from "@/lib/battle-profiles";
@@ -384,6 +390,11 @@ const BattleTracker = () => {
     const [battleStates, setBattleStates] = useState({});
     const [loaded, setLoaded] = useState(false);
     const [storageMessage, setStorageMessage] = useState("");
+    const activeRoomId = useSyncExternalStore(
+        subscribeToActiveRoom,
+        getActiveRoomId,
+        getServerActiveRoomId,
+    );
 
     useEffect(() => {
         let active = true;
@@ -392,10 +403,14 @@ const BattleTracker = () => {
 
             try {
                 const library = loadFleetLibrary(window.localStorage);
+                const roomFleetId = getActiveRoomFleetId();
                 setFleets(library.fleets);
                 setSelectedFleetId((previous) => (
-                    library.fleets.some((fleet) => fleet.id === previous)
-                        ? previous : getDefaultFleetId(library.fleets)
+                    library.fleets.some((fleet) => fleet.id === roomFleetId)
+                        ? roomFleetId
+                        : library.fleets.some((fleet) => fleet.id === previous)
+                            ? previous
+                            : getDefaultFleetId(library.fleets)
                 ));
                 setStorageMessage(library.saveError ? "Demo fleet could not be saved. Browser storage is unavailable or full." : "");
             } catch {
@@ -444,6 +459,10 @@ const BattleTracker = () => {
     };
 
     const selectFleet = (id) => {
+        if (activeRoomId) {
+            return;
+        }
+
         setSelectedFleetId(id);
         setSelectedShipId("");
     };
@@ -471,6 +490,7 @@ const BattleTracker = () => {
                 fleets={fleets}
                 selectedFleetId={selectedFleetId}
                 onSelectFleet={selectFleet}
+                isFleetSelectionLocked={Boolean(activeRoomId)}
                 fleet={vessels}
                 selectedShipId={vessel?.id}
                 onSelect={setSelectedShipId}

@@ -162,7 +162,7 @@ const Connect = () => {
             const result = await createRoom({ fleet, displayName });
             setRoomId(result.roomId);
             setCurrentUid(result.user.uid);
-            setActiveRoomId(result.roomId);
+            setActiveRoomId(result.roomId, fleet.id);
             setRoomInput(formatRoomId(result.roomId));
             window.history.replaceState(null, "", `/connect?room=${result.roomId}`);
         } catch (error) {
@@ -195,7 +195,7 @@ const Connect = () => {
             });
             setRoomId(result.roomId);
             setCurrentUid(result.user.uid);
-            setActiveRoomId(result.roomId);
+            setActiveRoomId(result.roomId, fleet.id);
             window.history.replaceState(null, "", `/connect?room=${result.roomId}`);
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : String(error));

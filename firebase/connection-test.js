@@ -58,6 +58,7 @@ export const createConnectionTest = async (displayName) => {
     const timestamp = serverTimestamp();
     const room = {
         hostUid: user.uid,
+        guestUid: false,
         createdAt: timestamp,
         expiresAt: Date.now() + connectionTestLifetimeMs,
         participants: {
@@ -102,17 +103,26 @@ export const joinConnectionTest = async (roomId, displayName) => {
         throw new Error("This connection test has expired.");
     }
 
-    if (!participants[user.uid] && Object.keys(participants).length >= 2) {
+    if (room.guestUid && room.guestUid !== user.uid) {
         throw new Error("This connection test already has two machines.");
     }
 
-    await set(ref(database, `${connectionTestPath(roomId)}/participants/${user.uid}`), {
+    const participant = {
         displayName: normalizeDisplayName(displayName),
         role: user.uid === room.hostUid ? "host" : "guest",
         connected: true,
         joinedAt: participants[user.uid]?.joinedAt || serverTimestamp(),
         lastSeenAt: serverTimestamp(),
-    });
+    };
+    const updates = {
+        [`participants/${user.uid}`]: participant,
+    };
+
+    if (user.uid !== room.hostUid) {
+        updates.guestUid = user.uid;
+    }
+
+    await update(roomReference, updates);
     await registerConnectionTestPresence(roomId, user.uid);
 
     return { roomId, user };
@@ -185,5 +195,8 @@ export const leaveConnectionTest = async (roomId) => {
         return;
     }
 
-    await remove(ref(database, `${connectionTestPath(roomId)}/participants/${user.uid}`));
+    await update(roomReference, {
+        guestUid: false,
+        [`participants/${user.uid}`]: null,
+    });
 };

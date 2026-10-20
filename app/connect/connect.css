@@ -1,0 +1,229 @@
+.connect-page {
+    max-width: 1040px;
+    padding-bottom: 60px;
+}
+
+.connect-page button {
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--foreground);
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+.connect-page button:hover:not(:disabled),
+.connect-page button:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.connect-page button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.connect-page input {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--foreground);
+    background: var(--background);
+    font: inherit;
+}
+
+.connect-page input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.connect-page label {
+    display: grid;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.connect-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.status-light {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: light-dark(#8b8579, #56615a);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--muted) 12%, transparent);
+}
+
+.status-light.online {
+    background: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.connect-error {
+    margin: 0 0 20px;
+    padding: 14px 16px;
+    border: 1px solid light-dark(#ba6a5d, #803b35);
+    border-radius: 4px;
+    color: light-dark(#8c241b, #ff9a8f);
+    background: light-dark(#fff2ed, #1d100f);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.connect-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.connect-panel {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+    padding: 24px;
+}
+
+.connect-panel:first-child {
+    grid-column: 1 / -1;
+}
+
+.connect-panel h2,
+.connection-room h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.connect-panel p:not(.eyebrow) {
+    min-height: 48px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.connection-room {
+    padding: 24px;
+}
+
+.connection-room-heading {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.connection-room-heading h2 {
+    margin-top: 10px;
+    overflow-wrap: anywhere;
+}
+
+.connection-role {
+    padding: 7px 9px;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+    border-radius: 3px;
+    color: var(--accent);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+}
+
+.invite-box {
+    margin-top: 22px;
+}
+
+.invite-box > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+}
+
+.invite-box small {
+    display: block;
+    margin-top: 8px;
+    color: var(--accent);
+}
+
+.participant-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.participant-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 78px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.participant-card div,
+.signal-test > div {
+    display: grid;
+    gap: 5px;
+}
+
+.participant-card small,
+.signal-test small {
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.participant-card.waiting {
+    border-style: dashed;
+    color: var(--muted);
+}
+
+.signal-test {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.leave-button {
+    margin-top: 24px;
+}
+
+@media (max-width: 720px) {
+    .connect-page {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    .connect-grid,
+    .participant-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .signal-test {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .signal-test button {
+        width: 100%;
+    }
+}

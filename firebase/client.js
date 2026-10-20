@@ -7,6 +7,13 @@ import { getFirebaseConfig, shouldUseFirebaseEmulators } from "./config";
 
 let areEmulatorsConnected = false;
 
+/**
+ * Returns the shared Firebase app, anonymous-auth service, and realtime database.
+ * Connects each service to its local emulator once when emulator mode is enabled.
+ *
+ * @returns {{ app: import("firebase/app").FirebaseApp, auth: import("firebase/auth").Auth, database: import("firebase/database").Database }}
+ * @throws {Error} When required Firebase configuration is missing.
+ */
 export const getFirebaseServices = () => {
     const app = getApps().length ? getApp() : initializeApp(getFirebaseConfig());
     const auth = getAuth(app);

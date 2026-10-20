@@ -17,6 +17,12 @@ const requiredConfigKeys = [
     "appId",
 ];
 
+/**
+ * Returns the browser-safe Firebase configuration after checking required values.
+ *
+ * @returns {object} The configuration passed to `initializeApp`.
+ * @throws {Error} When a required public environment variable is missing.
+ */
 export const getFirebaseConfig = () => {
     const missingKeys = requiredConfigKeys.filter((key) => !firebaseConfig[key]);
 
@@ -29,6 +35,11 @@ export const getFirebaseConfig = () => {
     return firebaseConfig;
 };
 
+/**
+ * Reports whether browser Firebase clients should connect to local emulators.
+ *
+ * @returns {boolean} True only when the public emulator flag is exactly `true`.
+ */
 export const shouldUseFirebaseEmulators = () => (
     process.env.NEXT_PUBLIC_FIREBASE_USE_EMULATORS === "true"
 );

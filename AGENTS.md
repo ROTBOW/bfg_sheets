@@ -23,6 +23,7 @@ Here’s the portable code style prompt, without the Next.js-specific instructio
 - Explicit loops and helper functions are welcome. Do not replace them with dense chains or inline callbacks merely to shorten code. A readable `.map()` is also fine when it fits the surrounding code.
 - Short, obvious callbacks and ternaries are fine. Expand multi-step handlers and complicated conditions into blocks or named helpers.
 - Explain intent or a non-obvious constraint with a short comment. Avoid verbose comments that only repeat what the code already says.
+- Add concise JSDoc docstrings to new or materially changed functions and helpers. Document the contract, parameters, return value, side effects, and thrown errors when they are not obvious; do not restate the implementation line by line.
 - Improve the code you touch without reformatting unrelated files. Follow the existing readable style without copying incidental bugs or accessibility issues.
 
 ## JSX: show the structure

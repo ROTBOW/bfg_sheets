@@ -20,8 +20,22 @@ import {
     normalizeDisplayName,
 } from "./room-schema.mjs";
 
+/**
+ * Returns the database path for a capability-style room identifier.
+ *
+ * @param {string} roomId Secure room identifier from an invite.
+ * @returns {string} Realtime Database path for the room.
+ */
 const roomPath = (roomId) => `rooms/${roomId}`;
 
+/**
+ * Creates a hosted room from a detached local fleet snapshot and registers presence.
+ *
+ * @param {object} options Room creation options.
+ * @param {object} options.fleet Host fleet to snapshot.
+ * @param {string} options.displayName Public host name.
+ * @returns {Promise<{ roomId: string, room: object, user: import("firebase/auth").User }>} Created room details.
+ */
 export const createRoom = async ({ fleet, displayName }) => {
     const user = await ensureAnonymousUser();
     const { database } = getFirebaseServices();
@@ -39,6 +53,17 @@ export const createRoom = async ({ fleet, displayName }) => {
     return { roomId, room, user };
 };
 
+/**
+ * Claims the open guest side, or resumes the caller's existing side.
+ * The multi-location update keeps the player record and guest fleet assignment atomic.
+ *
+ * @param {object} options Join options.
+ * @param {string} options.roomId Room identifier from the invite.
+ * @param {object} options.fleet Guest fleet to snapshot.
+ * @param {string} options.displayName Public guest name.
+ * @returns {Promise<{ roomId: string, side: "host"|"guest", user: import("firebase/auth").User }>} Assigned side details.
+ * @throws {Error} When the room is missing, unavailable, or already has a guest.
+ */
 export const joinRoom = async ({ roomId, fleet, displayName }) => {
     const user = await ensureAnonymousUser();
     const { database } = getFirebaseServices();
@@ -86,6 +111,14 @@ export const joinRoom = async ({ roomId, fleet, displayName }) => {
     return { roomId, side: "guest", user };
 };
 
+/**
+ * Subscribes to the complete room snapshot and reports null after room deletion.
+ *
+ * @param {string} roomId Room to observe.
+ * @param {(room: object|null) => void} onRoom Snapshot callback.
+ * @param {(error: Error) => void} [onError] Subscription error callback.
+ * @returns {() => void} Function that detaches the realtime listener.
+ */
 export const subscribeToRoom = (roomId, onRoom, onError) => {
     const { database } = getFirebaseServices();
     const roomReference = ref(database, roomPath(roomId));
@@ -97,6 +130,13 @@ export const subscribeToRoom = (roomId, onRoom, onError) => {
     );
 };
 
+/**
+ * Marks a participant online and schedules server-side offline timestamps.
+ *
+ * @param {string} roomId Room containing the participant.
+ * @param {string} uid Authenticated participant UID.
+ * @returns {Promise<void>} Resolves after presence hooks and the online state are stored.
+ */
 export const registerPresence = async (roomId, uid) => {
     const { database } = getFirebaseServices();
     const connectedReference = ref(database, `${roomPath(roomId)}/players/${uid}/connected`);
@@ -110,6 +150,16 @@ export const registerPresence = async (roomId, uid) => {
     });
 };
 
+/**
+ * Merges tracker changes into one ship and records the authenticated writer.
+ *
+ * @param {object} options Battle-state update.
+ * @param {string} options.roomId Active room identifier.
+ * @param {"host"|"guest"} options.side Player-owned side.
+ * @param {string} options.shipId Stable fleet ship identifier.
+ * @param {object} options.changes Changed tracker fields only.
+ * @returns {Promise<void>} Resolves after Firebase accepts the update.
+ */
 export const updateShipBattleState = async ({ roomId, side, shipId, changes }) => {
     const user = await ensureAnonymousUser();
     const { database } = getFirebaseServices();
@@ -122,11 +172,26 @@ export const updateShipBattleState = async ({ roomId, side, shipId, changes }) =
     });
 };
 
+/**
+ * Changes the readiness flag for a player-owned side.
+ *
+ * @param {object} options Readiness update.
+ * @param {string} options.roomId Active room identifier.
+ * @param {"host"|"guest"} options.side Player-owned side.
+ * @param {boolean} options.isReady Desired readiness state.
+ * @returns {Promise<void>} Resolves after Firebase accepts the update.
+ */
 export const setSideReady = async ({ roomId, side, isReady }) => {
     const { database } = getFirebaseServices();
     await set(ref(database, `${roomPath(roomId)}/sides/${side}/ready`), Boolean(isReady));
 };
 
+/**
+ * Marks a room closed. Security Rules restrict this lifecycle change to the host.
+ *
+ * @param {string} roomId Room to close.
+ * @returns {Promise<void>} Resolves after the closed state is stored.
+ */
 export const closeRoom = async (roomId) => {
     const { database } = getFirebaseServices();
     await update(ref(database, `${roomPath(roomId)}/meta`), {
@@ -135,6 +200,12 @@ export const closeRoom = async (roomId) => {
     });
 };
 
+/**
+ * Permanently removes a room. Security Rules restrict deletion to the host.
+ *
+ * @param {string} roomId Room to delete.
+ * @returns {Promise<void>} Resolves after the room is removed.
+ */
 export const deleteRoom = async (roomId) => {
     const { database } = getFirebaseServices();
     await remove(ref(database, roomPath(roomId)));

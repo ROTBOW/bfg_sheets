@@ -5,6 +5,13 @@ export const maximumShipsPerFleet = 100;
 
 const roomIdBytes = 16;
 
+/**
+ * Creates an unguessable 128-bit room identifier encoded as lowercase hex.
+ *
+ * @param {Crypto} [cryptoApi=globalThis.crypto] Cryptographic source; injectable for tests.
+ * @returns {string} A 32-character room identifier.
+ * @throws {Error} When secure random generation is unavailable.
+ */
 export const createRoomId = (cryptoApi = globalThis.crypto) => {
     if (!cryptoApi?.getRandomValues) {
         throw new Error("Secure random values are unavailable in this browser.");
@@ -14,6 +21,12 @@ export const createRoomId = (cryptoApi = globalThis.crypto) => {
     return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 };
 
+/**
+ * Produces the bounded public name stored with a room participant.
+ *
+ * @param {unknown} displayName User-provided name.
+ * @returns {string} A trimmed name, or `Admiral` when the input is empty.
+ */
 export const normalizeDisplayName = (displayName) => {
     const normalizedName = String(displayName || "").trim();
 
@@ -24,6 +37,14 @@ export const normalizeDisplayName = (displayName) => {
     return normalizedName.slice(0, maximumDisplayNameLength);
 };
 
+/**
+ * Validates basic room limits and deep-clones a local fleet for online play.
+ * The detached copy prevents later fleet-builder edits from changing a battle.
+ *
+ * @param {object} fleet Local fleet selected by the player.
+ * @returns {object} A JSON-safe, detached fleet snapshot.
+ * @throws {Error} When the fleet or its ship list is invalid or oversized.
+ */
 export const createFleetSnapshot = (fleet) => {
     if (!fleet || typeof fleet !== "object" || Array.isArray(fleet)) {
         throw new Error("Choose a valid fleet before joining a room.");
@@ -40,6 +61,17 @@ export const createFleetSnapshot = (fleet) => {
     return JSON.parse(JSON.stringify(fleet));
 };
 
+/**
+ * Builds the initial versioned database record for a host and their fleet.
+ *
+ * @param {object} options Room creation values.
+ * @param {string} options.hostUid Authenticated host UID.
+ * @param {unknown} options.displayName Public host name.
+ * @param {object} options.fleet Fleet selected for this battle.
+ * @param {number|object} options.timestamp Firebase timestamp or deterministic test value.
+ * @returns {object} A new room record ready to write to Realtime Database.
+ * @throws {Error} When no host is present or the fleet snapshot is invalid.
+ */
 export const createRoomRecord = ({ hostUid, displayName, fleet, timestamp }) => {
     if (!hostUid) {
         throw new Error("A signed-in host is required to create a room.");
@@ -75,6 +107,13 @@ export const createRoomRecord = ({ hostUid, displayName, fleet, timestamp }) => 
     };
 };
 
+/**
+ * Finds the player-controlled side assigned to a Firebase user.
+ *
+ * @param {object|null} room Current room snapshot.
+ * @param {string} uid Firebase user ID.
+ * @returns {"host"|"guest"|""} The owned side, or an empty string for spectators.
+ */
 export const getRoomSideForUser = (room, uid) => {
     if (!room || !uid) return "";
     if (room.sides?.host?.ownerUid === uid) return "host";

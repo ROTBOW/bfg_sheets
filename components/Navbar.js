@@ -237,8 +237,9 @@ const OptionsDropdown = () => {
 
 const navigationLinks = [
     { href: "/", label: "Battle Tracker" },
-    { href: "/fleet-creator", label: "Fleet creator" },
+    { href: "/fleet-creator", label: "Fleet Creator" },
     { href: "/connect", label: "Connect" },
+    { href: "/battle-reports", label: "Battle Reports" },
 ];
 
 const Navbar = () => {

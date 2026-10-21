@@ -34,6 +34,8 @@ const MirroredShip = ({
     isActiveTurn = false,
     hasEnemyOnSpecialOrders = false,
     commandChecksBlocked = false,
+    attackCraftCapacity = 0,
+    activeAttackCraftStrength = 0,
 }) => {
     const [selectedWeaponIndex, setSelectedWeaponIndex] = useState(null);
     const isNecron = ship.faction === "Necrons";
@@ -210,6 +212,8 @@ const MirroredShip = ({
                                                         order={battleState.order}
                                                         round={round}
                                                         turnSide={turnSide}
+                                                        attackCraftCapacity={attackCraftCapacity}
+                                                        activeAttackCraftStrength={activeAttackCraftStrength}
                                                         onClose={() => setSelectedWeaponIndex(null)}
                                                         onRoll={onRoll}
                                                         onClearRoll={onClearRoll}

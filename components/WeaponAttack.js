@@ -611,14 +611,34 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
 };
 
 /** Records an ordnance launch without resolving damage against a ship. */
-const OrdnanceLaunch = ({ weapon, weaponIndex, attacker, order, round, turnSide, onLaunch, onClose }) => {
+const OrdnanceLaunch = ({
+    weapon,
+    weaponIndex,
+    attacker,
+    order,
+    round,
+    turnSide,
+    attackCraftCapacity,
+    activeAttackCraftStrength,
+    onLaunch,
+    onClose,
+}) => {
     const [isLaunching, setIsLaunching] = useState(false);
     const [error, setError] = useState("");
     const strength = getOrderedWeaponStrength(weapon, order);
+    const isAttackCraft = weapon.type === "Launch Bay";
+    const availableAttackCraft = Math.max(0, attackCraftCapacity - activeAttackCraftStrength);
+    const exceedsFleetCapacity = isAttackCraft && strength > availableAttackCraft;
 
     const launch = async () => {
         setIsLaunching(true);
         setError("");
+
+        if (exceedsFleetCapacity) {
+            setError("Recall or reduce active attack craft from the Active Ordnance drawer before launching.");
+            setIsLaunching(false);
+            return;
+        }
 
         try {
             await onLaunch({
@@ -654,7 +674,17 @@ const OrdnanceLaunch = ({ weapon, weaponIndex, attacker, order, round, turnSide,
             <p className="weapon-attack-note">
                 Launch this marker now. Resolve its hit later from Active Ordnance.
             </p>
-            <button type="button" className="weapon-roll-button" disabled={isLaunching} onClick={launch}>
+            {isAttackCraft && (
+                <p className="weapon-attack-note" role="status">
+                    Fleet attack craft: {activeAttackCraftStrength} active / {attackCraftCapacity} available.
+                </p>
+            )}
+            <button
+                type="button"
+                className="weapon-roll-button"
+                disabled={isLaunching || exceedsFleetCapacity}
+                onClick={launch}
+            >
                 {isLaunching ? "Launching…" : "FIRE"}
             </button>
             {error && <p className="weapon-attack-error" role="alert">{error}</p>}

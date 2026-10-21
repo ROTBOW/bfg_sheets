@@ -49,6 +49,8 @@ test("live rolls are bounded and writable only by the active player", async () =
     assert.match(liveRollRules[".write"], /turn\/activeSide/);
     assert.match(liveRollRules[".write"], /ownerUid/);
     assert.match(liveRollRules[".validate"], /expiresAt/);
+    assert.match(liveRollRules[".validate"], /targetNumber/);
+    assert.match(liveRollRules.kind[".validate"], /command-check/);
     assert.match(liveRollRules.initialDurations.$rollIndex[".validate"], />= 1000/);
     assert.match(liveRollRules.initialDurations.$rollIndex[".validate"], /<= 5000/);
     assert.match(liveRollRules.shieldBypassingHits[".validate"], /child\('hits'\)/);

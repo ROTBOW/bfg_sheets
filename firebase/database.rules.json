@@ -55,9 +55,12 @@
                 },
                 "liveRoll": {
                     ".write": "auth != null && ((!newData.exists() && data.child('createdBy').val() === auth.uid) || (data.parent().child('turn/activeSide').val() === 'host' && data.parent().child('sides/host/ownerUid').val() === auth.uid) || (data.parent().child('turn/activeSide').val() === 'guest' && data.parent().child('sides/guest/ownerUid').val() === auth.uid))",
-                    ".validate": "!newData.exists() || (newData.hasChildren(['id', 'sourceSide', 'attackerId', 'attackerName', 'targetId', 'targetName', 'weaponName', 'initialRolls', 'initialDurations', 'hitThreshold', 'shieldBypassRoll', 'hits', 'shieldBypassingHits', 'startedAt', 'expiresAt', 'createdBy']) && newData.child('sourceSide').val() === newData.parent().child('turn/activeSide').val() && newData.child('expiresAt').val() > newData.child('startedAt').val() && newData.child('expiresAt').val() <= newData.child('startedAt').val() + 30000)",
+                    ".validate": "!newData.exists() || (newData.hasChildren(['id', 'kind', 'sourceSide', 'attackerId', 'attackerName', 'targetId', 'targetName', 'weaponName', 'initialRolls', 'initialDurations', 'hitThreshold', 'shieldBypassRoll', 'hits', 'shieldBypassingHits', 'startedAt', 'expiresAt', 'createdBy']) && (newData.child('kind').val() !== 'command-check' || newData.hasChildren(['total', 'targetNumber', 'passed'])) && newData.child('sourceSide').val() === newData.parent().child('turn/activeSide').val() && newData.child('expiresAt').val() > newData.child('startedAt').val() && newData.child('expiresAt').val() <= newData.child('startedAt').val() + 30000)",
                     "id": {
                         ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+                    },
+                    "kind": {
+                        ".validate": "newData.isString() && (newData.val() === 'weapon' || newData.val() === 'command-check')"
                     },
                     "sourceSide": {
                         ".validate": "newData.isString() && (newData.val() === 'host' || newData.val() === 'guest')"
@@ -108,6 +111,15 @@
                     },
                     "shieldBypassingHits": {
                         ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('hits').val()"
+                    },
+                    "total": {
+                        ".validate": "newData.parent().child('kind').val() === 'command-check' && newData.isNumber() && newData.val() >= 2 && newData.val() <= 12"
+                    },
+                    "targetNumber": {
+                        ".validate": "newData.parent().child('kind').val() === 'command-check' && newData.isNumber() && newData.val() >= 1 && newData.val() <= 10"
+                    },
+                    "passed": {
+                        ".validate": "newData.parent().child('kind').val() === 'command-check' && newData.isBoolean()"
                     },
                     "startedAt": {
                         ".validate": "newData.isNumber() && newData.val() > now - 60000 && newData.val() <= now + 60000"

@@ -10,7 +10,7 @@ import {
     rollDice,
 } from "@/lib/gunnery.mjs";
 import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
-import { getLiveRollTimestamp } from "@/lib/live-roll.mjs";
+import { createRollDurations, getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 import { canLockOnReroll, getOrderedWeaponStrength } from "@/lib/special-orders.mjs";
 
 const subscribeToDistanceControl = (onChange) => {
@@ -70,11 +70,6 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
         return () => window.clearTimeout(revealTimer);
     }, [isRolling, rollRevealDelay, rollSequence]);
 
-    /** Creates stable per-die animation timings that can be shared with the opponent. */
-    const createRollDurations = (count) => (
-        Array.from({ length: count }, () => 1000 + Math.floor(Math.random() * 4001))
-    );
-
     const resolveRolls = (rolls, presentationRolls = rolls, presentationRerolls = [], startedAt) => {
         if (
             isLightningArc
@@ -120,6 +115,7 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
             : 0;
         const liveRoll = {
             id: crypto.randomUUID(),
+            kind: "weapon",
             sourceSide: turnSide,
             attackerId: attacker.id,
             attackerName: attacker.name,

@@ -43,40 +43,51 @@ const LiveRollViewer = ({ liveRoll, localSide }) => {
     }
 
     const isLocalRoll = liveRoll.sourceSide === localSide;
+    const isCommandCheck = liveRoll.kind === "command-check";
 
     return (
         <div className="shared-dice-roll" aria-label={`${isLocalRoll ? "Your" : "Incoming"} fire from ${liveRoll.attackerName}`}>
             <header className="live-roll-heading">
                 <div>
                     <span className="eyebrow">{isLocalRoll ? "YOUR ROLL" : "INCOMING FIRE"}</span>
-                    <h2>{liveRoll.weaponName}</h2>
-                    <small>{liveRoll.attackerName} → {liveRoll.targetName}</small>
+                    <h2>{isCommandCheck ? "Leadership check" : liveRoll.weaponName}</h2>
+                    <small>
+                        {isCommandCheck
+                            ? liveRoll.attackerName
+                            : `${liveRoll.attackerName} → ${liveRoll.targetName}`}
+                    </small>
                 </div>
                 <strong>{isRolling ? "ROLLING" : "RESOLVED"}</strong>
             </header>
             <div className="live-roll-content" role="status">
                 <DiceTray
                     rolls={liveRoll.initialRolls || []}
-                    hitThreshold={liveRoll.hitThreshold}
-                    shieldBypassRoll={liveRoll.shieldBypassRoll || null}
-                    label="Initial roll"
+                    hitThreshold={isCommandCheck ? null : liveRoll.hitThreshold}
+                    shieldBypassRoll={isCommandCheck ? null : liveRoll.shieldBypassRoll || null}
+                    label={isCommandCheck ? "2D6 command check" : "Initial roll"}
                     durations={liveRoll.initialDurations || []}
                     elapsedMs={elapsedMs}
                 />
-                <DiceTray
-                    rolls={liveRoll.rerolls || []}
-                    hitThreshold={liveRoll.hitThreshold}
-                    shieldBypassRoll={liveRoll.shieldBypassRoll || null}
-                    label="Lock On re-rolls"
-                    isReroll
-                    startDelay={300}
-                    durations={liveRoll.rerollDurations || []}
-                    elapsedMs={elapsedMs}
-                />
+                {!isCommandCheck && (
+                    <DiceTray
+                        rolls={liveRoll.rerolls || []}
+                        hitThreshold={liveRoll.hitThreshold}
+                        shieldBypassRoll={liveRoll.shieldBypassRoll || null}
+                        label="Lock On re-rolls"
+                        isReroll
+                        startDelay={300}
+                        durations={liveRoll.rerollDurations || []}
+                        elapsedMs={elapsedMs}
+                    />
+                )}
                 {!isRolling && (
                     <div className="live-roll-summary">
-                        <strong>{liveRoll.hits} hit{liveRoll.hits === 1 ? "" : "s"}</strong>
-                        {liveRoll.shieldBypassingHits > 0 && (
+                        <strong>
+                            {isCommandCheck
+                                ? `${liveRoll.total} vs Ld ${liveRoll.targetNumber} · ${liveRoll.passed ? "PASSED" : "FAILED"}`
+                                : `${liveRoll.hits} hit${liveRoll.hits === 1 ? "" : "s"}`}
+                        </strong>
+                        {!isCommandCheck && liveRoll.shieldBypassingHits > 0 && (
                             <span>
                                 {liveRoll.shieldBypassingHits} bypass shield
                                 {liveRoll.shieldBypassingHits === 1 ? "" : "s"}

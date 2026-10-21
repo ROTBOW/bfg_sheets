@@ -3,6 +3,7 @@
 import Image from "next/image";
 import HullWarning from "@/components/HullWarning";
 import { resolveCommandCheck, rollLeadership } from "@/lib/leadership.mjs";
+import { createRollDurations, getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 
 const specialOrders = [
     {
@@ -87,6 +88,7 @@ const BattleStatus = ({
     battleState,
     leadership,
     onUpdate,
+    onRoll,
     isReadOnly = false,
     hasEnemyOnSpecialOrders = false,
     commandChecksBlocked = false,
@@ -120,6 +122,34 @@ const BattleStatus = ({
         const modifierText = result.modifiedLeadership === displayedLeadership
             ? ""
             : ` (modified to ${result.modifiedLeadership})`;
+        const startedAt = getLiveRollTimestamp();
+        const initialDurations = createRollDurations(result.dice.length);
+
+        Promise.resolve(onRoll?.({
+            id: crypto.randomUUID(),
+            kind: "command-check",
+            sourceSide: turnSide,
+            attackerId: vessel.id,
+            attackerName: vessel.name,
+            targetId: vessel.id,
+            targetName: vessel.name,
+            weaponName: "Leadership check",
+            initialRolls: result.dice,
+            rerolls: [],
+            initialDurations,
+            rerollDurations: [],
+            hitThreshold: 6,
+            shieldBypassRoll: 0,
+            hits: result.passed ? 1 : 0,
+            shieldBypassingHits: 0,
+            total: result.roll,
+            targetNumber: result.modifiedLeadership,
+            passed: result.passed,
+            startedAt,
+            expiresAt: startedAt + 15000,
+        })).catch(() => {
+            onUpdate?.({ message: "The Leadership check was resolved but could not be shown to your opponent." });
+        });
 
         onUpdate?.({
             order: "No special orders",

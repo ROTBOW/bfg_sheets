@@ -101,6 +101,7 @@ const MirroredShip = ({
                 battleState={battleState}
                 leadership={leadership}
                 onUpdate={onUpdate}
+                onRoll={onRoll}
                 isReadOnly={isEnemy}
                 hasEnemyOnSpecialOrders={hasEnemyOnSpecialOrders}
                 commandChecksBlocked={commandChecksBlocked}

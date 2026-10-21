@@ -41,3 +41,14 @@ test("weapon-fire records bound shield-bypassing damage to total damage", async 
         /newData\.val\(\) <= newData\.parent\(\)\.child\('damage'\)\.val\(\)/,
     );
 });
+
+test("Nova Cannon records allow D6 hits and template resolution details", async () => {
+    const rules = await loadRules();
+    const entryRules = rules.rules.rooms.$roomId.sides.$sideId.battle.$shipId.weaponFire.$entryIndex;
+
+    assert.match(entryRules.hits[".validate"], /Nova Cannon/);
+    assert.match(entryRules.hits[".validate"], /<= 6/);
+    assert.match(entryRules.novaOutcome[".validate"], /center/);
+    assert.match(entryRules.scatterResult[".validate"], /arrow/);
+    assert.match(entryRules.scatterDistance[".validate"], /<= 18/);
+});

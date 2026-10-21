@@ -179,7 +179,7 @@
                                             ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
                                         },
                                         "hits": {
-                                            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('shots').val()"
+                                            ".validate": "newData.isNumber() && newData.val() >= 0 && ((newData.parent().child('weaponType').val() === 'Nova Cannon' && newData.val() <= 6) || newData.val() <= newData.parent().child('shots').val())"
                                         },
                                         "damage": {
                                             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
@@ -189,6 +189,18 @@
                                         },
                                         "accuracy": {
                                             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
+                                        },
+                                        "novaOutcome": {
+                                            ".validate": "newData.parent().child('weaponType').val() === 'Nova Cannon' && newData.isString() && (newData.val() === 'center' || newData.val() === 'outer' || newData.val() === 'miss')"
+                                        },
+                                        "scatterResult": {
+                                            ".validate": "newData.parent().child('weaponType').val() === 'Nova Cannon' && newData.isString() && (newData.val() === 'hit' || newData.val() === 'arrow')"
+                                        },
+                                        "scatterAngle": {
+                                            ".validate": "newData.parent().child('weaponType').val() === 'Nova Cannon' && newData.isNumber() && newData.val() >= 0 && newData.val() <= 359"
+                                        },
+                                        "scatterDistance": {
+                                            ".validate": "newData.parent().child('weaponType').val() === 'Nova Cannon' && newData.isNumber() && newData.val() >= 0 && newData.val() <= 18"
                                         },
                                         "createdAt": {
                                             ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= now + 60000"

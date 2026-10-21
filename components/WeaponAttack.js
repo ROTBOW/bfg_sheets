@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import NovaCannonAttack from "@/components/NovaCannonAttack";
 import {
     getWeaponAttackProfile,
     gunneryDirections,
@@ -19,8 +20,8 @@ const getDistanceControlSnapshot = () =>
     document.documentElement.dataset.distanceControl === "slider";
 const getServerDistanceControlSnapshot = () => false;
 
-/** Resolves and records one selected weapon firing at the selected enemy vessel. */
-const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round, turnSide, onRecord, onClose }) => {
+/** Resolves and records one standard weapon firing at the selected enemy vessel. */
+const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round, turnSide, onRecord, onClose }) => {
     const [direction, setDirection] = useState("closing");
     const [distance, setDistance] = useState("");
     const initialAttackProfile = getWeaponAttackProfile(weapon, targetShip, "closing");
@@ -217,6 +218,15 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
             {error && <p className="weapon-attack-error" role="alert">{error}</p>}
         </section>
     );
+};
+
+/** Selects the rules-specific firing controls for the chosen weapon. */
+const WeaponAttack = (props) => {
+    if (props.weapon.type === "Nova Cannon") {
+        return <NovaCannonAttack {...props} />;
+    }
+
+    return <StandardWeaponAttack {...props} />;
 };
 
 export default WeaponAttack;

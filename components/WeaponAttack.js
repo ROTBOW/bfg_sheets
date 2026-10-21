@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
     getWeaponAttackProfile,
     gunneryDirections,
@@ -8,6 +8,16 @@ import {
     resolveWeaponRolls,
     rollDice,
 } from "@/lib/gunnery.mjs";
+
+const subscribeToDistanceControl = (onChange) => {
+    window.addEventListener("distancecontrolchange", onChange);
+
+    return () => window.removeEventListener("distancecontrolchange", onChange);
+};
+
+const getDistanceControlSnapshot = () =>
+    document.documentElement.dataset.distanceControl === "slider";
+const getServerDistanceControlSnapshot = () => false;
 
 /** Resolves and records one selected weapon firing at the selected enemy vessel. */
 const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round, turnSide, onRecord, onClose }) => {
@@ -21,7 +31,13 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
     const [result, setResult] = useState(null);
     const [error, setError] = useState("");
     const [isRecording, setIsRecording] = useState(false);
-    const distanceCm = distance === "" ? null : Number(distance);
+    const usesDistanceSlider = useSyncExternalStore(
+        subscribeToDistanceControl,
+        getDistanceControlSnapshot,
+        getServerDistanceControlSnapshot,
+    );
+    const displayedDistance = usesDistanceSlider && distance === "" ? 5 : distance;
+    const distanceCm = displayedDistance === "" ? null : Number(displayedDistance);
     const attackProfile = getWeaponAttackProfile(weapon, targetShip, direction, distanceCm);
     const { supportsDigitalRoll, diceCount, hitThreshold } = attackProfile;
 
@@ -120,15 +136,17 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
                 <label>
                     Distance to target (cm)
                     <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        value={distance}
+                        type={usesDistanceSlider ? "range" : "number"}
+                        min={usesDistanceSlider ? "5" : "1"}
+                        max={usesDistanceSlider ? String(weapon.rangeCm || 120) : undefined}
+                        step={usesDistanceSlider ? "5" : "1"}
+                        value={displayedDistance}
                         onChange={(event) => {
                             setDistance(event.target.value);
                             setResult(null);
                         }}
                     />
+                    {usesDistanceSlider && <output>{displayedDistance} cm</output>}
                 </label>
                 <label>
                     Target direction

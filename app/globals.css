@@ -340,6 +340,10 @@ a.rules-link {
     color: var(--muted);
 }
 
+.options-section-heading {
+    margin: 20px 0 0;
+}
+
 .options-button {
     display: inline-flex;
     align-items: center;
@@ -779,6 +783,12 @@ td small {
     font-size: 9px;
     letter-spacing: 0.7px;
     text-transform: uppercase;
+}
+
+.weapon-attack label output {
+    color: var(--accent);
+    font-size: 10px;
+    text-align: right;
 }
 
 .weapon-attack input,

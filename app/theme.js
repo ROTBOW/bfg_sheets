@@ -10,6 +10,7 @@ export const terminalAccents = [
 ];
 
 export const themeCookieName = "bfg-theme";
+export const distanceControlCookieName = "bfg-distance-control";
 
 // Run before the page paints. Omitting Expires and Max-Age keeps a session cookie.
 export const themeInitializationScript = `
@@ -27,9 +28,18 @@ export const themeInitializationScript = `
         const allowedAccents = ${JSON.stringify(terminalAccents.map((accent) => accent.id))};
         const accent = allowedAccents.includes(storedAccent) ? storedAccent : "${defaultAccent}";
 
+        const distanceControlCookie = document.cookie
+            .split("; ")
+            .find((entry) => entry.startsWith("${distanceControlCookieName}="));
+        const distanceControl = distanceControlCookie === "${distanceControlCookieName}=slider"
+            ? "slider"
+            : "input";
+
         document.documentElement.dataset.accent = accent;
         document.cookie = "${accentCookieName}=" + accent + "; Path=/; SameSite=Lax" + secure;
         document.documentElement.dataset.theme = theme;
         document.cookie = "${themeCookieName}=" + theme + "; Path=/; SameSite=Lax" + secure;
+        document.documentElement.dataset.distanceControl = distanceControl;
+        document.cookie = "${distanceControlCookieName}=" + distanceControl + "; Path=/; SameSite=Lax" + secure;
     })();
 `;

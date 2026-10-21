@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
     accentCookieName,
     defaultAccent,
+    distanceControlCookieName,
     terminalAccents,
     themeCookieName,
 } from "@/app/theme";
@@ -76,6 +77,25 @@ const getAccentSnapshot = () =>
     document.documentElement.dataset.accent || defaultAccent;
 const getServerAccentSnapshot = () => defaultAccent;
 
+const subscribeToDistanceControl = (onChange) => {
+    window.addEventListener("distancecontrolchange", onChange);
+
+    return () => window.removeEventListener("distancecontrolchange", onChange);
+};
+
+const getDistanceControlSnapshot = () =>
+    document.documentElement.dataset.distanceControl === "slider";
+const getServerDistanceControlSnapshot = () => false;
+
+const toggleDistanceControl = () => {
+    const distanceControl = getDistanceControlSnapshot() ? "input" : "slider";
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+
+    document.documentElement.dataset.distanceControl = distanceControl;
+    document.cookie = `${distanceControlCookieName}=${distanceControl}; Path=/; SameSite=Lax${secure}`;
+    window.dispatchEvent(new Event("distancecontrolchange"));
+};
+
 const selectAccent = (accent) => {
     if (!terminalAccents.some((option) => option.id === accent)) {
         return;
@@ -99,6 +119,11 @@ const OptionsDropdown = () => {
         subscribeToTheme,
         getAccentSnapshot,
         getServerAccentSnapshot,
+    );
+    const usesDistanceSlider = useSyncExternalStore(
+        subscribeToDistanceControl,
+        getDistanceControlSnapshot,
+        getServerDistanceControlSnapshot,
     );
     const dropdownRef = useRef(null);
     const buttonRef = useRef(null);
@@ -194,6 +219,24 @@ const OptionsDropdown = () => {
                         {isLightTheme
                             ? "Light theme enabled"
                             : "Dark theme enabled"}
+                    </p>
+                    <p className="eyebrow options-section-heading">Battle controls</p>
+                    <button
+                        type="button"
+                        className="theme-toggle"
+                        role="switch"
+                        aria-checked={usesDistanceSlider}
+                        onClick={toggleDistanceControl}
+                    >
+                        <span>Distance slider</span>
+                        <span className="theme-switch" aria-hidden="true">
+                            <span />
+                        </span>
+                    </button>
+                    <p className="theme-description">
+                        {usesDistanceSlider
+                            ? "Snaps to 5 cm intervals"
+                            : "Uses a numeric distance input"}
                     </p>
                     <fieldset className="accent-picker">
                         <legend className="eyebrow">Accent</legend>

@@ -310,6 +310,8 @@ const BattleTracker = () => {
             maximumShields: damagedVessel.profile.stats.shields,
             shieldBypassingDamage: entry.shieldBypassingDamage,
             reactiveHullSave: damagedVessel.profile.stats.reactiveHullSave ?? null,
+            targetFaction: damagedVessel.profile.faction,
+            targetType: damagedVessel.profile.type,
             message: `${vessel.name}'s ${entry.weaponName} inflicted ${entry.damage} damage.${bypassMessage}`,
         });
     };
@@ -354,6 +356,8 @@ const BattleTracker = () => {
                 maximumShields: damagedVessel.profile.stats.shields,
                 shieldBypassingDamage: attack.shieldBypassingDamage,
                 reactiveHullSave: damagedVessel.profile.stats.reactiveHullSave ?? null,
+                targetFaction: damagedVessel.profile.faction,
+                targetType: damagedVessel.profile.type,
                 message: `${ordnance.attackerName}'s ${ordnance.weaponName} inflicted ${attack.damage} damage.`,
             });
         }

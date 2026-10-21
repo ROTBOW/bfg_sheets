@@ -42,6 +42,14 @@ test("weapon-fire records bound shield-bypassing damage to total damage", async 
     );
 });
 
+test("battle state accepts automatic critical-damage records", async () => {
+    const rules = await loadRules();
+    const criticalRule = rules.rules.rooms.$roomId.sides.$sideId.battle.$shipId
+        .criticalDamage.$entryIndex[".validate"];
+
+    assert.match(criticalRule, /source.*automatic/);
+});
+
 test("live rolls are bounded and writable only by the active player", async () => {
     const rules = await loadRules();
     const liveRollRules = rules.rules.rooms.$roomId.liveRoll;

@@ -8,6 +8,7 @@ import { resolveOrdnanceHit } from "@/lib/ordnance.mjs";
 /** Resolves turret defence and the surviving ordnance's attack against one ship. */
 const ActiveOrdnanceAttack = ({ ordnance, target, turnSide, onResolve, onRoll, onClearRoll, onClose }) => {
     const [result, setResult] = useState(null);
+    const [supportingShips, setSupportingShips] = useState(0);
     const [isRecording, setIsRecording] = useState(false);
     const [error, setError] = useState("");
     const targetTurrets = target.ship.stats.turrets;
@@ -23,6 +24,7 @@ const ActiveOrdnanceAttack = ({ ordnance, target, turnSide, onResolve, onRoll, o
             strength: ordnance.strength,
             turrets: targetTurrets,
             armour: targetArmour,
+            supportingShips,
         });
         const startedAt = getLiveRollTimestamp();
 
@@ -96,6 +98,21 @@ const ActiveOrdnanceAttack = ({ ordnance, target, turnSide, onResolve, onRoll, o
                     ? "Turrets destroy torpedoes on 4+. Survivors roll against the ship’s lowest armour and ignore shields."
                     : "Turrets destroy bomber squadrons on 4+. Each survivor generates D6 minus Turrets attack dice against the ship’s lowest armour."}
             </p>
+            <label className="ordnance-massed-turrets">
+                Supporting ships in base contact
+                <select
+                    value={supportingShips}
+                    onChange={(event) => {
+                        setSupportingShips(Number(event.target.value));
+                        setResult(null);
+                    }}
+                >
+                    {[0, 1, 2, 3].map((count) => (
+                        <option key={count} value={count}>{count} (+{count} turret dice)</option>
+                    ))}
+                </select>
+                <small>Only the target ship’s {targetTurrets} turrets reduce bomber attack dice.</small>
+            </label>
             {!result && (
                 <button type="button" className="ordnance-roll-button" onClick={rollAttack}>
                     Roll turrets and attack
@@ -137,12 +154,43 @@ const ActiveOrdnanceAttack = ({ ordnance, target, turnSide, onResolve, onRoll, o
 };
 
 /** Lists launched ordnance and opens its delayed attack controls. */
-const ActiveOrdnance = ({ ordnance, localSide, targets, turnSide, onResolve, onRoll, onClearRoll }) => {
+const ActiveOrdnance = ({
+    ordnance,
+    localSide,
+    targets,
+    turnSide,
+    onResolve,
+    onRemove,
+    onAdjustStrength,
+    onRoll,
+    onClearRoll,
+}) => {
     const [selectedId, setSelectedId] = useState("");
     const [targetId, setTargetId] = useState(targets[0]?.vessel.id || "");
+    const [strengths, setStrengths] = useState({});
     const selectedOrdnance = ordnance.find((entry) => entry.id === selectedId);
-    const selectedTarget = targets.find(({ vessel }) => vessel.id === targetId) || targets[0];
-    const canResolve = selectedOrdnance?.sourceSide === localSide && turnSide === localSide;
+    const eligibleTargets = selectedOrdnance
+        ? targets.filter(({ side }) => side !== selectedOrdnance.sourceSide)
+        : [];
+    const selectedTarget = eligibleTargets.find(({ vessel }) => vessel.id === targetId) || eligibleTargets[0];
+    const canResolve = Boolean(selectedOrdnance && selectedTarget);
+
+    const toggleResolution = (entry) => {
+        const nextTargets = targets.filter(({ side }) => side !== entry.sourceSide);
+
+        setSelectedId((current) => current === entry.id ? "" : entry.id);
+        setTargetId(nextTargets[0]?.vessel.id || "");
+    };
+
+    const changeStrength = async (entry) => {
+        const requestedStrength = Number(strengths[entry.id] ?? entry.strength);
+
+        if (!Number.isInteger(requestedStrength) || requestedStrength < 0 || requestedStrength > entry.strength) {
+            return;
+        }
+
+        await onAdjustStrength(entry, requestedStrength);
+    };
 
     if (!ordnance.length) {
         return (
@@ -162,17 +210,34 @@ const ActiveOrdnance = ({ ordnance, localSide, targets, turnSide, onResolve, onR
                         <strong>{entry.weaponName}</strong>
                         <small>{entry.attackerName} · Strength {entry.strength}</small>
                     </div>
-                    {entry.sourceSide === localSide && (
+                    <div className="active-ordnance-actions">
                         <button
                             type="button"
                             className="active-ordnance-confirm"
-                            disabled={turnSide !== localSide}
                             aria-expanded={selectedId === entry.id}
-                            onClick={() => setSelectedId((current) => current === entry.id ? "" : entry.id)}
+                            onClick={() => toggleResolution(entry)}
                         >
-                            CONFIRM HIT
+                            RESOLVE HIT
                         </button>
-                    )}
+                        {entry.sourceSide === localSide && (
+                            <>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max={entry.strength}
+                                    step="1"
+                                    aria-label={`Remaining strength for ${entry.weaponName}`}
+                                    value={strengths[entry.id] ?? entry.strength}
+                                    onChange={(event) => setStrengths((current) => ({
+                                        ...current,
+                                        [entry.id]: event.target.value,
+                                    }))}
+                                />
+                                <button type="button" onClick={() => changeStrength(entry)}>SET</button>
+                                <button type="button" onClick={() => onRemove(entry)}>REMOVE</button>
+                            </>
+                        )}
+                    </div>
                 </article>
             ))}
             {selectedOrdnance && canResolve && selectedTarget && (
@@ -180,7 +245,7 @@ const ActiveOrdnance = ({ ordnance, localSide, targets, turnSide, onResolve, onR
                     <label>
                         Ship being hit
                         <select value={selectedTarget.vessel.id} onChange={(event) => setTargetId(event.target.value)}>
-                            {targets.map(({ vessel, side }) => (
+                            {eligibleTargets.map(({ vessel, side }) => (
                                 <option key={`${side}-${vessel.id}`} value={vessel.id}>{vessel.name}</option>
                             ))}
                         </select>

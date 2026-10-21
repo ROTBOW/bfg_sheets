@@ -42,6 +42,14 @@ test("weapon-fire records bound shield-bypassing damage to total damage", async 
     );
 });
 
+test("battle state accepts automatic critical-damage records", async () => {
+    const rules = await loadRules();
+    const criticalRule = rules.rules.rooms.$roomId.sides.$sideId.battle.$shipId
+        .criticalDamage.$entryIndex[".validate"];
+
+    assert.match(criticalRule, /source.*automatic/);
+});
+
 test("live rolls are bounded and writable only by the active player", async () => {
     const rules = await loadRules();
     const liveRollRules = rules.rules.rooms.$roomId.liveRoll;
@@ -56,12 +64,14 @@ test("live rolls are bounded and writable only by the active player", async () =
     assert.match(liveRollRules.shieldBypassingHits[".validate"], /child\('hits'\)/);
 });
 
-test("active ordnance is owned by its launcher and limited to ordnance weapon types", async () => {
+test("active ordnance launches are owner-controlled while room players can resolve markers", async () => {
     const rules = await loadRules();
     const ordnanceRules = rules.rules.rooms.$roomId.activeOrdnance.$ordnanceId;
 
     assert.match(ordnanceRules[".write"], /createdBy/);
     assert.match(ordnanceRules[".write"], /turn\/activeSide/);
+    assert.match(ordnanceRules[".write"], /players\/.*auth\.uid/);
+    assert.match(ordnanceRules[".write"], /strength.*<=.*strength/);
     assert.match(ordnanceRules.weaponType[".validate"], /Torpedo/);
     assert.match(ordnanceRules.weaponType[".validate"], /Launch Bay/);
     assert.match(ordnanceRules.strength[".validate"], /<= 100/);

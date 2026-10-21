@@ -32,19 +32,29 @@ const FleetMenu = ({
             <div className="fleet-heading">
                 <div className="fleet-toolbar">
                     {onSelectFleet ? (
-                        <label className="tracker-fleet-picker">
-                            <span className="eyebrow">{label}</span>
-                            <select
-                                value={selectedFleetId}
-                                onChange={(event) => onSelectFleet(event.target.value)}
-                                disabled={!fleets.length || isFleetSelectionLocked}
-                                title={isFleetSelectionLocked ? "Fleet selection is locked while connected to a room." : undefined}
-                            >
-                                {!fleets.length && <option value="">No saved fleets</option>}
-                                {fleets.map((entry) => (
-                                    <option key={entry.id} value={entry.id}>{entry.name || "Untitled fleet"}</option>
-                                ))}
-                            </select>
+                        <label className={`tracker-fleet-picker${isFleetSelectionLocked ? " is-locked" : ""}`}>
+                            <span className="fleet-picker-label">
+                                <span className="eyebrow">{label}</span>
+                                {isFleetSelectionLocked && (
+                                    <span className="fleet-picker-lock ml-2">
+                                        <span aria-hidden="true" className="mr-1">🔒</span>
+                                        other fleets Locked while in battle
+                                    </span>
+                                )}
+                            </span>
+                            <span className="fleet-select-control">
+                                <select
+                                    value={selectedFleetId}
+                                    onChange={(event) => onSelectFleet(event.target.value)}
+                                    disabled={!fleets.length || isFleetSelectionLocked}
+                                    title={isFleetSelectionLocked ? "Fleet selection is locked while connected to a room." : undefined}
+                                >
+                                    {!fleets.length && <option value="">No saved fleets</option>}
+                                    {fleets.map((entry) => (
+                                        <option key={entry.id} value={entry.id}>{entry.name || "Untitled fleet"}</option>
+                                    ))}
+                                </select>
+                            </span>
                         </label>
                     ) : (
                         <div className="tracker-fleet-name">

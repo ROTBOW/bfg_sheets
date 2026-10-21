@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import DiceTray from "@/components/DiceTray";
 import NovaCannonAttack from "@/components/NovaCannonAttack";
 import {
     getWeaponAttackProfile,
@@ -46,6 +47,9 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
     const [manualHits, setManualHits] = useState(0);
     const [damage, setDamage] = useState(0);
     const [result, setResult] = useState(null);
+    const [rollSequence, setRollSequence] = useState(0);
+    const [isRolling, setIsRolling] = useState(false);
+    const [initialRolls, setInitialRolls] = useState([]);
     const [rerolledMisses, setRerolledMisses] = useState([]);
     const [error, setError] = useState("");
     const [isRecording, setIsRecording] = useState(false);
@@ -58,6 +62,14 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
     const distanceCm = displayedDistance === "" ? null : Number(displayedDistance);
     const attackProfile = getWeaponAttackProfile(effectiveWeapon, targetShip, direction, distanceCm);
     const { supportsDigitalRoll, diceCount, hitThreshold } = attackProfile;
+
+    useEffect(() => {
+        if (!isRolling) return undefined;
+
+        const revealTimer = window.setTimeout(() => setIsRolling(false), 5500);
+
+        return () => window.clearTimeout(revealTimer);
+    }, [isRolling, rollSequence]);
 
     const resolveRolls = (rolls) => {
         if (
@@ -96,21 +108,25 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
         }
 
         setResult({ rolls, ...resolvedAttack });
+        setRollSequence((sequence) => sequence + 1);
+        setIsRolling(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
         setDamage(hits);
         setError("");
     };
 
     const rollAttack = () => {
-        const initialRolls = rollDice(diceCount);
+        const rolledDice = rollDice(diceCount);
+
+        setInitialRolls(rolledDice);
 
         if (!canLockOnReroll(weapon, order)) {
             setRerolledMisses([]);
-            resolveRolls(initialRolls);
+            resolveRolls(rolledDice);
             return;
         }
 
-        const successfulRolls = initialRolls.filter((roll) => roll >= hitThreshold);
-        const failedRolls = initialRolls.filter((roll) => roll < hitThreshold);
+        const successfulRolls = rolledDice.filter((roll) => roll >= hitThreshold);
+        const failedRolls = rolledDice.filter((roll) => roll < hitThreshold);
         const replacementRolls = rollDice(failedRolls.length);
 
         setRerolledMisses(replacementRolls);
@@ -119,16 +135,18 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
 
     const usePhysicalRoll = () => {
         try {
-            const initialRolls = parseDiceResults(manualRolls);
+            const enteredRolls = parseDiceResults(manualRolls);
+
+            setInitialRolls(enteredRolls);
 
             if (!canLockOnReroll(weapon, order)) {
                 setRerolledMisses([]);
-                resolveRolls(initialRolls);
+                resolveRolls(enteredRolls);
                 return;
             }
 
-            const successfulRolls = initialRolls.filter((roll) => roll >= hitThreshold);
-            const failedRolls = initialRolls.filter((roll) => roll < hitThreshold);
+            const successfulRolls = enteredRolls.filter((roll) => roll >= hitThreshold);
+            const failedRolls = enteredRolls.filter((roll) => roll < hitThreshold);
             const replacementRolls = failedRolls.length ? parseDiceResults(manualRerolls) : [];
 
             if (replacementRolls.length !== failedRolls.length) {
@@ -190,90 +208,91 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
     };
 
     return (
-        <section className="weapon-attack" aria-label={`Fire ${weapon.name}`}>
-            <div className="weapon-attack-heading">
-                <div>
-                    <span className="eyebrow">FIRE WEAPON</span>
-                    <h3>{weapon.name}</h3>
-                    <small>{attacker.name} → {target.name}</small>
+        <section className="weapon-attack weapon-attack-standard" aria-label={`Fire ${weapon.name}`}>
+            <div className="weapon-attack-controls">
+                <div className="weapon-attack-heading">
+                    <div>
+                        <span className="eyebrow">FIRE WEAPON</span>
+                        <h3>{weapon.name}</h3>
+                        <small>{attacker.name} → {target.name}</small>
+                    </div>
+                    <button type="button" onClick={onClose} aria-label="Close weapon attack">×</button>
                 </div>
-                <button type="button" onClick={onClose} aria-label="Close weapon attack">×</button>
-            </div>
-            <div className="weapon-attack-fields">
-                <label>
-                    Distance to target (cm)
-                    <input
-                        type={usesDistanceSlider ? "range" : "number"}
-                        min={usesDistanceSlider ? "5" : "1"}
-                        max={usesDistanceSlider ? String(weapon.rangeCm || 120) : undefined}
-                        step={usesDistanceSlider ? "5" : "1"}
-                        value={displayedDistance}
-                        onChange={(event) => {
-                            setDistance(event.target.value);
-                            setResult(null);
-                        }}
-                    />
-                    {usesDistanceSlider && <output>{displayedDistance} cm</output>}
-                </label>
-                <label>
-                    Target aspect
-                    <select
-                        value={direction}
-                        onChange={(event) => {
-                            setDirection(event.target.value);
-                            setResult(null);
-                        }}
-                    >
-                        {gunneryDirections.map((option) => (
-                            <option key={option.id} value={option.id}>{option.label}</option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    Dice method
-                    <select value={mode} onChange={(event) => { setMode(event.target.value); setResult(null); }}>
-                        {supportsDigitalRoll && <option value="digital">Roll digitally</option>}
-                        <option value="manual">Enter physical dice</option>
-                    </select>
-                </label>
-            </div>
-            <p className="weapon-attack-note">{attackProfile.note}</p>
-            {canLockOnReroll(weapon, order) && (
-                <p className="weapon-attack-note">Lock On re-rolls failed hit rolls.</p>
-            )}
-            {isLightningArc && (
-                <div className="lightning-allocation">
-                    <p>
-                        <strong>{lightningAvailability.remainingStrength}</strong> Firepower remaining.
-                        Each firing arc and target may be used once this turn.
-                    </p>
+                <div className="weapon-attack-fields">
                     <label>
-                        Firing arc
-                        <select value={fireArc} onChange={(event) => { setFireArc(event.target.value); setResult(null); }}>
-                            {lightningAvailability.availableArcs.map((arc) => (
-                                <option key={arc.id} value={arc.id}>{arc.label}</option>
+                        Distance to target (cm)
+                        <input
+                            type={usesDistanceSlider ? "range" : "number"}
+                            min={usesDistanceSlider ? "5" : "1"}
+                            max={usesDistanceSlider ? String(weapon.rangeCm || 120) : undefined}
+                            step={usesDistanceSlider ? "5" : "1"}
+                            value={displayedDistance}
+                            onChange={(event) => {
+                                setDistance(event.target.value);
+                                setResult(null);
+                            }}
+                        />
+                        {usesDistanceSlider && <output>{displayedDistance} cm</output>}
+                    </label>
+                    <label>
+                        Target aspect
+                        <select
+                            value={direction}
+                            onChange={(event) => {
+                                setDirection(event.target.value);
+                                setResult(null);
+                            }}
+                        >
+                            {gunneryDirections.map((option) => (
+                                <option key={option.id} value={option.id}>{option.label}</option>
                             ))}
                         </select>
                     </label>
                     <label>
-                        Firepower allocated
-                        <input
-                            type="number"
-                            min="1"
-                            max={lightningAvailability.remainingStrength}
-                            step="1"
-                            value={allocatedStrength}
-                            onChange={(event) => { setAllocatedStrength(event.target.value); setResult(null); }}
-                        />
+                        Dice method
+                        <select value={mode} onChange={(event) => { setMode(event.target.value); setResult(null); }}>
+                            {supportsDigitalRoll && <option value="digital">Roll digitally</option>}
+                            <option value="manual">Enter physical dice</option>
+                        </select>
                     </label>
                 </div>
-            )}
-            {mode === "digital" && supportsDigitalRoll ? (
-                <button type="button" className="weapon-roll-button" onClick={rollAttack}>
-                    Roll {diceCount}D6 · hits on {hitThreshold}+
-                </button>
-            ) : (
-                <div className="physical-roll-fields">
+                <p className="weapon-attack-note">{attackProfile.note}</p>
+                {canLockOnReroll(weapon, order) && (
+                    <p className="weapon-attack-note">Lock On re-rolls failed hit rolls.</p>
+                )}
+                {isLightningArc && (
+                    <div className="lightning-allocation">
+                        <p>
+                            <strong>{lightningAvailability.remainingStrength}</strong> Firepower remaining.
+                            Each firing arc and target may be used once this turn.
+                        </p>
+                        <label>
+                            Firing arc
+                            <select value={fireArc} onChange={(event) => { setFireArc(event.target.value); setResult(null); }}>
+                                {lightningAvailability.availableArcs.map((arc) => (
+                                    <option key={arc.id} value={arc.id}>{arc.label}</option>
+                                ))}
+                            </select>
+                        </label>
+                        <label>
+                            Firepower allocated
+                            <input
+                                type="number"
+                                min="1"
+                                max={lightningAvailability.remainingStrength}
+                                step="1"
+                                value={allocatedStrength}
+                                onChange={(event) => { setAllocatedStrength(event.target.value); setResult(null); }}
+                            />
+                        </label>
+                    </div>
+                )}
+                {mode === "digital" && supportsDigitalRoll ? (
+                    <button type="button" className="weapon-roll-button" onClick={rollAttack}>
+                        Roll {diceCount}D6 · hits on {hitThreshold}+
+                    </button>
+                ) : (
+                    <div className="physical-roll-fields">
                     <label>
                         D6 results
                         <input value={manualRolls} placeholder="6, 4, 2" onChange={(event) => setManualRolls(event.target.value)} />
@@ -302,33 +321,64 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                         </label>
                     )}
                     <button type="button" onClick={usePhysicalRoll}>Use entered roll</button>
-                </div>
-            )}
-            {result && (
-                <div className="weapon-result" role="status">
-                    <span>Rolls: {result.rolls.join(", ")}</span>
-                    {rerolledMisses.length > 0 && <span>Lock On re-rolls: {rerolledMisses.join(", ")}</span>}
-                    <strong>{result.hits} hits</strong>
-                    {result.shieldBypassingHits > 0 && (
-                        <span>{result.shieldBypassingHits} bypass shields</span>
-                    )}
-                    <label>
-                        Damage inflicted
-                        <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="1"
-                            value={damage}
-                            onChange={(event) => setDamage(event.target.value)}
+                    </div>
+                )}
+                {error && <p className="weapon-attack-error" role="alert">{error}</p>}
+            </div>
+            <div className="weapon-roll-stage">
+                {result ? (
+                    <div className="weapon-result" role="status">
+                    <div key={rollSequence} className="weapon-dice-display">
+                        <DiceTray
+                            rolls={initialRolls}
+                            hitThreshold={hitThreshold}
+                            shieldBypassRoll={attackProfile.shieldBypassRoll}
+                            label="Initial roll"
                         />
-                    </label>
-                    <button type="button" disabled={isRecording} onClick={recordAttack}>
-                        {isRecording ? "Sending damage…" : "Record firing"}
-                    </button>
-                </div>
-            )}
-            {error && <p className="weapon-attack-error" role="alert">{error}</p>}
+                        <DiceTray
+                            rolls={rerolledMisses}
+                            hitThreshold={hitThreshold}
+                            shieldBypassRoll={attackProfile.shieldBypassRoll}
+                            label="Lock On re-rolls"
+                            isReroll
+                            startDelay={300}
+                        />
+                    </div>
+                    {isRolling ? (
+                        <p className="weapon-result-resolving">Resolving salvo…</p>
+                    ) : (
+                        <>
+                            <div className="weapon-result-summary">
+                                <strong>{result.hits} hit{result.hits === 1 ? "" : "s"}</strong>
+                                {result.shieldBypassingHits > 0 && (
+                                    <span>{result.shieldBypassingHits} bypass shield{result.shieldBypassingHits === 1 ? "" : "s"}</span>
+                                )}
+                            </div>
+                            <label>
+                                Damage inflicted
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="1"
+                                    value={damage}
+                                    onChange={(event) => setDamage(event.target.value)}
+                                />
+                            </label>
+                            <button type="button" disabled={isRecording} onClick={recordAttack}>
+                                {isRecording ? "Sending damage…" : "Record firing"}
+                            </button>
+                        </>
+                    )}
+                    </div>
+                ) : (
+                    <div className="weapon-roll-awaiting" aria-hidden="true">
+                        <span className="eyebrow">DICE TRAY</span>
+                        <strong>Awaiting firing solution</strong>
+                        <small>Resolved dice will appear here.</small>
+                    </div>
+                )}
+            </div>
         </section>
     );
 };

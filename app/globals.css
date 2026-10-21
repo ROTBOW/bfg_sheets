@@ -950,6 +950,16 @@ td small {
     margin-top: 0;
 }
 
+.mirrored-ship:has(.weapon-attack) {
+    position: relative;
+    z-index: 12;
+}
+
+.mirrored-ship:has(.weapon-attack) .armament,
+.mirrored-ship:has(.weapon-attack) .table-scroll {
+    overflow: visible;
+}
+
 .weapon-marker {
     display: inline-block;
     width: 29px;
@@ -983,12 +993,52 @@ td small {
     cursor: not-allowed;
 }
 
+.weapon-attack-standard {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: calc(200% + 106px);
+    min-height: 250px;
+}
+
 .weapon-attack {
     margin-top: 12px;
     border: 1px solid var(--accent);
     border-radius: 4px;
     background: light-dark(#f4f0e6, #0b0f0d);
     box-shadow: 0 14px 38px #0005;
+}
+
+.weapon-attack-controls {
+    min-width: 0;
+    border-right: 1px solid var(--border);
+}
+
+.weapon-roll-stage {
+    display: grid;
+    min-width: 0;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--accent) 4%, transparent), transparent 55%),
+        light-dark(#eee9dd, #080b09);
+}
+
+.weapon-roll-awaiting {
+    display: grid;
+    place-content: center;
+    gap: 8px;
+    min-height: 100%;
+    padding: 28px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.weapon-roll-awaiting strong {
+    color: var(--foreground);
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.weapon-roll-awaiting small {
+    font-size: 10px;
 }
 
 .weapon-attack-heading {
@@ -1085,13 +1135,130 @@ td small {
 }
 
 .weapon-result {
+    align-content: start;
     align-items: end;
-    border-top: 1px solid var(--border);
+}
+
+.weapon-dice-display {
+    display: grid;
+    grid-column: 1 / -1;
+    gap: 10px;
+    padding: 2px 0 4px;
+}
+
+.dice-group {
+    display: grid;
+    gap: 6px;
+}
+
+.dice-group-label {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
+
+.dice-group-reroll .dice-group-label {
+    color: var(--accent);
+}
+
+.dice-tray {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    min-height: 72px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--background) 88%, var(--foreground));
+}
+
+.die {
+    display: inline-grid;
+    width: 54px;
+    height: 54px;
+    place-items: center;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, sans-serif;
+    font-size: 50px;
+    line-height: 1;
+    transition: border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.die-rolling {
+    color: var(--muted);
+    animation: die-tumble 180ms ease-in-out infinite alternate;
+}
+
+.die-hit {
+    border-color: color-mix(in srgb, var(--accent) 75%, var(--border));
+    color: var(--accent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.die-miss {
+    color: var(--muted);
+}
+
+.die-bypass {
+    border-color: #d9f5ff;
+    color: #d9f5ff;
+    box-shadow: 0 0 13px color-mix(in srgb, #8cddff 48%, transparent);
+}
+
+.weapon-result-summary {
+    display: grid;
+    align-self: stretch;
+    align-content: center;
+    gap: 3px;
+}
+
+.weapon-result-summary strong {
+    color: var(--accent);
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.weapon-result-summary span {
+    color: #d9f5ff;
+    font-size: 10px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.weapon-result-resolving {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+@keyframes die-tumble {
+    from {
+        transform: translateY(-2px) rotate(-5deg) scale(0.96);
+    }
+
+    to {
+        transform: translateY(2px) rotate(5deg) scale(1.04);
+    }
 }
 
 .weapon-result > span,
 .weapon-result > strong {
     align-self: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .die-rolling {
+        transform: none;
+        animation: none;
+    }
 }
 
 .weapon-result > span {
@@ -1135,6 +1302,16 @@ td small {
 }
 
 @media (max-width: 760px) {
+    .weapon-attack-standard {
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+    }
+
+    .weapon-attack-controls {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+    }
+
     .physical-roll-fields,
     .weapon-result {
         grid-template-columns: 1fr;

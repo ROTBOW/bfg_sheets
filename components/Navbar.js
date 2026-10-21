@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { flushSync } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import BattleLog from "@/components/BattleLog";
 import {
     accentCookieName,
     defaultAccent,
@@ -378,6 +379,7 @@ const Navbar = () => {
                 <span className="demo-badge">{trackerBadge}</span>
             )}
             <div className="navbar-actions">
+                {activeRoomId && <BattleLog roomId={activeRoomId} />}
                 <a
                     href="https://github.com/ROTBOW/bfg_sheets/issues"
                     className="options-button"

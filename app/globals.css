@@ -278,6 +278,227 @@ a.rules-link {
     flex-shrink: 0;
 }
 
+.battle-log-control {
+    position: relative;
+}
+
+.battle-log-control > .options-button svg {
+    width: 22px;
+    height: 22px;
+}
+
+.battle-log-drawer {
+    position: fixed;
+    top: 88px;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    width: min(430px, 100vw);
+    height: calc(100dvh - 88px);
+    padding: 24px;
+    border-left: 1px solid var(--border);
+    background: light-dark(#fffdf6, #0d0f0f);
+    box-shadow: -16px 0 36px #00000030;
+}
+
+.battle-log-drawer > header,
+.battle-log-drawer > footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.battle-log-drawer h2 {
+    margin: 5px 0 0;
+    font-size: 28px;
+}
+
+.battle-log-drawer > header > button {
+    border: 0;
+    color: var(--foreground);
+    background: transparent;
+    font-size: 28px;
+}
+
+.battle-log-id {
+    overflow: hidden;
+    margin: 18px 0;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-overflow: ellipsis;
+}
+
+.battle-log-events {
+    flex: 1;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.battle-log-events li {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+}
+
+.battle-log-events time,
+.battle-log-events span {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.battle-log-events p {
+    grid-column: 2;
+    margin: 6px 0 0;
+    line-height: 1.5;
+}
+
+.battle-log-empty,
+.battle-log-error {
+    flex: 1;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.battle-log-error {
+    color: #ff766d;
+}
+
+.battle-log-drawer > footer {
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+.battle-log-drawer > footer a {
+    color: var(--accent);
+}
+
+.battle-log-drawer > footer button,
+.battle-report-actions button {
+    padding: 10px 14px;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    color: var(--accent);
+    background: transparent;
+}
+
+.battle-reports-page {
+    max-width: 1240px;
+}
+
+.battle-reports-grid {
+    display: grid;
+    grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+    gap: 22px;
+}
+
+.battle-report-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.battle-report-list button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--foreground);
+    background: transparent;
+    text-align: left;
+}
+
+.battle-report-list button[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.battle-report-list span,
+.battle-report-list small,
+.battle-report-detail > header p,
+.battle-reports-empty p {
+    color: var(--muted);
+}
+
+.battle-report-detail {
+    padding: 24px;
+}
+
+.battle-report-detail > header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.battle-report-detail h2 {
+    margin: 8px 0;
+}
+
+.battle-report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.battle-report-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+}
+
+.battle-report-summary div:last-child {
+    grid-column: 1 / -1;
+}
+
+.battle-report-summary dt {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.battle-report-summary dd {
+    overflow-wrap: anywhere;
+    margin: 5px 0 0;
+}
+
+.battle-report-timeline {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.battle-report-timeline li {
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+}
+
+.battle-report-timeline li div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.battle-report-timeline p {
+    margin: 8px 0 0;
+}
+
+.battle-reports-empty {
+    padding: 28px;
+}
+
 .options-panel {
     position: absolute;
     top: calc(100% + 10px);
@@ -1326,6 +1547,19 @@ footer {
 
     .navbar-actions {
         margin-left: auto;
+    }
+
+    .battle-log-drawer {
+        top: 0;
+        height: 100dvh;
+    }
+
+    .battle-reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .battle-report-detail > header {
+        flex-direction: column;
     }
 
     .brand {

@@ -232,6 +232,8 @@ const BattleTracker = () => {
                 roomId: activeRoomId,
                 side: connectedLocalSide,
                 shipId: vessel.id,
+                shipName: vessel.name,
+                round: connectedRoom?.turn?.round || 1,
                 changes: updates,
             }).catch(() => {
                 setStorageMessage("A battle update could not be shared with your opponent. Check your connection.");

@@ -169,6 +169,14 @@ export const createRoomRecord = ({ hostUid, displayName, fleet, timestamp }) => 
             firstSide: "",
             activeSide: "",
         },
+        report: {
+            status: "active",
+            result: "",
+            startedAt: timestamp,
+            updatedAt: timestamp,
+            endedAt: 0,
+            events: {},
+        },
     };
 };
 

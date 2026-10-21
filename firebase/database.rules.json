@@ -269,6 +269,54 @@
                         ".validate": false
                     }
                 },
+                "report": {
+                    ".write": "auth != null && data.parent().child('players/' + auth.uid).exists()",
+                    ".validate": "newData.hasChildren(['status', 'result', 'startedAt', 'updatedAt', 'endedAt'])",
+                    "status": {
+                        ".validate": "newData.isString() && (newData.val() === 'active' || newData.val() === 'closed')"
+                    },
+                    "result": {
+                        ".validate": "newData.isString() && newData.val().length <= 100"
+                    },
+                    "startedAt": {
+                        ".validate": "newData.isNumber()"
+                    },
+                    "updatedAt": {
+                        ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+                    },
+                    "endedAt": {
+                        ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+                    },
+                    "events": {
+                        "$eventId": {
+                            ".validate": "newData.hasChildren(['type', 'message', 'round', 'side', 'createdAt', 'createdBy']) && newData.child('createdBy').val() === auth.uid",
+                            "type": {
+                                ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 64"
+                            },
+                            "message": {
+                                ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500"
+                            },
+                            "round": {
+                                ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+                            },
+                            "side": {
+                                ".validate": "newData.isString() && (newData.val() === '' || newData.val() === 'host' || newData.val() === 'guest')"
+                            },
+                            "createdAt": {
+                                ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+                            },
+                            "createdBy": {
+                                ".validate": "newData.isString() && newData.val() === auth.uid"
+                            },
+                            "$other": {
+                                ".validate": false
+                            }
+                        }
+                    },
+                    "$other": {
+                        ".validate": false
+                    }
+                },
                 "$other": {
                     ".validate": false
                 }

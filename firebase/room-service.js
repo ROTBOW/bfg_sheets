@@ -4,6 +4,7 @@ import {
     get,
     onDisconnect,
     onValue,
+    push,
     ref,
     remove,
     runTransaction,
@@ -32,6 +33,26 @@ import {
  * @returns {string} Realtime Database path for the room.
  */
 const roomPath = (roomId) => `rooms/${roomId}`;
+
+/** Appends one bounded, authenticated event to the room's shared battle report. */
+const appendBattleEvent = async ({ roomId, type, message, round = 1, side = "" }) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+    const eventReference = push(ref(database, `${roomPath(roomId)}/report/events`));
+
+    await set(eventReference, {
+        type,
+        message: String(message).slice(0, 500),
+        round,
+        side,
+        createdAt: serverTimestamp(),
+        createdBy: user.uid,
+    });
+
+    await update(ref(database, `${roomPath(roomId)}/report`), {
+        updatedAt: serverTimestamp(),
+    });
+};
 
 /**
  * Creates a hosted room from a detached local fleet snapshot and registers presence.
@@ -241,16 +262,57 @@ export const registerPresence = async (roomId, uid) => {
  * @param {object} options.changes Changed tracker fields only.
  * @returns {Promise<void>} Resolves after Firebase accepts the update.
  */
-export const updateShipBattleState = async ({ roomId, side, shipId, changes }) => {
+export const updateShipBattleState = async ({ roomId, side, shipId, shipName, round = 1, changes }) => {
     const user = await ensureAnonymousUser();
     const { database } = getFirebaseServices();
     const battleReference = ref(database, `${roomPath(roomId)}/sides/${side}/battle/${shipId}`);
+    const previousState = (await get(battleReference)).val() || {};
 
     await update(battleReference, {
         ...changes,
         updatedAt: serverTimestamp(),
         updatedBy: user.uid,
     });
+
+    const descriptions = [];
+    const labels = { hull: "Hull", shields: "Shields", leadership: "Leadership" };
+
+    for (const field of ["hull", "shields", "leadership"]) {
+        if (changes[field] !== undefined && changes[field] !== previousState[field]) {
+            descriptions.push(`${labels[field]} ${previousState[field] ?? "—"} → ${changes[field]}`);
+        }
+    }
+
+    if (changes.order !== undefined && changes.order !== previousState.order) {
+        descriptions.push(`Special orders: ${changes.order}`);
+    }
+
+    if (
+        changes.criticalDamage !== undefined
+        && JSON.stringify(changes.criticalDamage) !== JSON.stringify(previousState.criticalDamage || [])
+    ) {
+        const previousCount = previousState.criticalDamage?.length || 0;
+        const nextCount = changes.criticalDamage?.length || 0;
+
+        descriptions.push(previousCount === nextCount
+            ? "Critical damage status updated"
+            : `Critical damage ${previousCount} → ${nextCount}`);
+    }
+
+    if (changes.weaponFire?.length > (previousState.weaponFire?.length || 0)) {
+        const attack = changes.weaponFire.at(-1);
+        descriptions.push(`${attack.weaponName} fired at ${attack.targetName}: ${attack.hits} hits, ${attack.damage} damage`);
+    }
+
+    if (descriptions.length) {
+        await appendBattleEvent({
+            roomId,
+            type: changes.hull === 0 && previousState.hull !== 0 ? "ship-destroyed" : "ship-update",
+            message: `${shipName || "Ship"}: ${descriptions.join(" · ")}`,
+            round,
+            side,
+        });
+    }
 };
 
 /**
@@ -326,13 +388,56 @@ export const updateBattleTurn = async ({ roomId, action, firstSide }) => {
     const { database } = getFirebaseServices();
     const turnReference = ref(database, `${roomPath(roomId)}/turn`);
 
-    await runTransaction(turnReference, (currentTurn) => {
+    const result = await runTransaction(turnReference, (currentTurn) => {
         if (action === "start") {
             return startBattleTurn(firstSide);
         }
 
         return advanceBattleTurn(currentTurn);
     });
+
+    const nextTurn = result.snapshot.val();
+    await appendBattleEvent({
+        roomId,
+        type: action === "start" ? "battle-started" : "turn-ended",
+        message: action === "start"
+            ? `${firstSide === "host" ? "Host" : "Guest"} fleet takes the first turn.`
+            : `Turn ended. ${nextTurn.activeSide === "host" ? "Host" : "Guest"} fleet to act in round ${nextTurn.round}.`,
+        round: nextTurn.round,
+        side: nextTurn.activeSide,
+    });
+};
+
+/** Finalizes the shared report and closes the room after local confirmation. */
+export const endBattle = async ({ roomId, result }) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+    const roomReference = ref(database, roomPath(roomId));
+    const room = (await get(roomReference)).val();
+    const side = getRoomSideForUser(room, user.uid);
+    const round = room?.turn?.round || 1;
+
+    await appendBattleEvent({
+        roomId,
+        type: "battle-ended",
+        message: `Battle ended: ${result}.`,
+        round,
+        side,
+    });
+
+    const finalUpdates = {
+        "report/status": "closed",
+        "report/result": result,
+        "report/endedAt": serverTimestamp(),
+        "report/updatedAt": serverTimestamp(),
+    };
+
+    if (side === "host") {
+        finalUpdates["meta/status"] = "closed";
+        finalUpdates["meta/updatedAt"] = serverTimestamp();
+    }
+
+    await update(roomReference, finalUpdates);
 };
 
 /**

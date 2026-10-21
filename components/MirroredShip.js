@@ -86,7 +86,7 @@ const MirroredShip = ({
                         <span className="mt-2">{label}</span>
                         <strong className={isChanged ? "order-modified-value" : ""}>
                             {isChanged && (
-                                <del>{label === "Speed" ? ship.stats.speedCm : `${ship.stats.turnDegrees}°`}</del>
+                                <del>({label === "Speed" ? ship.stats.speedCm : `${ship.stats.turnDegrees}°`})</del>
                             )}
                             {value}<small>{unit}</small>
                         </strong>
@@ -179,7 +179,7 @@ const MirroredShip = ({
                                             <td>{weapon.rangeLabel || `${weapon.rangeCm} cm`}</td>
                                             <td className="strength">
                                                 <span title={isOrderModified ? `Strength halved by ${battleState.order}; fractions round up.` : undefined}>
-                                                    {isOrderModified && <del>{weapon.strength}</del>}
+                                                    {isOrderModified && <del>({weapon.strength})</del>}
                                                     {orderedStrength}
                                                 </span>
                                                 {weapon.strengthUnit && <small>{weapon.strengthUnit}</small>}

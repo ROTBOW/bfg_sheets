@@ -1528,9 +1528,10 @@ td small {
 
 .order-modified-value del,
 .strength del {
-    color: light-dark(#8e877b, #697266);
+    color: light-dark(#8e8e8e, #777d78);
     font-size: 0.65em;
     font-weight: 400;
+    opacity: 0.8;
 }
 
 .order-control p {

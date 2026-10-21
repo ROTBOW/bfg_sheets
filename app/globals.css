@@ -3018,6 +3018,10 @@ footer {
     gap: 8px;
 }
 
+.rules-drawers.is-ordnance-open {
+    z-index: 31;
+}
+
 .drawer-trigger-row {
     display: grid;
     grid-template-columns: 20px 1fr 20px;

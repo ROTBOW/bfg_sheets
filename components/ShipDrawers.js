@@ -77,7 +77,7 @@ const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide, activeOrdna
         : null;
 
     return (
-        <div className="rules-drawers">
+        <div className={`rules-drawers${isOrdnanceOpen ? " is-ordnance-open" : ""}`}>
             <div className="drawer-trigger-row">
                 <button type="button" title="Your critical damage" aria-label="Show your ship critical damage" aria-expanded={openDrawer === "critical-friendly"} onClick={() => toggleDrawer("critical", "friendly")}>◁</button>
                 <span>CRIT</span>

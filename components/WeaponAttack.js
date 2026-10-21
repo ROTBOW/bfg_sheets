@@ -12,6 +12,7 @@ import {
 /** Resolves and records one selected weapon firing at the selected enemy vessel. */
 const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round, turnSide, onRecord, onClose }) => {
     const [direction, setDirection] = useState("closing");
+    const [distance, setDistance] = useState("");
     const initialAttackProfile = getWeaponAttackProfile(weapon, targetShip, "closing");
     const [mode, setMode] = useState(initialAttackProfile.supportsDigitalRoll ? "digital" : "manual");
     const [manualRolls, setManualRolls] = useState("");
@@ -20,10 +21,21 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
     const [result, setResult] = useState(null);
     const [error, setError] = useState("");
     const [isRecording, setIsRecording] = useState(false);
-    const attackProfile = getWeaponAttackProfile(weapon, targetShip, direction);
+    const distanceCm = distance === "" ? null : Number(distance);
+    const attackProfile = getWeaponAttackProfile(weapon, targetShip, direction, distanceCm);
     const { supportsDigitalRoll, diceCount, hitThreshold } = attackProfile;
 
     const resolveRolls = (rolls) => {
+        if (!Number.isFinite(distanceCm) || distanceCm <= 0) {
+            setError("Enter the distance to the target before resolving the attack.");
+            return;
+        }
+
+        if (Number.isFinite(weapon.rangeCm) && distanceCm > weapon.rangeCm) {
+            setError(`${weapon.name} is out of range (${weapon.rangeCm} cm).`);
+            return;
+        }
+
         const resolvedAttack = supportsDigitalRoll
             ? resolveWeaponRolls(rolls, attackProfile)
             : { hits: Number(manualHits), shieldBypassingHits: 0 };
@@ -105,6 +117,19 @@ const WeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round
                 <button type="button" onClick={onClose} aria-label="Close weapon attack">×</button>
             </div>
             <div className="weapon-attack-fields">
+                <label>
+                    Distance to target (cm)
+                    <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={distance}
+                        onChange={(event) => {
+                            setDistance(event.target.value);
+                            setResult(null);
+                        }}
+                    />
+                </label>
                 <label>
                     Target direction
                     <select value={direction} onChange={(event) => { setDirection(event.target.value); setResult(null); }}>

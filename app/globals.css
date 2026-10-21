@@ -735,14 +735,14 @@ td small {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
-    padding: 16px 18px;
+    gap: 12px;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border);
 }
 
 .weapon-attack-heading h3 {
-    margin: 4px 0;
-    font-size: 16px;
+    margin: 2px 0;
+    font-size: 14px;
     font-weight: 500;
 }
 
@@ -764,8 +764,12 @@ td small {
 .weapon-result {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    padding: 14px 18px;
+    gap: 8px;
+    padding: 10px 12px;
+}
+
+.weapon-attack-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .weapon-attack label {
@@ -796,15 +800,15 @@ td small {
 
 .weapon-attack-note {
     margin: 0;
-    padding: 0 18px 14px;
+    padding: 0 12px 10px;
     color: var(--muted);
     font-size: 10px;
     line-height: 1.5;
 }
 
 .weapon-roll-button {
-    width: calc(100% - 36px);
-    margin: 0 18px 14px;
+    width: calc(100% - 24px);
+    margin: 0 12px 10px;
     color: var(--accent) !important;
 }
 
@@ -837,7 +841,7 @@ td small {
 
 .weapon-attack-error {
     margin: 0;
-    padding: 0 18px 14px;
+    padding: 0 12px 10px;
     color: #e8917c;
     font-size: 11px;
 }
@@ -865,10 +869,15 @@ td small {
 }
 
 @media (max-width: 760px) {
-    .weapon-attack-fields,
     .physical-roll-fields,
     .weapon-result {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    .weapon-attack-fields {
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 

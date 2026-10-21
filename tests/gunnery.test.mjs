@@ -22,6 +22,12 @@ test("gunnery dice follow the table and split firepower above twenty", () => {
     assert.equal(getGunneryDice(32, "closing", "Cruiser"), 22);
 });
 
+test("target distance shifts battery fire along the Gunnery table", () => {
+    assert.equal(getGunneryDice(10, "closing", "Cruiser", 15), 9);
+    assert.equal(getGunneryDice(10, "closing", "Cruiser", 16), 7);
+    assert.equal(getGunneryDice(10, "closing", "Cruiser", 31), 5);
+});
+
 test("physical and digital dice results normalize to D6 values", () => {
     assert.deepEqual(parseDiceResults("6, 4  2"), [6, 4, 2]);
     assert.deepEqual(rollDice(3, () => 0), [1, 1, 1]);

@@ -56,6 +56,17 @@ test("live rolls are bounded and writable only by the active player", async () =
     assert.match(liveRollRules.shieldBypassingHits[".validate"], /child\('hits'\)/);
 });
 
+test("active ordnance is owned by its launcher and limited to ordnance weapon types", async () => {
+    const rules = await loadRules();
+    const ordnanceRules = rules.rules.rooms.$roomId.activeOrdnance.$ordnanceId;
+
+    assert.match(ordnanceRules[".write"], /createdBy/);
+    assert.match(ordnanceRules[".write"], /turn\/activeSide/);
+    assert.match(ordnanceRules.weaponType[".validate"], /Torpedo/);
+    assert.match(ordnanceRules.weaponType[".validate"], /Launch Bay/);
+    assert.match(ordnanceRules.strength[".validate"], /<= 100/);
+});
+
 test("Nova Cannon records allow D6 hits and template resolution details", async () => {
     const rules = await loadRules();
     const entryRules = rules.rules.rooms.$roomId.sides.$sideId.battle.$shipId.weaponFire.$entryIndex;

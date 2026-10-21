@@ -11,7 +11,11 @@ import {
 } from "@/lib/gunnery.mjs";
 import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
 import { createRollDurations, getLiveRollTimestamp } from "@/lib/live-roll.mjs";
-import { canLockOnReroll, getOrderedWeaponStrength } from "@/lib/special-orders.mjs";
+import {
+    canLockOnReroll,
+    getOrderedWeaponStrength,
+    ordnanceWeaponTypes,
+} from "@/lib/special-orders.mjs";
 
 const subscribeToDistanceControl = (onChange) => {
     window.addEventListener("distancecontrolchange", onChange);
@@ -606,8 +610,64 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
     );
 };
 
+/** Records an ordnance launch without resolving damage against a ship. */
+const OrdnanceLaunch = ({ weapon, weaponIndex, attacker, order, round, turnSide, onLaunch, onClose }) => {
+    const [isLaunching, setIsLaunching] = useState(false);
+    const [error, setError] = useState("");
+    const strength = getOrderedWeaponStrength(weapon, order);
+
+    const launch = async () => {
+        setIsLaunching(true);
+        setError("");
+
+        try {
+            await onLaunch({
+                id: crypto.randomUUID(),
+                sourceSide: turnSide,
+                attackerId: attacker.id,
+                attackerName: attacker.name,
+                weaponIndex,
+                weaponName: weapon.name,
+                weaponType: weapon.type,
+                strength,
+                rangeCm: weapon.rangeCm || 0,
+                round,
+                createdAt: Date.now(),
+            });
+            onClose();
+        } catch {
+            setError("The ordnance could not be placed on the battlefield. Check your connection and try again.");
+            setIsLaunching(false);
+        }
+    };
+
+    return (
+        <section className="weapon-attack" aria-label={`Launch ${weapon.name}`}>
+            <div className="weapon-attack-heading">
+                <div>
+                    <span className="eyebrow">LAUNCH ORDNANCE</span>
+                    <h3>{weapon.name}</h3>
+                    <small>{attacker.name} · Strength {strength}</small>
+                </div>
+                <button type="button" onClick={onClose} aria-label="Close ordnance launch">×</button>
+            </div>
+            <p className="weapon-attack-note">
+                Launch this marker now. Resolve its hit later from Active Ordnance.
+            </p>
+            <button type="button" className="weapon-roll-button" disabled={isLaunching} onClick={launch}>
+                {isLaunching ? "Launching…" : "FIRE"}
+            </button>
+            {error && <p className="weapon-attack-error" role="alert">{error}</p>}
+        </section>
+    );
+};
+
 /** Selects the rules-specific firing controls for the chosen weapon. */
 const WeaponAttack = (props) => {
+    if (ordnanceWeaponTypes.has(props.weapon.type) && !props.isActiveOrdnance) {
+        return <OrdnanceLaunch {...props} />;
+    }
+
     if (props.weapon.type === "Nova Cannon") {
         return <NovaCannonAttack {...props} />;
     }

@@ -24,6 +24,7 @@ const MirroredShip = ({
     onDamageTarget,
     onRoll,
     onClearRoll,
+    onLaunchOrdnance,
     isEnemy = false,
     target,
     targetShip,
@@ -153,7 +154,7 @@ const MirroredShip = ({
                                     && !targetWasEngaged
                                     && !isOrdnanceSpent
                                     && !isDisabledByOrder
-                                    && Boolean(target);
+                                    && (ordnanceWeaponTypes.has(weapon.type) || Boolean(target));
                                 const weaponRowClass = [
                                     canSelect ? "weapon-row-selectable" : "",
                                     isSelected ? "weapon-row-selected" : "",
@@ -194,7 +195,7 @@ const MirroredShip = ({
                                             </td>
                                             <td><span className="arc">{weapon.arc}</span></td>
                                         </tr>
-                                        {!isEnemy && isSelected && target && (
+                                        {!isEnemy && isSelected && (target || ordnanceWeaponTypes.has(weapon.type)) && (
                                             <tr className="weapon-attack-row">
                                                 <td colSpan="4">
                                                     <WeaponAttack
@@ -212,6 +213,7 @@ const MirroredShip = ({
                                                         onClose={() => setSelectedWeaponIndex(null)}
                                                         onRoll={onRoll}
                                                         onClearRoll={onClearRoll}
+                                                        onLaunch={onLaunchOrdnance}
                                                         onRecord={recordAttack}
                                                     />
                                                 </td>

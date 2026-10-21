@@ -18,7 +18,10 @@ import {
     clearStartingSpecialOrders,
     clearLiveRoll,
     damageEnemyShip,
+    launchActiveOrdnance,
     publishLiveRoll,
+    removeActiveOrdnance,
+    updateActiveOrdnanceStrength,
     subscribeToRoom,
     updateShipBattleState,
 } from "@/firebase/room-service";
@@ -323,6 +326,50 @@ const BattleTracker = () => {
         await clearLiveRoll(activeRoomId);
     };
 
+    /** Launches ordnance without applying damage or binding it to the selected target. */
+    const launchOrdnance = async (ordnance) => {
+        await launchActiveOrdnance({ roomId: activeRoomId, ordnance });
+        updateSelectedShip((current) => ({
+            spentOrdnance: [...new Set([...current.spentOrdnance, ordnance.weaponIndex])],
+            message: `${ordnance.weaponName} launched at strength ${ordnance.strength}.`,
+        }));
+    };
+
+    /** Applies an active-ordnance hit and removes its battlefield marker. */
+    const resolveOrdnance = async (ordnance, attack, targetSide) => {
+        const targetFleet = targetSide === connectedLocalSide ? vessels : enemyVessels;
+        const damagedVessel = targetFleet.find((candidate) => candidate.id === attack.targetShipId);
+
+        if (!damagedVessel?.profile) {
+            throw new Error("The target vessel is no longer available.");
+        }
+
+        if (attack.damage) {
+            await damageEnemyShip({
+                roomId: activeRoomId,
+                targetSide,
+                shipId: damagedVessel.id,
+                damage: attack.damage,
+                maximumHull: damagedVessel.profile.stats.hull,
+                maximumShields: damagedVessel.profile.stats.shields,
+                shieldBypassingDamage: attack.shieldBypassingDamage,
+                reactiveHullSave: damagedVessel.profile.stats.reactiveHullSave ?? null,
+                message: `${ordnance.attackerName}'s ${ordnance.weaponName} inflicted ${attack.damage} damage.`,
+            });
+        }
+
+        if (attack.remainingStrength > 0) {
+            await updateActiveOrdnanceStrength({
+                roomId: activeRoomId,
+                ordnanceId: ordnance.id,
+                strength: attack.remainingStrength,
+            });
+        } else {
+            await removeActiveOrdnance({ roomId: activeRoomId, ordnanceId: ordnance.id });
+        }
+        await dismissLiveRoll().catch(() => {});
+    };
+
     if (!loaded) {
         return <main role="status">Loading saved fleets…</main>;
     }
@@ -370,6 +417,7 @@ const BattleTracker = () => {
                         onDamageTarget={damageSelectedEnemyShip}
                         onRoll={shareLiveRoll}
                         onClearRoll={dismissLiveRoll}
+                        onLaunchOrdnance={launchOrdnance}
                         target={enemyVessel}
                         targetShip={enemyShip}
                         targets={enemyVessels
@@ -389,6 +437,19 @@ const BattleTracker = () => {
                         enemyShip={{ ship: enemyShip, vessel: enemyVessel, battleState: enemyState }}
                         liveRoll={localLiveRoll || connectedRoom.liveRoll}
                         localSide={connectedLocalSide}
+                        activeOrdnance={Object.values(connectedRoom.activeOrdnance || {})}
+                        ordnanceTargets={[
+                            ...enemyVessels
+                                .filter((candidate) => candidate.profile)
+                                .map((candidate) => ({ vessel: candidate, ship: candidate.profile, side: enemySide })),
+                            ...vessels
+                                .filter((candidate) => candidate.profile)
+                                .map((candidate) => ({ vessel: candidate, ship: candidate.profile, side: connectedLocalSide })),
+                        ]}
+                        turnSide={connectedRoom.turn?.activeSide || ""}
+                        onResolveOrdnance={resolveOrdnance}
+                        onRoll={shareLiveRoll}
+                        onClearRoll={dismissLiveRoll}
                     />
                     <MirroredShip
                         ship={enemyShip}

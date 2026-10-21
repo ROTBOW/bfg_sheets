@@ -998,8 +998,8 @@ td small {
     z-index: 28;
     display: grid;
     width: clamp(420px, 31vw, 680px);
-    height: min(560px, calc(100dvh - 64px));
-    max-height: calc(100dvh - 64px);
+    height: min(560px, calc(50dvh - 40px));
+    max-height: calc(50dvh - 40px);
     overflow: auto;
     border: 1px solid var(--accent);
     border-radius: 5px;
@@ -3047,6 +3047,7 @@ footer {
 }
 
 .gunnery-drawer-trigger,
+.ordnance-drawer-trigger,
 .dice-drawer-trigger {
     width: 100%;
     min-height: 28px;
@@ -3059,10 +3060,197 @@ footer {
 }
 
 .gunnery-drawer-trigger[aria-expanded="true"],
+.ordnance-drawer-trigger[aria-expanded="true"],
 .dice-drawer-trigger[aria-expanded="true"] {
     border-color: var(--accent);
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 12%, var(--background));
+}
+
+.ordnance-drawer {
+    position: fixed;
+    right: calc(var(--enemy-fleet-width) + clamp(14px, 1.5vw, 28px));
+    top: 72px;
+    z-index: 29;
+    width: clamp(420px, 31vw, 680px);
+    max-height: calc(50dvh - 40px);
+    min-height: 210px;
+    overflow: auto;
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    background: light-dark(#f4f0e6, #080b09);
+    box-shadow: 0 20px 58px #000a;
+}
+
+.active-ordnance-list {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+}
+
+.active-ordnance-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid var(--border);
+}
+
+.active-ordnance-card > div,
+.active-ordnance-empty {
+    display: grid;
+    gap: 4px;
+}
+
+.active-ordnance-card small,
+.active-ordnance-empty small {
+    color: var(--muted);
+}
+
+.active-ordnance-confirm {
+    min-width: 132px;
+    padding: 10px 14px;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    color: #080b09;
+    background: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.active-ordnance-confirm:hover:not(:disabled),
+.active-ordnance-confirm:focus-visible,
+.active-ordnance-confirm[aria-expanded="true"] {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, var(--background));
+}
+
+.active-ordnance-confirm:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.active-ordnance-empty {
+    place-content: center;
+    min-height: 150px;
+    padding: 32px;
+    text-align: center;
+}
+
+.active-ordnance-attack > label {
+    display: grid;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.active-ordnance-attack > label select {
+    width: 100%;
+}
+
+.ordnance-attack {
+    margin-top: 10px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: light-dark(#f4f0e6, #0b0f0d);
+}
+
+.ordnance-attack > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.ordnance-attack > header h3 {
+    margin: 3px 0;
+}
+
+.ordnance-attack > header small,
+.ordnance-attack > p {
+    color: var(--muted);
+}
+
+.ordnance-attack > header > button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+}
+
+.ordnance-attack > p {
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.ordnance-target-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--border);
+}
+
+.ordnance-target-summary span {
+    display: grid;
+    gap: 4px;
+    padding: 9px 12px;
+    color: var(--muted);
+    background: var(--background);
+    font-size: 9px;
+}
+
+.ordnance-target-summary strong {
+    color: var(--foreground);
+    font-size: 14px;
+}
+
+.ordnance-roll-button,
+.ordnance-record-button {
+    width: calc(100% - 24px);
+    margin: 0 12px 12px;
+    padding: 11px 14px;
+    border-color: var(--accent);
+    color: #080b09;
+    background: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.ordnance-roll-results {
+    display: grid;
+    gap: 10px;
+    padding: 0 12px 12px;
+}
+
+.ordnance-bomber-counts,
+.ordnance-result-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+}
+
+.ordnance-bomber-counts span,
+.ordnance-result-summary span {
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.ordnance-result-summary strong {
+    color: var(--accent);
+}
+
+.ordnance-roll-results .ordnance-record-button {
+    width: 100%;
+    margin: 0;
 }
 
 .rules-drawer {
@@ -3212,6 +3400,13 @@ footer {
         top: auto;
         grid-row: 2;
         padding: 8px 0;
+    }
+
+    .ordnance-drawer {
+        right: 12px;
+        top: 12px;
+        width: calc(100vw - 24px);
+        max-height: calc(50dvh - 18px);
     }
 
     .mirrored-ship.is-enemy {

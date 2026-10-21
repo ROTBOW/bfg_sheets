@@ -175,6 +175,29 @@ export const clearLiveRoll = async (roomId) => {
     await remove(ref(database, `${roomPath(roomId)}/liveRoll`));
 };
 
+/** Places one launched ordnance marker in the room-wide battlefield pool. */
+export const launchActiveOrdnance = async ({ roomId, ordnance }) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+
+    await set(ref(database, `${roomPath(roomId)}/activeOrdnance/${ordnance.id}`), {
+        ...ordnance,
+        createdBy: user.uid,
+    });
+};
+
+/** Removes an owned ordnance marker after its attack has been recorded. */
+export const removeActiveOrdnance = async ({ roomId, ordnanceId }) => {
+    const { database } = getFirebaseServices();
+    await remove(ref(database, `${roomPath(roomId)}/activeOrdnance/${ordnanceId}`));
+};
+
+/** Keeps a surviving torpedo salvo in play at its reduced strength. */
+export const updateActiveOrdnanceStrength = async ({ roomId, ordnanceId, strength }) => {
+    const { database } = getFirebaseServices();
+    await update(ref(database, `${roomPath(roomId)}/activeOrdnance/${ordnanceId}`), { strength });
+};
+
 /**
  * Restores presence for a participant who already owns a side in a room.
  *

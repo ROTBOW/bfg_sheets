@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CriticalDamage from "@/components/CriticalDamage";
+import ActiveOrdnance from "@/components/ActiveOrdnance";
 import LiveRollViewer from "@/components/LiveRollViewer";
 import SpecialRules from "@/components/SpecialRules";
 import { gunneryTable } from "@/lib/gunnery.mjs";
@@ -43,8 +44,9 @@ const GunneryReference = () => (
 );
 
 /** Center controls that reveal ship references and the shared Gunnery table. */
-const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide }) => {
+const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide, activeOrdnance = [], ordnanceTargets = [], turnSide, onResolveOrdnance, onRoll, onClearRoll }) => {
     const [openDrawer, setOpenDrawer] = useState("");
+    const [isOrdnanceOpen, setIsOrdnanceOpen] = useState(false);
     const [diceTrayOpenedAt, setDiceTrayOpenedAt] = useState(0);
     const [drawerType, drawerSide] = openDrawer.split("-");
     const activeShip = drawerSide === "friendly"
@@ -96,6 +98,14 @@ const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide }) => {
             </button>
             <button
                 type="button"
+                className="ordnance-drawer-trigger"
+                aria-expanded={isOrdnanceOpen}
+                onClick={() => setIsOrdnanceOpen((current) => !current)}
+            >
+                ACTIVE ORDNANCE{activeOrdnance.length ? ` · ${activeOrdnance.length}` : ""}
+            </button>
+            <button
+                type="button"
                 className="dice-drawer-trigger"
                 aria-expanded={openDrawer === "dice"}
                 onClick={toggleDiceTray}
@@ -125,6 +135,26 @@ const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide }) => {
                             <small>Your rolls and incoming fire will appear here while the tray is open.</small>
                         </div>
                     )}
+                </aside>
+            )}
+            {isOrdnanceOpen && (
+                <aside className="ordnance-drawer" aria-label="Active ordnance">
+                    <button type="button" className="dice-drawer-close" onClick={() => setIsOrdnanceOpen(false)} aria-label="Close Active Ordnance">×</button>
+                    <header className="live-roll-heading">
+                        <div>
+                            <span className="eyebrow">BATTLEFIELD</span>
+                            <h2>Active Ordnance</h2>
+                        </div>
+                    </header>
+                    <ActiveOrdnance
+                        ordnance={activeOrdnance}
+                        localSide={localSide}
+                        targets={ordnanceTargets}
+                        turnSide={turnSide}
+                        onResolve={onResolveOrdnance}
+                        onRoll={onRoll}
+                        onClearRoll={onClearRoll}
+                    />
                 </aside>
             )}
             {openDrawer === "gunnery" && (

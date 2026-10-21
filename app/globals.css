@@ -1176,6 +1176,66 @@ td small {
     color: var(--accent) !important;
 }
 
+.star-pulse-targets,
+.star-pulse-results {
+    display: grid;
+    gap: 8px;
+    padding: 0 12px 10px;
+}
+
+.star-pulse-targets fieldset {
+    margin: 0;
+    padding: 9px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+}
+
+.star-pulse-target-toggle {
+    display: flex !important;
+    align-items: center;
+    grid-template-columns: auto 1fr;
+    color: var(--foreground) !important;
+}
+
+.star-pulse-target-toggle input {
+    width: auto;
+    min-height: auto;
+}
+
+.star-pulse-targets .weapon-attack-fields {
+    align-items: end;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 10px 0 0;
+}
+
+.star-pulse-targets .weapon-attack-fields > span {
+    padding-bottom: 9px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.star-pulse-results label {
+    grid-template-columns: minmax(0, 1fr) 72px;
+    align-items: end;
+}
+
+.star-pulse-results label > span {
+    display: grid;
+    gap: 3px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+.star-pulse-results label strong {
+    color: var(--foreground);
+}
+
+.star-pulse-results > button {
+    color: var(--accent);
+}
+
 .physical-roll-fields button,
 .weapon-result button {
     align-self: end;
@@ -2196,7 +2256,7 @@ footer {
 }
 
 .battle-layout:has(.fleet-menu[data-view="compact"]) {
-    grid-template-columns: 156px minmax(0, 1fr);
+    grid-template-columns: 180px minmax(0, 1fr);
 }
 
 .fleet-menu[data-view="details"] .fleet-ship {
@@ -2237,41 +2297,86 @@ footer {
     display: none;
 }
 
+.fleet-search {
+    display: grid;
+    gap: 5px;
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 8px;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
+
+.fleet-search input {
+    width: 100%;
+    min-height: 34px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 10px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-search {
+    margin-top: 7px;
+}
+
+.fleet-menu[data-view="compact"] .fleet-search > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
 .fleet-menu[data-view="compact"] .fleet-list {
-    gap: 6px;
+    gap: 4px;
     padding: 8px;
 }
 
 .fleet-menu[data-view="compact"] .fleet-ship {
-    gap: 6px;
-    min-height: 86px;
-    padding: 10px 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 3px 6px;
+    min-height: 52px;
+    padding: 7px 8px;
 }
 
 .fleet-menu[data-view="compact"] .fleet-ship .registry {
+    grid-column: 1 / -1;
     font-size: 7px;
     letter-spacing: 0.5px;
 }
 
 .fleet-menu[data-view="compact"] .fleet-ship strong {
+    min-width: 0;
+    overflow: hidden;
     font-size: 12px;
     line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .compact-ship-status {
-    display: block;
-    margin-top: auto;
-    padding-top: 7px;
-    border-top: 1px solid var(--border);
+    display: contents;
 }
 
 .compact-ship-status .fleet-hull {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    width: 100%;
+    display: inline-flex;
+    width: auto;
     gap: 4px;
     color: var(--muted);
     font-size: 9px;
+}
+
+.compact-ship-status .fleet-hull > span:first-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
 }
 
 .compact-ship-status .fleet-hull > span:nth-child(2) {
@@ -2371,6 +2476,14 @@ footer {
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
     scrollbar-width: thin;
+}
+
+.fleet-list-empty {
+    padding: 18px 8px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+    text-align: center;
 }
 
 .fleet-ship {
@@ -2626,11 +2739,11 @@ footer {
 }
 
 .connected-battle-layout:has(> .fleet-menu:first-child[data-view="compact"]) {
-    --friendly-fleet-width: 124px;
+    --friendly-fleet-width: 160px;
 }
 
 .connected-battle-layout:has(> .fleet-menu:last-child[data-view="compact"]) {
-    --enemy-fleet-width: 124px;
+    --enemy-fleet-width: 160px;
 }
 
 .connected-battle-layout > .fleet-menu[data-view="compact"] .tracker-fleet-picker,

@@ -282,10 +282,16 @@ const BattleTracker = () => {
         updateSelectedShip({ targetId: shipId });
     };
 
-    /** Sends inflicted damage to the selected opposing ship in the shared room. */
+    /** Sends inflicted damage to the opposing ship named by a firing record. */
     const damageSelectedEnemyShip = async (entry) => {
         if (!entry.damage) {
             return;
+        }
+
+        const damagedVessel = enemyVessels.find((candidate) => candidate.id === entry.targetShipId);
+
+        if (!damagedVessel?.profile) {
+            throw new Error("The target vessel is no longer available.");
         }
 
         const bypassMessage = entry.shieldBypassingDamage
@@ -295,12 +301,12 @@ const BattleTracker = () => {
         await damageEnemyShip({
             roomId: activeRoomId,
             targetSide: enemySide,
-            shipId: enemyVessel.id,
+            shipId: damagedVessel.id,
             damage: entry.damage,
-            maximumHull: enemyVessel.profile.stats.hull,
-            maximumShields: enemyVessel.profile.stats.shields,
+            maximumHull: damagedVessel.profile.stats.hull,
+            maximumShields: damagedVessel.profile.stats.shields,
             shieldBypassingDamage: entry.shieldBypassingDamage,
-            reactiveHullSave: enemyVessel.profile.stats.reactiveHullSave ?? null,
+            reactiveHullSave: damagedVessel.profile.stats.reactiveHullSave ?? null,
             message: `${vessel.name}'s ${entry.weaponName} inflicted ${entry.damage} damage.${bypassMessage}`,
         });
     };
@@ -366,6 +372,12 @@ const BattleTracker = () => {
                         onClearRoll={dismissLiveRoll}
                         target={enemyVessel}
                         targetShip={enemyShip}
+                        targets={enemyVessels
+                            .filter((candidate) => candidate.profile)
+                            .map((candidate) => ({
+                                vessel: candidate,
+                                ship: candidate.profile,
+                            }))}
                         round={connectedRoom.turn?.round || 1}
                         turnSide={connectedRoom.turn?.activeSide || ""}
                         isActiveTurn={connectedRoom.turn?.activeSide === connectedLocalSide}

@@ -27,6 +27,7 @@ const MirroredShip = ({
     isEnemy = false,
     target,
     targetShip,
+    targets = [],
     round = 1,
     turnSide = "",
     isActiveTurn = false,
@@ -52,16 +53,20 @@ const MirroredShip = ({
     ];
 
     /** Records the firing result and closes the inline attack controls. */
-    const recordAttack = async (entry) => {
-        await onDamageTarget(entry);
+    const recordAttack = async (entryOrEntries) => {
+        const entries = Array.isArray(entryOrEntries) ? entryOrEntries : [entryOrEntries];
+
+        await Promise.all(entries.map((entry) => onDamageTarget(entry)));
         onUpdate((current) => ({
-            weaponFire: [...current.weaponFire, entry],
-            spentOrdnance: ordnanceWeaponTypes.has(entry.weaponType)
-                ? [...new Set([...current.spentOrdnance, entry.weaponIndex])]
+            weaponFire: [...current.weaponFire, ...entries],
+            spentOrdnance: entries.some((entry) => ordnanceWeaponTypes.has(entry.weaponType))
+                ? [...new Set([...current.spentOrdnance, ...entries.map((entry) => entry.weaponIndex)])]
                 : current.spentOrdnance,
-            message: entry.weaponType === "Lightning arc"
-                ? `${entry.weaponName} ${entry.fireArc} arc (${entry.allocatedStrength} FP): ${entry.hits} hits, ${entry.damage} damage.`
-                : `${entry.weaponName} recorded: ${entry.hits} hits, ${entry.damage} damage.`,
+            message: entries.length > 1
+                ? `${entries[0].weaponName} struck ${entries.filter((entry) => entry.hits > 0).length} of ${entries.length} targets for ${entries.reduce((total, entry) => total + entry.damage, 0)} damage.`
+                : entries[0].weaponType === "Lightning arc"
+                    ? `${entries[0].weaponName} ${entries[0].fireArc} arc (${entries[0].allocatedStrength} FP): ${entries[0].hits} hits, ${entries[0].damage} damage.`
+                    : `${entries[0].weaponName} recorded: ${entries[0].hits} hits, ${entries[0].damage} damage.`,
         }));
         setSelectedWeaponIndex(null);
     };
@@ -199,6 +204,7 @@ const MirroredShip = ({
                                                         attacker={vessel}
                                                         target={target}
                                                         targetShip={targetShip}
+                                                        targets={targets}
                                                         weaponFire={battleState.weaponFire}
                                                         order={battleState.order}
                                                         round={round}

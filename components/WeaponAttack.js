@@ -23,6 +23,218 @@ const getDistanceControlSnapshot = () =>
     document.documentElement.dataset.distanceControl === "slider";
 const getServerDistanceControlSnapshot = () => false;
 
+/** Resolves a Star Pulse Generator once against each chosen non-Necron vessel. */
+const StarPulseAttack = ({ weapon, weaponIndex, attacker, targets, round, turnSide, onRoll, onClearRoll, onRecord, onClose }) => {
+    const eligibleTargets = targets.filter(({ ship }) => ship.faction !== "Necrons");
+    const [selectedTargetIds, setSelectedTargetIds] = useState(() => eligibleTargets.map(({ vessel }) => vessel.id));
+    const [targetDetails, setTargetDetails] = useState(() => Object.fromEntries(
+        eligibleTargets.map(({ vessel }) => [vessel.id, { direction: "closing" }]),
+    ));
+    const [results, setResults] = useState(null);
+    const [error, setError] = useState("");
+    const [isRecording, setIsRecording] = useState(false);
+
+    const updateTargetDetails = (targetId, changes) => {
+        setTargetDetails((current) => ({
+            ...current,
+            [targetId]: { ...current[targetId], ...changes },
+        }));
+        setResults(null);
+    };
+
+    const toggleTarget = (targetId) => {
+        setSelectedTargetIds((current) => (
+            current.includes(targetId)
+                ? current.filter((id) => id !== targetId)
+                : [...current, targetId]
+        ));
+        setResults(null);
+    };
+
+    const resolvePulse = () => {
+        const selectedTargets = eligibleTargets.filter(({ vessel }) => selectedTargetIds.includes(vessel.id));
+
+        if (!selectedTargets.length) {
+            setError("Choose at least one target in range.");
+            return;
+        }
+
+        const startedAt = getLiveRollTimestamp();
+        const resolvedTargets = selectedTargets.map(({ vessel, ship }) => {
+            const direction = targetDetails[vessel.id].direction;
+            const attackProfile = getWeaponAttackProfile(weapon, ship, direction);
+            const roll = rollDice(1)[0];
+            const resolvedAttack = resolveWeaponRolls([roll], attackProfile);
+
+            return {
+                vessel,
+                direction,
+                roll,
+                hitThreshold: attackProfile.hitThreshold,
+                hits: resolvedAttack.hits,
+                damage: resolvedAttack.hits,
+            };
+        });
+
+        setResults(resolvedTargets);
+        setError("");
+
+        Promise.resolve(onRoll?.({
+            id: crypto.randomUUID(),
+            kind: "weapon",
+            sourceSide: turnSide,
+            attackerId: attacker.id,
+            attackerName: attacker.name,
+            targetId: "multiple",
+            targetName: `${resolvedTargets.length} targets`,
+            weaponName: weapon.name,
+            initialRolls: resolvedTargets.map(({ roll }) => roll),
+            rerolls: [],
+            initialDurations: createRollDurations(resolvedTargets.length),
+            rerollDurations: [],
+            hitThreshold: resolvedTargets[0].hitThreshold,
+            hitThresholds: resolvedTargets.map(({ hitThreshold }) => hitThreshold),
+            shieldBypassRoll: 0,
+            hits: resolvedTargets.reduce((total, result) => total + result.hits, 0),
+            shieldBypassingHits: 0,
+            startedAt,
+            expiresAt: startedAt + 15000,
+        })).catch(() => {
+            setError("The pulse was resolved locally but could not be shown to your opponent.");
+        });
+    };
+
+    const updateDamage = (targetId, damage) => {
+        setResults((current) => current.map((result) => (
+            result.vessel.id === targetId ? { ...result, damage } : result
+        )));
+    };
+
+    const recordPulse = async () => {
+        const hasInvalidDamage = results.some(({ damage }) => (
+            !Number.isInteger(Number(damage)) || Number(damage) < 0 || Number(damage) > 100
+        ));
+
+        if (hasInvalidDamage) {
+            setError("Damage must be a whole number from 0 to 100 for every target.");
+            return;
+        }
+
+        setIsRecording(true);
+        setError("");
+
+        try {
+            await Promise.resolve(onClearRoll?.()).catch(() => {});
+            await onRecord(results.map((result) => ({
+                id: crypto.randomUUID(),
+                weaponIndex,
+                weaponName: weapon.name,
+                weaponType: weapon.type,
+                round,
+                turnSide,
+                targetShipId: result.vessel.id,
+                targetName: result.vessel.name,
+                direction: result.direction,
+                mode: "digital",
+                rolls: [result.roll],
+                shots: 1,
+                hits: result.hits,
+                damage: Number(result.damage),
+                shieldBypassingDamage: 0,
+                accuracy: result.hits,
+                createdAt: Date.now(),
+            })));
+        } catch {
+            setError("Damage could not be sent to your opponent. Check your connection and try again.");
+            setIsRecording(false);
+        }
+    };
+
+    const closeAttack = () => {
+        Promise.resolve(onClearRoll?.()).catch(() => {});
+        onClose();
+    };
+
+    return (
+        <section className="weapon-attack" aria-label={`Fire ${weapon.name}`}>
+            <div className="weapon-attack-heading">
+                <div>
+                    <span className="eyebrow">FIRE WEAPON</span>
+                    <h3>{weapon.name}</h3>
+                    <small>{attacker.name} → multiple targets</small>
+                </div>
+                <button type="button" onClick={closeAttack} aria-label="Close weapon attack">×</button>
+            </div>
+            <p className="weapon-attack-note">
+                Select every non-Necron ship within the generator’s 20 cm radius, then choose its nearest-facing armour.
+            </p>
+            <div className="star-pulse-targets">
+                {eligibleTargets.map(({ vessel, ship }) => {
+                    const isSelected = selectedTargetIds.includes(vessel.id);
+
+                    return (
+                        <fieldset key={vessel.id}>
+                            <label className="star-pulse-target-toggle">
+                                <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => toggleTarget(vessel.id)}
+                                />
+                                <strong>{vessel.name}</strong>
+                            </label>
+                            {isSelected && (
+                                <div className="weapon-attack-fields">
+                                    <label>
+                                        Nearest aspect
+                                        <select
+                                            value={targetDetails[vessel.id]?.direction || "closing"}
+                                            onChange={(event) => updateTargetDetails(vessel.id, { direction: event.target.value })}
+                                        >
+                                            {gunneryDirections.map((option) => (
+                                                <option key={option.id} value={option.id}>{option.label}</option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                    <span>Armour {ship.stats.armour.front} / {ship.stats.armour.other}</span>
+                                </div>
+                            )}
+                        </fieldset>
+                    );
+                })}
+            </div>
+            {!eligibleTargets.length && <p className="weapon-attack-error">There are no non-Necron targets available.</p>}
+            <button type="button" className="weapon-roll-button" disabled={!eligibleTargets.length} onClick={resolvePulse}>
+                Roll pulse against selected targets
+            </button>
+            {error && <p className="weapon-attack-error" role="alert">{error}</p>}
+            {results && (
+                <div className="star-pulse-results" role="status">
+                    {results.map((result) => (
+                        <label key={result.vessel.id}>
+                            <span>
+                                <strong>{result.vessel.name}</strong>
+                                Rolled {result.roll} vs {result.hitThreshold}+ · {result.hits ? "hit" : "miss"}
+                            </span>
+                            Damage
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="1"
+                                value={result.damage}
+                                onChange={(event) => updateDamage(result.vessel.id, event.target.value)}
+                            />
+                        </label>
+                    ))}
+                    <button type="button" disabled={isRecording} onClick={recordPulse}>
+                        {isRecording ? "Sending damage…" : "Record pulse"}
+                    </button>
+                </div>
+            )}
+        </section>
+    );
+};
+
 /** Resolves and records one standard weapon firing at the selected enemy vessel. */
 const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, weaponFire = [], order, round, turnSide, onRoll, onClearRoll, onRecord, onClose }) => {
     const [direction, setDirection] = useState("closing");
@@ -398,6 +610,10 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
 const WeaponAttack = (props) => {
     if (props.weapon.type === "Nova Cannon") {
         return <NovaCannonAttack {...props} />;
+    }
+
+    if (props.weapon.type === "Star pulse generator") {
+        return <StarPulseAttack {...props} />;
     }
 
     return <StandardWeaponAttack {...props} />;

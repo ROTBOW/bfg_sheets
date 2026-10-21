@@ -63,6 +63,7 @@ const LiveRollViewer = ({ liveRoll, localSide }) => {
                 <DiceTray
                     rolls={liveRoll.initialRolls || []}
                     hitThreshold={isCommandCheck ? null : liveRoll.hitThreshold}
+                    hitThresholds={isCommandCheck ? [] : liveRoll.hitThresholds || []}
                     shieldBypassRoll={isCommandCheck ? null : liveRoll.shieldBypassRoll || null}
                     label={isCommandCheck ? "2D6 command check" : "Initial roll"}
                     durations={liveRoll.initialDurations || []}

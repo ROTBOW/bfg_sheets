@@ -70,6 +70,7 @@ const AnimatedDie = ({ roll, index, hitThreshold, shieldBypassRoll, startDelay, 
 const DiceTray = ({
     rolls,
     hitThreshold,
+    hitThresholds = [],
     shieldBypassRoll = null,
     label = "Attack roll",
     isReroll = false,
@@ -91,7 +92,7 @@ const DiceTray = ({
                         key={`${index}-${roll}`}
                         roll={roll}
                         index={index}
-                        hitThreshold={hitThreshold}
+                        hitThreshold={hitThresholds[index] ?? hitThreshold}
                         shieldBypassRoll={shieldBypassRoll}
                         startDelay={startDelay}
                         duration={durations[index] || 1000}

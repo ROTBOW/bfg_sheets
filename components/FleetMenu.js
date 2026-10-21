@@ -19,8 +19,18 @@ const FleetMenu = ({
     fleetName = "",
     side = "friendly",
 }) => {
-    const [viewMode, setViewMode] = useState("details");
+    const [viewMode, setViewMode] = useState(() => fleet.length >= 8 ? "compact" : "details");
+    const [search, setSearch] = useState("");
     const isCompact = viewMode === "compact";
+    const normalizedSearch = search.trim().toLocaleLowerCase();
+    const visibleFleet = normalizedSearch
+        ? fleet.filter((vessel) => (
+            String(vessel.name || "").toLocaleLowerCase().includes(normalizedSearch)
+            || String(vessel.className || "").toLocaleLowerCase().includes(normalizedSearch)
+            || String(vessel.registry || "").toLocaleLowerCase().includes(normalizedSearch)
+            || String(vessel.squadron || "").toLocaleLowerCase().includes(normalizedSearch)
+        ))
+        : fleet;
 
     return (
         <aside
@@ -81,10 +91,21 @@ const FleetMenu = ({
                 </div>
                 <h2>{title}</h2>
                 <p>{fleet.length} ships · Session tracking</p>
+                {fleet.length >= 8 && (
+                    <label className="fleet-search">
+                        <span>Find a ship</span>
+                        <input
+                            type="search"
+                            value={search}
+                            placeholder="Name, class, registry…"
+                            onChange={(event) => setSearch(event.target.value)}
+                        />
+                    </label>
+                )}
                 {storageMessage && <p role="alert">{storageMessage}</p>}
             </div>
             <ul className="fleet-list">
-                {fleet.map((vessel) => (
+                {visibleFleet.map((vessel) => (
                     <li key={vessel.id}>
                         <button
                             type="button"
@@ -143,6 +164,9 @@ const FleetMenu = ({
                         </button>
                     </li>
                 ))}
+                {!visibleFleet.length && (
+                    <li className="fleet-list-empty">No ships match “{search.trim()}”.</li>
+                )}
             </ul>
         </aside>
     );

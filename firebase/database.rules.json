@@ -103,6 +103,11 @@
                     "hitThreshold": {
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 6"
                     },
+                    "hitThresholds": {
+                        "$rollIndex": {
+                            ".validate": "$rollIndex.matches(/^([0-9]|[1-9][0-9])$/) && newData.isNumber() && newData.val() >= 1 && newData.val() <= 6"
+                        }
+                    },
                     "shieldBypassRoll": {
                         ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6"
                     },

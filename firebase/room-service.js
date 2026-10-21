@@ -25,6 +25,7 @@ import {
     advanceBattleTurn,
     startBattleTurn,
 } from "./room-schema.mjs";
+import { resolveAutomaticCriticals } from "../lib/critical-damage.mjs";
 
 /**
  * Returns the database path for a capability-style room identifier.
@@ -444,6 +445,8 @@ const clearEndingBraceOrders = async ({ roomId, side, turn, user, database }) =>
  * @param {number} options.maximumShields Target profile's starting shields.
  * @param {number} options.shieldBypassingDamage Damage applied directly to hull.
  * @param {string|null} options.reactiveHullSave Target's normal reactive-hull save.
+ * @param {string} options.targetFaction Target faction used to select the critical table.
+ * @param {string} options.targetType Target vessel type; escorts are destroyed by criticals.
  * @param {string} options.message Short attack summary for the target's tracker.
  * @returns {Promise<void>} Resolves after Firebase commits the damage.
  */
@@ -456,6 +459,8 @@ export const damageEnemyShip = async ({
     maximumShields,
     shieldBypassingDamage,
     reactiveHullSave = null,
+    targetFaction = "Imperial Navy",
+    targetType = "Cruiser",
     message,
 }) => {
     const user = await ensureAnonymousUser();
@@ -476,18 +481,46 @@ export const damageEnemyShip = async ({
         shields: maximumShields,
         shieldBypassingDamage: Math.min(shieldBypassingDamage, reactiveHullResult.damage),
     });
+    const currentHull = Number(currentBattleState?.hull ?? maximumHull);
+    const hullDamage = Math.max(0, currentHull - defenses.hull);
+    const criticalResult = resolveAutomaticCriticals(
+        hullDamage,
+        targetFaction,
+        targetType === "Escort",
+    );
+    const criticalDamage = [
+        ...(currentBattleState?.criticalDamage || []),
+        ...criticalResult.criticals.map(({ id, typeId, source, status }) => ({
+            id,
+            typeId,
+            source,
+            status,
+        })),
+    ];
+    const finalHull = criticalResult.escortDestroyed
+        ? 0
+        : Math.max(0, defenses.hull - criticalResult.extraDamage);
     const saveMessage = reactiveHullResult.rolls.length
         ? ` Reactive hull saved ${reactiveHullResult.savedDamage} damage (${reactiveHullResult.rolls.join(", ")}).`
         : "";
+    const criticalMessage = criticalResult.escortDestroyed
+        ? " Critical hit destroyed the escort."
+        : criticalResult.criticals.length
+            ? ` Critical checks ${criticalResult.criticalChecks.join(", ")}; ${criticalResult.criticals.length} critical hit${criticalResult.criticals.length === 1 ? "" : "s"}${criticalResult.extraDamage ? ` caused ${criticalResult.extraDamage} extra damage` : ""}.`
+            : criticalResult.criticalChecks.length
+                ? ` Critical checks ${criticalResult.criticalChecks.join(", ")}: no critical damage.`
+                : "";
 
     await update(battleReference, {
         ...defenses,
-        message: `${message}${saveMessage}`,
+        hull: finalHull,
+        criticalDamage,
+        message: `${message}${saveMessage}${criticalMessage}`,
         updatedAt: serverTimestamp(),
         updatedBy: user.uid,
     });
 
-    return reactiveHullResult;
+    return { ...reactiveHullResult, criticalResult };
 };
 
 /**

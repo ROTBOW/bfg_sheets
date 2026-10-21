@@ -11,6 +11,7 @@ export const terminalAccents = [
 
 export const themeCookieName = "bfg-theme";
 export const distanceControlCookieName = "bfg-distance-control";
+export const endTurnWarningCookieName = "bfg-end-turn-warning";
 
 // Run before the page paints. Omitting Expires and Max-Age keeps a session cookie.
 export const themeInitializationScript = `
@@ -35,11 +36,20 @@ export const themeInitializationScript = `
             ? "slider"
             : "input";
 
+        const endTurnWarningCookie = document.cookie
+            .split("; ")
+            .find((entry) => entry.startsWith("${endTurnWarningCookieName}="));
+        const endTurnWarning = endTurnWarningCookie === "${endTurnWarningCookieName}=disabled"
+            ? "disabled"
+            : "enabled";
+
         document.documentElement.dataset.accent = accent;
         document.cookie = "${accentCookieName}=" + accent + "; Path=/; SameSite=Lax" + secure;
         document.documentElement.dataset.theme = theme;
         document.cookie = "${themeCookieName}=" + theme + "; Path=/; SameSite=Lax" + secure;
         document.documentElement.dataset.distanceControl = distanceControl;
         document.cookie = "${distanceControlCookieName}=" + distanceControl + "; Path=/; SameSite=Lax" + secure;
+        document.documentElement.dataset.endTurnWarning = endTurnWarning;
+        document.cookie = "${endTurnWarningCookieName}=" + endTurnWarning + "; Path=/; SameSite=Lax" + secure;
     })();
 `;

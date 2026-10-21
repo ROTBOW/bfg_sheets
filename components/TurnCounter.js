@@ -1,10 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { updateBattleTurn } from "@/firebase/room-service";
 
+const subscribeToEndTurnWarning = (onChange) => {
+    window.addEventListener("endturnwarningchange", onChange);
+
+    return () => window.removeEventListener("endturnwarningchange", onChange);
+};
+
+const getEndTurnWarningSnapshot = () =>
+    document.documentElement.dataset.endTurnWarning !== "disabled";
+const getServerEndTurnWarningSnapshot = () => true;
+
 /** Displays and advances the shared game round and active player turn. */
-const TurnCounter = ({ roomId, turn, localSide, friendlyName, enemyName }) => {
+const TurnCounter = ({
+    roomId,
+    turn,
+    localSide,
+    friendlyName,
+    enemyName,
+    shipsThatCanFire = 0,
+}) => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [turnError, setTurnError] = useState("");
     const round = turn?.round || 1;
@@ -13,6 +30,11 @@ const TurnCounter = ({ roomId, turn, localSide, friendlyName, enemyName }) => {
     const enemyDatabaseSide = localSide === "host" ? "guest" : "host";
     const activeName = activeSide === friendlyDatabaseSide ? friendlyName : enemyName;
     const isLocalTurn = activeSide === localSide;
+    const warnsBeforeEndingTurn = useSyncExternalStore(
+        subscribeToEndTurnWarning,
+        getEndTurnWarningSnapshot,
+        getServerEndTurnWarningSnapshot,
+    );
 
     const changeTurn = async (options) => {
         setIsUpdating(true);
@@ -27,6 +49,22 @@ const TurnCounter = ({ roomId, turn, localSide, friendlyName, enemyName }) => {
         }
     };
 
+    /** Confirms intentional turn completion when friendly ships still have weapons available. */
+    const endTurn = () => {
+        if (warnsBeforeEndingTurn && shipsThatCanFire > 0) {
+            const shipLabel = shipsThatCanFire === 1 ? "ship still has" : "ships still have";
+            const shouldEndTurn = window.confirm(
+                `${shipsThatCanFire} ${shipLabel} weapons available to fire. End your turn anyway?`,
+            );
+
+            if (!shouldEndTurn) {
+                return;
+            }
+        }
+
+        changeTurn({ action: "advance" });
+    };
+
     return (
         <section className="turn-counter turn-counter-compact" aria-labelledby="turn-counter-title">
             <span className="sr-only">Game turn</span>
@@ -38,7 +76,7 @@ const TurnCounter = ({ roomId, turn, localSide, friendlyName, enemyName }) => {
                     <button
                         type="button"
                         disabled={!isLocalTurn || isUpdating}
-                        onClick={() => changeTurn({ action: "advance" })}
+                        onClick={endTurn}
                     >
                         {isUpdating ? "Updating…" : isLocalTurn ? "End your turn" : "Waiting for opponent"}
                     </button>

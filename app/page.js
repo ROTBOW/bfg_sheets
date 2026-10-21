@@ -24,6 +24,7 @@ import { battleProfiles, createShipBattleState } from "@/lib/battle-profiles";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { getShip, storageKey } from "@/lib/fleets.mjs";
 import { getProfileUrl, getVesselPoints } from "@/lib/ship-upgrades.mjs";
+import { countShipsThatCanFire } from "@/lib/turn-warning.mjs";
 
 /** Coordinates saved fleets, room synchronization, and the active ship views. */
 const BattleTracker = () => {
@@ -193,6 +194,14 @@ const BattleTracker = () => {
     const enemyState = enemyVessel?.profile
         ? { ...createShipBattleState(enemyVessel.profile), ...enemyBattleStates[enemyVessel.id] }
         : null;
+    const shipsThatCanFire = connectedRoom && connectedLocalSide
+        ? countShipsThatCanFire(
+            vessels,
+            fleetBattleStates,
+            connectedRoom.turn?.round || 1,
+            connectedLocalSide,
+        )
+        : 0;
 
     const selectFleet = (id) => {
         if (activeRoomId) {
@@ -294,6 +303,7 @@ const BattleTracker = () => {
                         localSide={connectedLocalSide}
                         friendlyName={fleet.name}
                         enemyName={enemyFleet.name}
+                        shipsThatCanFire={shipsThatCanFire}
                     />
                     <MirroredShip
                         ship={friendlyShip}

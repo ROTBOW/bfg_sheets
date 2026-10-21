@@ -8,6 +8,7 @@ import {
     accentCookieName,
     defaultAccent,
     distanceControlCookieName,
+    endTurnWarningCookieName,
     terminalAccents,
     themeCookieName,
 } from "@/app/theme";
@@ -96,6 +97,25 @@ const toggleDistanceControl = () => {
     window.dispatchEvent(new Event("distancecontrolchange"));
 };
 
+const subscribeToEndTurnWarning = (onChange) => {
+    window.addEventListener("endturnwarningchange", onChange);
+
+    return () => window.removeEventListener("endturnwarningchange", onChange);
+};
+
+const getEndTurnWarningSnapshot = () =>
+    document.documentElement.dataset.endTurnWarning !== "disabled";
+const getServerEndTurnWarningSnapshot = () => true;
+
+const toggleEndTurnWarning = () => {
+    const endTurnWarning = getEndTurnWarningSnapshot() ? "disabled" : "enabled";
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+
+    document.documentElement.dataset.endTurnWarning = endTurnWarning;
+    document.cookie = `${endTurnWarningCookieName}=${endTurnWarning}; Path=/; SameSite=Lax${secure}`;
+    window.dispatchEvent(new Event("endturnwarningchange"));
+};
+
 const selectAccent = (accent) => {
     if (!terminalAccents.some((option) => option.id === accent)) {
         return;
@@ -124,6 +144,11 @@ const OptionsDropdown = () => {
         subscribeToDistanceControl,
         getDistanceControlSnapshot,
         getServerDistanceControlSnapshot,
+    );
+    const warnsBeforeEndingTurn = useSyncExternalStore(
+        subscribeToEndTurnWarning,
+        getEndTurnWarningSnapshot,
+        getServerEndTurnWarningSnapshot,
     );
     const dropdownRef = useRef(null);
     const buttonRef = useRef(null);
@@ -237,6 +262,21 @@ const OptionsDropdown = () => {
                         {usesDistanceSlider
                             ? "Snaps to 5 cm intervals"
                             : "Uses a numeric distance input"}
+                    </p>
+                    <button
+                        type="button"
+                        className="theme-toggle"
+                        role="switch"
+                        aria-checked={warnsBeforeEndingTurn}
+                        onClick={toggleEndTurnWarning}
+                    >
+                        <span>Unfired ships warning</span>
+                        <span className="theme-switch" aria-hidden="true">
+                            <span />
+                        </span>
+                    </button>
+                    <p className="theme-description">
+                        Warns before ending a turn with ships able to fire
                     </p>
                     <fieldset className="accent-picker">
                         <legend className="eyebrow">Accent</legend>

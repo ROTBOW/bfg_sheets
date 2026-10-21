@@ -10,6 +10,7 @@ import {
     rollDice,
 } from "@/lib/gunnery.mjs";
 import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
+import { canLockOnReroll, getOrderedWeaponStrength } from "@/lib/special-orders.mjs";
 
 const subscribeToDistanceControl = (onChange) => {
     window.addEventListener("distancecontrolchange", onChange);
@@ -22,7 +23,7 @@ const getDistanceControlSnapshot = () =>
 const getServerDistanceControlSnapshot = () => false;
 
 /** Resolves and records one standard weapon firing at the selected enemy vessel. */
-const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, weaponFire = [], round, turnSide, onRecord, onClose }) => {
+const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, weaponFire = [], order, round, turnSide, onRecord, onClose }) => {
     const [direction, setDirection] = useState("closing");
     const [distance, setDistance] = useState("");
     const isLightningArc = weapon.type === "Lightning arc";
@@ -31,15 +32,21 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
         : null;
     const [fireArc, setFireArc] = useState(lightningAvailability?.availableArcs[0]?.id || "");
     const [allocatedStrength, setAllocatedStrength] = useState(lightningAvailability?.remainingStrength || weapon.strength);
-    const effectiveWeapon = isLightningArc
-        ? { ...weapon, strength: Number(allocatedStrength) }
-        : weapon;
+    const orderedStrength = getOrderedWeaponStrength(weapon, order);
+    const effectiveWeapon = {
+        ...weapon,
+        strength: isLightningArc
+            ? Math.min(Number(allocatedStrength), orderedStrength)
+            : orderedStrength,
+    };
     const initialAttackProfile = getWeaponAttackProfile(effectiveWeapon, targetShip, "closing");
     const [mode, setMode] = useState(initialAttackProfile.supportsDigitalRoll ? "digital" : "manual");
     const [manualRolls, setManualRolls] = useState("");
+    const [manualRerolls, setManualRerolls] = useState("");
     const [manualHits, setManualHits] = useState(0);
     const [damage, setDamage] = useState(0);
     const [result, setResult] = useState(null);
+    const [rerolledMisses, setRerolledMisses] = useState([]);
     const [error, setError] = useState("");
     const [isRecording, setIsRecording] = useState(false);
     const usesDistanceSlider = useSyncExternalStore(
@@ -94,12 +101,42 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
     };
 
     const rollAttack = () => {
-        resolveRolls(rollDice(diceCount));
+        const initialRolls = rollDice(diceCount);
+
+        if (!canLockOnReroll(weapon, order)) {
+            setRerolledMisses([]);
+            resolveRolls(initialRolls);
+            return;
+        }
+
+        const successfulRolls = initialRolls.filter((roll) => roll >= hitThreshold);
+        const failedRolls = initialRolls.filter((roll) => roll < hitThreshold);
+        const replacementRolls = rollDice(failedRolls.length);
+
+        setRerolledMisses(replacementRolls);
+        resolveRolls([...successfulRolls, ...replacementRolls]);
     };
 
     const usePhysicalRoll = () => {
         try {
-            resolveRolls(parseDiceResults(manualRolls));
+            const initialRolls = parseDiceResults(manualRolls);
+
+            if (!canLockOnReroll(weapon, order)) {
+                setRerolledMisses([]);
+                resolveRolls(initialRolls);
+                return;
+            }
+
+            const successfulRolls = initialRolls.filter((roll) => roll >= hitThreshold);
+            const failedRolls = initialRolls.filter((roll) => roll < hitThreshold);
+            const replacementRolls = failedRolls.length ? parseDiceResults(manualRerolls) : [];
+
+            if (replacementRolls.length !== failedRolls.length) {
+                throw new Error(`Enter exactly ${failedRolls.length} Lock On re-roll result${failedRolls.length === 1 ? "" : "s"}.`);
+            }
+
+            setRerolledMisses(replacementRolls);
+            resolveRolls([...successfulRolls, ...replacementRolls]);
         } catch (rollError) {
             setError(rollError instanceof Error ? rollError.message : String(rollError));
         }
@@ -201,6 +238,9 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                 </label>
             </div>
             <p className="weapon-attack-note">{attackProfile.note}</p>
+            {canLockOnReroll(weapon, order) && (
+                <p className="weapon-attack-note">Lock On re-rolls failed hit rolls.</p>
+            )}
             {isLightningArc && (
                 <div className="lightning-allocation">
                     <p>
@@ -238,6 +278,16 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                         D6 results
                         <input value={manualRolls} placeholder="6, 4, 2" onChange={(event) => setManualRolls(event.target.value)} />
                     </label>
+                    {canLockOnReroll(weapon, order) && (
+                        <label>
+                            Failed-die re-rolls
+                            <input
+                                value={manualRerolls}
+                                placeholder="Enter one result per failed die"
+                                onChange={(event) => setManualRerolls(event.target.value)}
+                            />
+                        </label>
+                    )}
                     {!supportsDigitalRoll && (
                         <label>
                             Resolved hits
@@ -257,6 +307,7 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
             {result && (
                 <div className="weapon-result" role="status">
                     <span>Rolls: {result.rolls.join(", ")}</span>
+                    {rerolledMisses.length > 0 && <span>Lock On re-rolls: {rerolledMisses.join(", ")}</span>}
                     <strong>{result.hits} hits</strong>
                     {result.shieldBypassingHits > 0 && (
                         <span>{result.shieldBypassingHits} bypass shields</span>

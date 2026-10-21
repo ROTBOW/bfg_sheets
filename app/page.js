@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import FleetMenu from "@/components/FleetMenu";
 import MirroredShip from "@/components/MirroredShip";
@@ -15,6 +15,7 @@ import {
 } from "@/firebase/active-room";
 import { ensureAnonymousUser } from "@/firebase/auth";
 import {
+    clearStartingSpecialOrders,
     damageEnemyShip,
     subscribeToRoom,
     updateShipBattleState,
@@ -37,6 +38,7 @@ const BattleTracker = () => {
     const [localSide, setLocalSide] = useState("");
     const [loaded, setLoaded] = useState(false);
     const [storageMessage, setStorageMessage] = useState("");
+    const clearedOrdersForTurn = useRef("");
     const activeRoomId = useSyncExternalStore(
         subscribeToActiveRoom,
         getActiveRoomId,
@@ -143,6 +145,29 @@ const BattleTracker = () => {
         };
     }, [activeRoomId]);
 
+    useEffect(() => {
+        const turn = room?.turn;
+
+        if (!activeRoomId || !localSide || turn?.activeSide !== localSide) {
+            return;
+        }
+
+        const turnKey = `${activeRoomId}:${turn.round}:${turn.activeSide}`;
+
+        if (clearedOrdersForTurn.current === turnKey) {
+            return;
+        }
+
+        clearedOrdersForTurn.current = turnKey;
+        clearStartingSpecialOrders({
+            roomId: activeRoomId,
+            side: localSide,
+        }).catch(() => {
+            clearedOrdersForTurn.current = "";
+            setStorageMessage("Expired special orders could not be cleared. Check your connection.");
+        });
+    }, [activeRoomId, localSide, room?.turn]);
+
     const fleet = fleets.find((entry) => entry.id === selectedFleetId);
     const vessels = (fleet?.ships || []).map((vessel, index) => {
         const catalogShip = getShip(vessel.classId);
@@ -202,6 +227,14 @@ const BattleTracker = () => {
             connectedLocalSide,
         )
         : 0;
+    const enemyHasSpecialOrders = Object.values(enemyBattleStates).some((battleState) => (
+        battleState.order && battleState.order !== "No special orders"
+    ));
+    const commandChecksBlocked = Object.values(fleetBattleStates).some((battleState) => (
+        battleState.commandCheckFailed === true
+        && battleState.commandCheckRound === (connectedRoom?.turn?.round || 1)
+        && battleState.commandCheckTurnSide === (connectedRoom?.turn?.activeSide || "")
+    ));
 
     const selectFleet = (id) => {
         if (activeRoomId) {
@@ -319,6 +352,8 @@ const BattleTracker = () => {
                         round={connectedRoom.turn?.round || 1}
                         turnSide={connectedRoom.turn?.activeSide || ""}
                         isActiveTurn={connectedRoom.turn?.activeSide === connectedLocalSide}
+                        hasEnemyOnSpecialOrders={enemyHasSpecialOrders}
+                        commandChecksBlocked={commandChecksBlocked}
                     />
                     <ShipDrawers
                         friendlyShip={{ ship: friendlyShip, vessel, battleState: state, onUpdate: updateSelectedShip }}

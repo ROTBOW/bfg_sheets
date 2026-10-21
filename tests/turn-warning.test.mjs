@@ -48,3 +48,20 @@ test("ignores fire recorded in another round or player turn", () => {
 test("uses profile hull and empty fire history for ships without saved battle state", () => {
     assert.equal(countShipsThatCanFire([vessel("alpha")], {}, 1, "guest"), 1);
 });
+
+test("does not count spent ordnance or a Nova Cannon blocked by orders", () => {
+    const ordnanceVessel = vessel("carrier", 0);
+    ordnanceVessel.profile.weapons = [{ name: "Torpedoes", type: "Torpedo" }];
+    const novaVessel = vessel("nova", 0);
+    novaVessel.profile.weapons = [{ name: "Nova Cannon", type: "Nova Cannon" }];
+
+    assert.equal(countShipsThatCanFire(
+        [ordnanceVessel, novaVessel],
+        {
+            carrier: { spentOrdnance: [0] },
+            nova: { order: "All ahead full" },
+        },
+        1,
+        "host",
+    ), 0);
+});

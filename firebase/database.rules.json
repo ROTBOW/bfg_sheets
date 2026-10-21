@@ -132,6 +132,26 @@
                                 "order": {
                                     ".validate": "newData.isString() && newData.val().length <= 64"
                                 },
+                                "hasBlastMarker": {
+                                    ".validate": "newData.isBoolean()"
+                                },
+                                "commandCheckFailed": {
+                                    ".validate": "newData.isBoolean()"
+                                },
+                                "commandCheckPassed": {
+                                    ".validate": "newData.isBoolean()"
+                                },
+                                "commandCheckRound": {
+                                    ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+                                },
+                                "commandCheckTurnSide": {
+                                    ".validate": "newData.isString() && (newData.val() === '' || newData.val() === 'host' || newData.val() === 'guest')"
+                                },
+                                "spentOrdnance": {
+                                    "$entryIndex": {
+                                        ".validate": "$entryIndex.matches(/^([0-9]|[1-9][0-9])$/) && newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+                                    }
+                                },
                                 "criticalDamage": {
                                     "$entryIndex": {
                                         ".validate": "$entryIndex.matches(/^([0-9]|[1-4][0-9])$/) && newData.hasChildren(['id', 'typeId', 'source', 'status']) && newData.child('id').isString() && newData.child('id').val().length <= 128 && newData.child('typeId').isString() && newData.child('typeId').val().length <= 64 && newData.child('source').val() === 'manual' && (newData.child('status').val() === 'active' || newData.child('status').val() === 'repaired')"

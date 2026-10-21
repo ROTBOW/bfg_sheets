@@ -320,6 +320,76 @@ export const updateShipBattleState = async ({ roomId, side, shipId, shipName, ro
 };
 
 /**
+ * Removes ordinary special orders when the owning fleet begins its next turn.
+ * Brace for Impact remains until that player turn ends.
+ *
+ * @param {object} options Order cleanup options.
+ * @param {string} options.roomId Active room identifier.
+ * @param {"host"|"guest"} options.side Player-owned side beginning its turn.
+ * @returns {Promise<void>} Resolves after stale orders are removed.
+ */
+export const clearStartingSpecialOrders = async ({ roomId, side }) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+    const sideReference = ref(database, `${roomPath(roomId)}/sides/${side}`);
+    const sideSnapshot = await get(sideReference);
+    const sideData = sideSnapshot.val();
+
+    if (sideData?.ownerUid !== user.uid) {
+        throw new Error("Only the fleet owner can clear its expired special orders.");
+    }
+
+    const updates = {};
+
+    for (const [shipId, battleState] of Object.entries(sideData.battle || {})) {
+        if (!battleState.order || battleState.order === "No special orders" || battleState.order === "Brace for impact") {
+            continue;
+        }
+
+        updates[`battle/${shipId}/order`] = "No special orders";
+        updates[`battle/${shipId}/updatedAt`] = serverTimestamp();
+        updates[`battle/${shipId}/updatedBy`] = user.uid;
+    }
+
+    if (Object.keys(updates).length) {
+        await update(sideReference, updates);
+    }
+};
+
+/** Removes Brace for Impact orders after the owning fleet completes its turn. */
+const clearEndingBraceOrders = async ({ roomId, side, turn, user, database }) => {
+    const sideReference = ref(database, `${roomPath(roomId)}/sides/${side}`);
+    const sideData = (await get(sideReference)).val();
+
+    if (sideData?.ownerUid !== user.uid) {
+        throw new Error("Only the active fleet owner can end its turn.");
+    }
+
+    const updates = {};
+
+    for (const [shipId, battleState] of Object.entries(sideData.battle || {})) {
+        if (battleState.order !== "Brace for impact") {
+            continue;
+        }
+
+        if (
+            battleState.commandCheckRound === turn.round
+            && battleState.commandCheckTurnSide === side
+        ) {
+            continue;
+        }
+
+        updates[`battle/${shipId}/order`] = "No special orders";
+        updates[`battle/${shipId}/updatedAt`] = serverTimestamp();
+        updates[`battle/${shipId}/updatedBy`] = user.uid;
+    }
+
+    if (Object.keys(updates).length) {
+        await update(sideReference, updates);
+    }
+};
+
+/**
  * Applies an attack to an opposing ship, consuming shields before hull.
  * Security Rules limit this cross-side write to the player whose turn is active.
  *
@@ -388,9 +458,26 @@ export const damageEnemyShip = async ({
  * @returns {Promise<void>} Resolves after Firebase commits the transition.
  */
 export const updateBattleTurn = async ({ roomId, action, firstSide }) => {
-    await ensureAnonymousUser();
+    const user = await ensureAnonymousUser();
     const { database } = getFirebaseServices();
     const turnReference = ref(database, `${roomPath(roomId)}/turn`);
+
+    if (action === "advance") {
+        const room = (await get(ref(database, roomPath(roomId)))).val();
+        const side = getRoomSideForUser(room, user.uid);
+
+        if (!side || room?.turn?.activeSide !== side) {
+            throw new Error("Only the active player can end this turn.");
+        }
+
+        await clearEndingBraceOrders({
+            roomId,
+            side,
+            turn: room.turn,
+            user,
+            database,
+        });
+    }
 
     const result = await runTransaction(turnReference, (currentTurn) => {
         if (action === "start") {

@@ -8,16 +8,18 @@ import SpecialRules from "@/components/SpecialRules";
 import { getShip } from "@/lib/fleets.mjs";
 import { getUpgradeOptions } from "@/lib/ship-upgrades.mjs";
 import { weaponMarkers } from "@/lib/weapon-markers.mjs";
+import { getOrderedMovement, getOrderedWeaponStrength } from "@/lib/special-orders.mjs";
 
 /** Displays the complete standalone tracker for one selected ship. */
 const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership }) => {
     const shipStats = ship.stats;
     const { hull, criticalDamage } = battleState;
     const isNecron = ship.faction === "Necrons";
+    const movement = getOrderedMovement(shipStats.speedCm, shipStats.turnDegrees, battleState.order);
     const characteristics = [
         ["Type", ship.type],
-        ["Speed", shipStats.speedCm, "cm"],
-        ["Turns", shipStats.turnDegrees, "°"],
+        ["Speed", movement.speed, "cm", movement.speedChanged],
+        ["Turns", movement.turns, "", movement.turnsChanged],
         [isNecron ? "Saves" : "Shields", isNecron ? `${shipStats.reactiveHullSave} save` : shipStats.shields],
         ["Armour", `${shipStats.armour.front} / ${shipStats.armour.other}`],
         ["Turrets", shipStats.turrets],
@@ -55,10 +57,15 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                         </div>
                     </section>
                     <section className="stat-strip" aria-label="Ship characteristics">
-                        {characteristics.map(([label, value, unit]) => (
-                            <div key={label}>
+                        {characteristics.map(([label, value, unit, isChanged]) => (
+                            <div key={label} title={isChanged ? movement.explanation : undefined}>
                                 <span>{label}</span>
-                                <strong>{value}<small>{unit}</small></strong>
+                                <strong className={isChanged ? "order-modified-value" : ""}>
+                                    {isChanged && (
+                                        <del>{label === "Speed" ? shipStats.speedCm : `${shipStats.turnDegrees}°`}</del>
+                                    )}
+                                    {value}<small>{unit}</small>
+                                </strong>
                             </div>
                         ))}
                     </section>
@@ -85,37 +92,37 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {ship.weapons.map(({
-                                        name,
-                                        type,
-                                        rangeCm,
-                                        rangeLabel,
-                                        strength,
-                                        strengthUnit,
-                                        arc,
-                                    }) => (
-                                        <tr key={`${name}-${rangeLabel || rangeCm}`}>
+                                    {ship.weapons.map((weapon) => {
+                                        const orderedStrength = getOrderedWeaponStrength(weapon, battleState.order);
+                                        const isOrderModified = orderedStrength !== weapon.strength;
+
+                                        return (
+                                        <tr key={`${weapon.name}-${weapon.rangeLabel || weapon.rangeCm}`}>
                                             <td>
                                                 <span className="weapon-marker" aria-hidden="true">
-                                                    {weaponMarkers[type]}
+                                                    {weaponMarkers[weapon.type]}
                                                 </span>
-                                                {name}
-                                                <small>{type}</small>
+                                                {weapon.name}
+                                                <small>{weapon.type}</small>
                                             </td>
-                                            <td>{rangeLabel || `${rangeCm} cm`}</td>
+                                            <td>{weapon.rangeLabel || `${weapon.rangeCm} cm`}</td>
                                             <td className="strength">
-                                                {strength}
-                                                {strengthUnit && <small>{strengthUnit}</small>}
+                                                <span title={isOrderModified ? `Strength halved by ${battleState.order}; fractions round up.` : undefined}>
+                                                    {isOrderModified && <del>{weapon.strength}</del>}
+                                                    {orderedStrength}
+                                                </span>
+                                                {weapon.strengthUnit && <small>{weapon.strengthUnit}</small>}
                                             </td>
-                                            <td><span className="arc">{arc}</span></td>
+                                            <td><span className="arc">{weapon.arc}</span></td>
                                         </tr>
-                                    ))}
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
                         <div className="panel-footnote">
                             {ship.isDemo ? "Illustrative" : "Source"} base profile shown. Damage and purchased
-                            upgrades do not modify these weapon values yet.
+                            upgrades do not modify these weapon values yet. Active special orders are reflected above.
                         </div>
                     </section>
                     {vessel.upgrades?.length > 0 && (

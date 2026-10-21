@@ -950,16 +950,6 @@ td small {
     margin-top: 0;
 }
 
-.mirrored-ship:has(.weapon-attack) {
-    position: relative;
-    z-index: 12;
-}
-
-.mirrored-ship:has(.weapon-attack) .armament,
-.mirrored-ship:has(.weapon-attack) .table-scroll {
-    overflow: visible;
-}
-
 .weapon-marker {
     display: inline-block;
     width: 29px;
@@ -993,13 +983,6 @@ td small {
     cursor: not-allowed;
 }
 
-.weapon-attack-standard {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: calc(200% + 106px);
-    min-height: 250px;
-}
-
 .weapon-attack {
     margin-top: 12px;
     border: 1px solid var(--accent);
@@ -1008,37 +991,102 @@ td small {
     box-shadow: 0 14px 38px #0005;
 }
 
-.weapon-attack-controls {
-    min-width: 0;
-    border-right: 1px solid var(--border);
-}
-
-.weapon-roll-stage {
+.dice-drawer {
+    position: fixed;
+    right: calc(var(--enemy-fleet-width) + clamp(14px, 1.5vw, 28px));
+    bottom: 32px;
+    z-index: 28;
     display: grid;
-    min-width: 0;
-    background:
-        linear-gradient(135deg, color-mix(in srgb, var(--accent) 4%, transparent), transparent 55%),
-        light-dark(#eee9dd, #080b09);
+    width: clamp(420px, 31vw, 680px);
+    height: min(560px, calc(100dvh - 64px));
+    max-height: calc(100dvh - 64px);
+    overflow: auto;
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    background: light-dark(#f4f0e6, #080b09);
+    box-shadow: 0 20px 58px #000a;
 }
 
-.weapon-roll-awaiting {
+.dice-drawer-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--border);
+}
+
+.dice-drawer-awaiting {
     display: grid;
     place-content: center;
-    gap: 8px;
-    min-height: 100%;
-    padding: 28px;
+    gap: 9px;
+    min-height: 328px;
+    padding: 42px;
     color: var(--muted);
     text-align: center;
 }
 
-.weapon-roll-awaiting strong {
+.dice-drawer-awaiting strong {
     color: var(--foreground);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
 }
 
-.weapon-roll-awaiting small {
+.dice-drawer-awaiting small {
+    max-width: 330px;
+    line-height: 1.6;
+}
+
+.live-roll-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.live-roll-heading h2 {
+    margin: 3px 0;
+    font-size: 18px;
+}
+
+.live-roll-heading small {
+    color: var(--muted);
+}
+
+.live-roll-heading > strong {
+    color: var(--accent);
     font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.live-roll-content {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+}
+
+.live-roll-summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.live-roll-summary strong {
+    color: var(--accent);
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.live-roll-summary span {
+    color: #d9f5ff;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .weapon-attack-heading {
@@ -1302,14 +1350,11 @@ td small {
 }
 
 @media (max-width: 760px) {
-    .weapon-attack-standard {
-        grid-template-columns: minmax(0, 1fr);
-        width: 100%;
-    }
-
-    .weapon-attack-controls {
-        border-right: 0;
-        border-bottom: 1px solid var(--border);
+    .dice-drawer {
+        right: 12px;
+        bottom: 12px;
+        width: calc(100vw - 24px);
+        height: min(520px, calc(100dvh - 24px));
     }
 
     .physical-roll-fields,
@@ -2888,7 +2933,8 @@ footer {
     background: color-mix(in srgb, var(--accent) 12%, var(--background));
 }
 
-.gunnery-drawer-trigger {
+.gunnery-drawer-trigger,
+.dice-drawer-trigger {
     width: 100%;
     min-height: 28px;
     padding: 4px;
@@ -2899,7 +2945,8 @@ footer {
     letter-spacing: 0.5px;
 }
 
-.gunnery-drawer-trigger[aria-expanded="true"] {
+.gunnery-drawer-trigger[aria-expanded="true"],
+.dice-drawer-trigger[aria-expanded="true"] {
     border-color: var(--accent);
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 12%, var(--background));

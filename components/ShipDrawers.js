@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import CriticalDamage from "@/components/CriticalDamage";
+import LiveRollViewer from "@/components/LiveRollViewer";
 import SpecialRules from "@/components/SpecialRules";
 import { gunneryTable } from "@/lib/gunnery.mjs";
+import { getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 
 /** Rules reference for resolving weapon-battery fire. */
 const GunneryReference = () => (
@@ -41,8 +43,9 @@ const GunneryReference = () => (
 );
 
 /** Center controls that reveal ship references and the shared Gunnery table. */
-const ShipDrawers = ({ friendlyShip, enemyShip }) => {
+const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide }) => {
     const [openDrawer, setOpenDrawer] = useState("");
+    const [diceTrayOpenedAt, setDiceTrayOpenedAt] = useState(0);
     const [drawerType, drawerSide] = openDrawer.split("-");
     const activeShip = drawerSide === "friendly"
         ? friendlyShip
@@ -55,6 +58,21 @@ const ShipDrawers = ({ friendlyShip, enemyShip }) => {
 
         setOpenDrawer((current) => current === drawerId ? "" : drawerId);
     };
+
+    /** Opens a fresh tray session so rolls made while it was closed are not replayed. */
+    const toggleDiceTray = () => {
+        if (openDrawer === "dice") {
+            setOpenDrawer("");
+            return;
+        }
+
+        setDiceTrayOpenedAt(getLiveRollTimestamp());
+        setOpenDrawer("dice");
+    };
+
+    const visibleRoll = liveRoll?.startedAt >= diceTrayOpenedAt
+        ? liveRoll
+        : null;
 
     return (
         <div className="rules-drawers">
@@ -76,6 +94,39 @@ const ShipDrawers = ({ friendlyShip, enemyShip }) => {
             >
                 GUNNERY TABLE
             </button>
+            <button
+                type="button"
+                className="dice-drawer-trigger"
+                aria-expanded={openDrawer === "dice"}
+                onClick={toggleDiceTray}
+            >
+                DICE TRAY
+            </button>
+            {openDrawer === "dice" && (
+                <aside className="dice-drawer" aria-label="Shared dice tray">
+                    <button
+                        type="button"
+                        className="dice-drawer-close"
+                        onClick={() => setOpenDrawer("")}
+                        aria-label="Close dice tray"
+                    >
+                        ×
+                    </button>
+                    {visibleRoll ? (
+                        <LiveRollViewer
+                            key={visibleRoll.id}
+                            liveRoll={visibleRoll}
+                            localSide={localSide}
+                        />
+                    ) : (
+                        <div className="dice-drawer-awaiting" role="status">
+                            <span className="eyebrow">DICE TRAY</span>
+                            <strong>Awaiting a roll</strong>
+                            <small>Your rolls and incoming fire will appear here while the tray is open.</small>
+                        </div>
+                    )}
+                </aside>
+            )}
             {openDrawer === "gunnery" && (
                 <div
                     className="rules-drawer rules-drawer-gunnery"
@@ -86,7 +137,7 @@ const ShipDrawers = ({ friendlyShip, enemyShip }) => {
                     <GunneryReference />
                 </div>
             )}
-            {openDrawer && openDrawer !== "gunnery" && activeShip && (
+            {openDrawer && openDrawer !== "gunnery" && openDrawer !== "dice" && activeShip && (
                 <div
                     className={`rules-drawer rules-drawer-${drawerSide}`}
                     role="dialog"

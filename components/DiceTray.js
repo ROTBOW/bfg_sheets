@@ -5,23 +5,26 @@ import { useEffect, useState } from "react";
 const dieFaces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
 /** Displays one die cycling through faces before revealing its resolved result. */
-const AnimatedDie = ({ roll, index, hitThreshold, shieldBypassRoll, startDelay }) => {
+const AnimatedDie = ({ roll, index, hitThreshold, shieldBypassRoll, startDelay, duration, elapsedMs }) => {
+    const landingDelay = Math.max(0, startDelay + duration - elapsedMs);
+    const hasAlreadyLanded = landingDelay === 0;
     const [prefersReducedMotion] = useState(() => (
         typeof window !== "undefined"
         && window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ));
     const [displayedRoll, setDisplayedRoll] = useState(
-        prefersReducedMotion ? roll : ((roll + index + 1) % 6) + 1,
+        prefersReducedMotion || hasAlreadyLanded ? roll : ((roll + index + 1) % 6) + 1,
     );
-    const [hasLanded, setHasLanded] = useState(prefersReducedMotion);
-    const [rollDuration] = useState(() => 1000 + Math.floor(Math.random() * 4001));
+    const [hasLanded, setHasLanded] = useState(prefersReducedMotion || hasAlreadyLanded);
 
     useEffect(() => {
-        if (prefersReducedMotion) return undefined;
+        if (prefersReducedMotion || hasAlreadyLanded) return undefined;
 
         let faceInterval;
         let landingTimer;
 
+        const remainingStartDelay = Math.max(0, startDelay - elapsedMs);
+        const remainingRollDuration = Math.max(0, landingDelay - remainingStartDelay);
         const startTimer = window.setTimeout(() => {
             faceInterval = window.setInterval(() => {
                 setDisplayedRoll((currentRoll) => (currentRoll % 6) + 1);
@@ -31,15 +34,15 @@ const AnimatedDie = ({ roll, index, hitThreshold, shieldBypassRoll, startDelay }
                 window.clearInterval(faceInterval);
                 setDisplayedRoll(roll);
                 setHasLanded(true);
-            }, rollDuration);
-        }, startDelay);
+            }, remainingRollDuration);
+        }, remainingStartDelay);
 
         return () => {
             window.clearTimeout(startTimer);
             window.clearTimeout(landingTimer);
             window.clearInterval(faceInterval);
         };
-    }, [prefersReducedMotion, roll, rollDuration, startDelay]);
+    }, [elapsedMs, hasAlreadyLanded, landingDelay, prefersReducedMotion, roll, startDelay]);
 
     const isHit = hasLanded && Number.isInteger(hitThreshold) && roll >= hitThreshold;
     const bypassesShields = hasLanded
@@ -71,6 +74,8 @@ const DiceTray = ({
     label = "Attack roll",
     isReroll = false,
     startDelay = 0,
+    durations = [],
+    elapsedMs = 0,
 }) => {
     if (!rolls.length) return null;
 
@@ -89,6 +94,8 @@ const DiceTray = ({
                         hitThreshold={hitThreshold}
                         shieldBypassRoll={shieldBypassRoll}
                         startDelay={startDelay}
+                        duration={durations[index] || 1000}
+                        elapsedMs={elapsedMs}
                     />
                 ))}
             </div>

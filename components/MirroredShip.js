@@ -22,6 +22,8 @@ const MirroredShip = ({
     leadership,
     onUpdate,
     onDamageTarget,
+    onRoll,
+    onClearRoll,
     isEnemy = false,
     target,
     targetShip,
@@ -201,6 +203,8 @@ const MirroredShip = ({
                                                         round={round}
                                                         turnSide={turnSide}
                                                         onClose={() => setSelectedWeaponIndex(null)}
+                                                        onRoll={onRoll}
+                                                        onClearRoll={onClearRoll}
                                                         onRecord={recordAttack}
                                                     />
                                                 </td>

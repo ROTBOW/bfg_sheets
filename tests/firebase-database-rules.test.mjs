@@ -42,6 +42,18 @@ test("weapon-fire records bound shield-bypassing damage to total damage", async 
     );
 });
 
+test("live rolls are bounded and writable only by the active player", async () => {
+    const rules = await loadRules();
+    const liveRollRules = rules.rules.rooms.$roomId.liveRoll;
+
+    assert.match(liveRollRules[".write"], /turn\/activeSide/);
+    assert.match(liveRollRules[".write"], /ownerUid/);
+    assert.match(liveRollRules[".validate"], /expiresAt/);
+    assert.match(liveRollRules.initialDurations.$rollIndex[".validate"], />= 1000/);
+    assert.match(liveRollRules.initialDurations.$rollIndex[".validate"], /<= 5000/);
+    assert.match(liveRollRules.shieldBypassingHits[".validate"], /child\('hits'\)/);
+});
+
 test("Nova Cannon records allow D6 hits and template resolution details", async () => {
     const rules = await loadRules();
     const entryRules = rules.rules.rooms.$roomId.sides.$sideId.battle.$shipId.weaponFire.$entryIndex;

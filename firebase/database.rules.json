@@ -53,6 +53,75 @@
                         }
                     }
                 },
+                "liveRoll": {
+                    ".write": "auth != null && ((!newData.exists() && data.child('createdBy').val() === auth.uid) || (data.parent().child('turn/activeSide').val() === 'host' && data.parent().child('sides/host/ownerUid').val() === auth.uid) || (data.parent().child('turn/activeSide').val() === 'guest' && data.parent().child('sides/guest/ownerUid').val() === auth.uid))",
+                    ".validate": "!newData.exists() || (newData.hasChildren(['id', 'sourceSide', 'attackerId', 'attackerName', 'targetId', 'targetName', 'weaponName', 'initialRolls', 'initialDurations', 'hitThreshold', 'shieldBypassRoll', 'hits', 'shieldBypassingHits', 'startedAt', 'expiresAt', 'createdBy']) && newData.child('sourceSide').val() === newData.parent().child('turn/activeSide').val() && newData.child('expiresAt').val() > newData.child('startedAt').val() && newData.child('expiresAt').val() <= newData.child('startedAt').val() + 30000)",
+                    "id": {
+                        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+                    },
+                    "sourceSide": {
+                        ".validate": "newData.isString() && (newData.val() === 'host' || newData.val() === 'guest')"
+                    },
+                    "attackerId": {
+                        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+                    },
+                    "attackerName": {
+                        ".validate": "newData.isString() && newData.val().length <= 100"
+                    },
+                    "targetId": {
+                        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+                    },
+                    "targetName": {
+                        ".validate": "newData.isString() && newData.val().length <= 100"
+                    },
+                    "weaponName": {
+                        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+                    },
+                    "initialRolls": {
+                        "$rollIndex": {
+                            ".validate": "$rollIndex.matches(/^([0-9]|[1-9][0-9])$/) && newData.isNumber() && newData.val() >= 1 && newData.val() <= 6"
+                        }
+                    },
+                    "rerolls": {
+                        "$rollIndex": {
+                            ".validate": "$rollIndex.matches(/^([0-9]|[1-9][0-9])$/) && newData.isNumber() && newData.val() >= 1 && newData.val() <= 6"
+                        }
+                    },
+                    "initialDurations": {
+                        "$rollIndex": {
+                            ".validate": "$rollIndex.matches(/^([0-9]|[1-9][0-9])$/) && newData.isNumber() && newData.val() >= 1000 && newData.val() <= 5000"
+                        }
+                    },
+                    "rerollDurations": {
+                        "$rollIndex": {
+                            ".validate": "$rollIndex.matches(/^([0-9]|[1-9][0-9])$/) && newData.isNumber() && newData.val() >= 1000 && newData.val() <= 5000"
+                        }
+                    },
+                    "hitThreshold": {
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 6"
+                    },
+                    "shieldBypassRoll": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6"
+                    },
+                    "hits": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+                    },
+                    "shieldBypassingHits": {
+                        ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('hits').val()"
+                    },
+                    "startedAt": {
+                        ".validate": "newData.isNumber() && newData.val() > now - 60000 && newData.val() <= now + 60000"
+                    },
+                    "expiresAt": {
+                        ".validate": "newData.isNumber()"
+                    },
+                    "createdBy": {
+                        ".validate": "newData.isString() && newData.val() === auth.uid"
+                    },
+                    "$other": {
+                        ".validate": false
+                    }
+                },
                 "sides": {
                     "$sideId": {
                         ".write": "auth != null && newData.exists() && ($sideId === 'host' || $sideId === 'guest') && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || data.child('ownerUid').val() === auth.uid)",

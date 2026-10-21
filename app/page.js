@@ -16,7 +16,9 @@ import {
 import { ensureAnonymousUser } from "@/firebase/auth";
 import {
     clearStartingSpecialOrders,
+    clearLiveRoll,
     damageEnemyShip,
+    publishLiveRoll,
     subscribeToRoom,
     updateShipBattleState,
 } from "@/firebase/room-service";
@@ -36,6 +38,7 @@ const BattleTracker = () => {
     const [battleStates, setBattleStates] = useState({});
     const [room, setRoom] = useState(null);
     const [localSide, setLocalSide] = useState("");
+    const [localLiveRoll, setLocalLiveRoll] = useState(null);
     const [loaded, setLoaded] = useState(false);
     const [storageMessage, setStorageMessage] = useState("");
     const clearedOrdersForTurn = useRef("");
@@ -302,6 +305,18 @@ const BattleTracker = () => {
         });
     };
 
+    /** Shares a resolved roll so the opposing browser can replay its presentation. */
+    const shareLiveRoll = async (liveRoll) => {
+        setLocalLiveRoll(liveRoll);
+        await publishLiveRoll({ roomId: activeRoomId, liveRoll });
+    };
+
+    /** Clears the transient roll without changing the recorded attack history. */
+    const dismissLiveRoll = async () => {
+        setLocalLiveRoll(null);
+        await clearLiveRoll(activeRoomId);
+    };
+
     if (!loaded) {
         return <main role="status">Loading saved fleets…</main>;
     }
@@ -347,6 +362,8 @@ const BattleTracker = () => {
                         leadership={fleet.flagshipId === vessel.id ? commanderLeadership[fleet.commander] : undefined}
                         onUpdate={updateSelectedShip}
                         onDamageTarget={damageSelectedEnemyShip}
+                        onRoll={shareLiveRoll}
+                        onClearRoll={dismissLiveRoll}
                         target={enemyVessel}
                         targetShip={enemyShip}
                         round={connectedRoom.turn?.round || 1}
@@ -358,6 +375,8 @@ const BattleTracker = () => {
                     <ShipDrawers
                         friendlyShip={{ ship: friendlyShip, vessel, battleState: state, onUpdate: updateSelectedShip }}
                         enemyShip={{ ship: enemyShip, vessel: enemyVessel, battleState: enemyState }}
+                        liveRoll={localLiveRoll || connectedRoom.liveRoll}
+                        localSide={connectedLocalSide}
                     />
                     <MirroredShip
                         ship={enemyShip}

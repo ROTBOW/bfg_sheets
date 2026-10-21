@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import DiceTray from "@/components/DiceTray";
 import NovaCannonAttack from "@/components/NovaCannonAttack";
 import {
     getWeaponAttackProfile,
@@ -11,6 +10,7 @@ import {
     rollDice,
 } from "@/lib/gunnery.mjs";
 import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
+import { getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 import { canLockOnReroll, getOrderedWeaponStrength } from "@/lib/special-orders.mjs";
 
 const subscribeToDistanceControl = (onChange) => {
@@ -24,7 +24,7 @@ const getDistanceControlSnapshot = () =>
 const getServerDistanceControlSnapshot = () => false;
 
 /** Resolves and records one standard weapon firing at the selected enemy vessel. */
-const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, weaponFire = [], order, round, turnSide, onRecord, onClose }) => {
+const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, weaponFire = [], order, round, turnSide, onRoll, onClearRoll, onRecord, onClose }) => {
     const [direction, setDirection] = useState("closing");
     const [distance, setDistance] = useState("");
     const isLightningArc = weapon.type === "Lightning arc";
@@ -49,8 +49,7 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
     const [result, setResult] = useState(null);
     const [rollSequence, setRollSequence] = useState(0);
     const [isRolling, setIsRolling] = useState(false);
-    const [initialRolls, setInitialRolls] = useState([]);
-    const [rerolledMisses, setRerolledMisses] = useState([]);
+    const [rollRevealDelay, setRollRevealDelay] = useState(0);
     const [error, setError] = useState("");
     const [isRecording, setIsRecording] = useState(false);
     const usesDistanceSlider = useSyncExternalStore(
@@ -66,12 +65,17 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
     useEffect(() => {
         if (!isRolling) return undefined;
 
-        const revealTimer = window.setTimeout(() => setIsRolling(false), 5500);
+        const revealTimer = window.setTimeout(() => setIsRolling(false), rollRevealDelay);
 
         return () => window.clearTimeout(revealTimer);
-    }, [isRolling, rollSequence]);
+    }, [isRolling, rollRevealDelay, rollSequence]);
 
-    const resolveRolls = (rolls) => {
+    /** Creates stable per-die animation timings that can be shared with the opponent. */
+    const createRollDurations = (count) => (
+        Array.from({ length: count }, () => 1000 + Math.floor(Math.random() * 4001))
+    );
+
+    const resolveRolls = (rolls, presentationRolls = rolls, presentationRerolls = [], startedAt) => {
         if (
             isLightningArc
             && (!Number.isInteger(Number(allocatedStrength))
@@ -107,21 +111,50 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
             return;
         }
 
+        const nextRollSequence = rollSequence + 1;
+        const nextInitialDurations = createRollDurations(presentationRolls.length);
+        const nextRerollDurations = createRollDurations(presentationRerolls.length);
+        const longestInitialRoll = Math.max(0, ...nextInitialDurations);
+        const longestReroll = nextRerollDurations.length
+            ? 300 + Math.max(...nextRerollDurations)
+            : 0;
+        const liveRoll = {
+            id: crypto.randomUUID(),
+            sourceSide: turnSide,
+            attackerId: attacker.id,
+            attackerName: attacker.name,
+            targetId: target.id,
+            targetName: target.name,
+            weaponName: weapon.name,
+            initialRolls: presentationRolls,
+            rerolls: presentationRerolls,
+            initialDurations: nextInitialDurations,
+            rerollDurations: nextRerollDurations,
+            hitThreshold,
+            shieldBypassRoll: attackProfile.shieldBypassRoll || 0,
+            hits: resolvedAttack.hits,
+            shieldBypassingHits: resolvedAttack.shieldBypassingHits,
+            startedAt,
+            expiresAt: startedAt + 15000,
+        };
+
         setResult({ rolls, ...resolvedAttack });
-        setRollSequence((sequence) => sequence + 1);
+        setRollSequence(nextRollSequence);
         setIsRolling(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+        setRollRevealDelay(Math.max(longestInitialRoll, longestReroll));
         setDamage(hits);
         setError("");
+        Promise.resolve(onRoll?.(liveRoll)).catch(() => {
+            setError("The roll was resolved locally but could not be shown to your opponent.");
+        });
     };
 
     const rollAttack = () => {
         const rolledDice = rollDice(diceCount);
-
-        setInitialRolls(rolledDice);
+        const startedAt = getLiveRollTimestamp();
 
         if (!canLockOnReroll(weapon, order)) {
-            setRerolledMisses([]);
-            resolveRolls(rolledDice);
+            resolveRolls(rolledDice, rolledDice, [], startedAt);
             return;
         }
 
@@ -129,19 +162,16 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
         const failedRolls = rolledDice.filter((roll) => roll < hitThreshold);
         const replacementRolls = rollDice(failedRolls.length);
 
-        setRerolledMisses(replacementRolls);
-        resolveRolls([...successfulRolls, ...replacementRolls]);
+        resolveRolls([...successfulRolls, ...replacementRolls], rolledDice, replacementRolls, startedAt);
     };
 
     const usePhysicalRoll = () => {
         try {
             const enteredRolls = parseDiceResults(manualRolls);
-
-            setInitialRolls(enteredRolls);
+            const startedAt = getLiveRollTimestamp();
 
             if (!canLockOnReroll(weapon, order)) {
-                setRerolledMisses([]);
-                resolveRolls(enteredRolls);
+                resolveRolls(enteredRolls, enteredRolls, [], startedAt);
                 return;
             }
 
@@ -153,8 +183,7 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                 throw new Error(`Enter exactly ${failedRolls.length} Lock On re-roll result${failedRolls.length === 1 ? "" : "s"}.`);
             }
 
-            setRerolledMisses(replacementRolls);
-            resolveRolls([...successfulRolls, ...replacementRolls]);
+            resolveRolls([...successfulRolls, ...replacementRolls], enteredRolls, replacementRolls, startedAt);
         } catch (rollError) {
             setError(rollError instanceof Error ? rollError.message : String(rollError));
         }
@@ -178,6 +207,7 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
         setError("");
 
         try {
+            await Promise.resolve(onClearRoll?.()).catch(() => {});
             await onRecord({
                 id: crypto.randomUUID(),
                 weaponIndex,
@@ -207,16 +237,21 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
         }
     };
 
+    /** Closes the firing workspace and removes any uncommitted shared roll. */
+    const closeAttack = () => {
+        Promise.resolve(onClearRoll?.()).catch(() => {});
+        onClose();
+    };
+
     return (
-        <section className="weapon-attack weapon-attack-standard" aria-label={`Fire ${weapon.name}`}>
-            <div className="weapon-attack-controls">
+        <section className="weapon-attack" aria-label={`Fire ${weapon.name}`}>
                 <div className="weapon-attack-heading">
                     <div>
                         <span className="eyebrow">FIRE WEAPON</span>
                         <h3>{weapon.name}</h3>
                         <small>{attacker.name} → {target.name}</small>
                     </div>
-                    <button type="button" onClick={onClose} aria-label="Close weapon attack">×</button>
+                    <button type="button" onClick={closeAttack} aria-label="Close weapon attack">×</button>
                 </div>
                 <div className="weapon-attack-fields">
                     <label>
@@ -288,8 +323,13 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                     </div>
                 )}
                 {mode === "digital" && supportsDigitalRoll ? (
-                    <button type="button" className="weapon-roll-button" onClick={rollAttack}>
-                        Roll {diceCount}D6 · hits on {hitThreshold}+
+                    <button
+                        type="button"
+                        className="weapon-roll-button"
+                        disabled={isRolling}
+                        onClick={rollAttack}
+                    >
+                        {isRolling ? "Resolving salvo…" : `Roll ${diceCount}D6 · hits on ${hitThreshold}+`}
                     </button>
                 ) : (
                     <div className="physical-roll-fields">
@@ -320,30 +360,12 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                             />
                         </label>
                     )}
-                    <button type="button" onClick={usePhysicalRoll}>Use entered roll</button>
+                    <button type="button" disabled={isRolling} onClick={usePhysicalRoll}>Use entered roll</button>
                     </div>
                 )}
                 {error && <p className="weapon-attack-error" role="alert">{error}</p>}
-            </div>
-            <div className="weapon-roll-stage">
-                {result ? (
-                    <div className="weapon-result" role="status">
-                    <div key={rollSequence} className="weapon-dice-display">
-                        <DiceTray
-                            rolls={initialRolls}
-                            hitThreshold={hitThreshold}
-                            shieldBypassRoll={attackProfile.shieldBypassRoll}
-                            label="Initial roll"
-                        />
-                        <DiceTray
-                            rolls={rerolledMisses}
-                            hitThreshold={hitThreshold}
-                            shieldBypassRoll={attackProfile.shieldBypassRoll}
-                            label="Lock On re-rolls"
-                            isReroll
-                            startDelay={300}
-                        />
-                    </div>
+            {result && (
+                <div className="weapon-result" role="status">
                     {isRolling ? (
                         <p className="weapon-result-resolving">Resolving salvo…</p>
                     ) : (
@@ -370,15 +392,8 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                             </button>
                         </>
                     )}
-                    </div>
-                ) : (
-                    <div className="weapon-roll-awaiting" aria-hidden="true">
-                        <span className="eyebrow">DICE TRAY</span>
-                        <strong>Awaiting firing solution</strong>
-                        <small>Resolved dice will appear here.</small>
-                    </div>
-                )}
-            </div>
+                </div>
+            )}
         </section>
     );
 };

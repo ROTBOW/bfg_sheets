@@ -156,6 +156,25 @@ export const subscribeToRoom = (roomId, onRoom, onError) => {
     );
 };
 
+/** Publishes a short-lived dice presentation for both room participants. */
+export const publishLiveRoll = async ({ roomId, liveRoll }) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+
+    await set(ref(database, `${roomPath(roomId)}/liveRoll`), {
+        ...liveRoll,
+        createdBy: user.uid,
+    });
+};
+
+/** Removes the active dice presentation after it is closed or committed. */
+export const clearLiveRoll = async (roomId) => {
+    await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+
+    await remove(ref(database, `${roomPath(roomId)}/liveRoll`));
+};
+
 /**
  * Restores presence for a participant who already owns a side in a room.
  *

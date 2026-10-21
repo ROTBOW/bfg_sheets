@@ -19,6 +19,7 @@ import {
     createRoomId,
     createRoomRecord,
     getRoomSideForUser,
+    resolveReactiveHullDamage,
     normalizeDisplayName,
     advanceBattleTurn,
     startBattleTurn,
@@ -264,6 +265,7 @@ export const updateShipBattleState = async ({ roomId, side, shipId, changes }) =
  * @param {number} options.maximumHull Target profile's starting hull.
  * @param {number} options.maximumShields Target profile's starting shields.
  * @param {number} options.shieldBypassingDamage Damage applied directly to hull.
+ * @param {string|null} options.reactiveHullSave Target's normal reactive-hull save.
  * @param {string} options.message Short attack summary for the target's tracker.
  * @returns {Promise<void>} Resolves after Firebase commits the damage.
  */
@@ -275,24 +277,39 @@ export const damageEnemyShip = async ({
     maximumHull,
     maximumShields,
     shieldBypassingDamage,
+    reactiveHullSave = null,
     message,
 }) => {
     const user = await ensureAnonymousUser();
     const { database } = getFirebaseServices();
     const battleReference = ref(database, `${roomPath(roomId)}/sides/${targetSide}/battle/${shipId}`);
     const snapshot = await get(battleReference);
-    const defenses = applyWeaponDamage(snapshot.val(), damage, {
+    const currentBattleState = snapshot.val();
+    const activeSave = currentBattleState?.order === "Brace for impact"
+        ? "2+"
+        : reactiveHullSave;
+    const reactiveHullResult = resolveReactiveHullDamage(
+        damage,
+        activeSave,
+        shieldBypassingDamage,
+    );
+    const defenses = applyWeaponDamage(currentBattleState, reactiveHullResult.damage, {
         hull: maximumHull,
         shields: maximumShields,
-        shieldBypassingDamage,
+        shieldBypassingDamage: Math.min(shieldBypassingDamage, reactiveHullResult.damage),
     });
+    const saveMessage = reactiveHullResult.rolls.length
+        ? ` Reactive hull saved ${reactiveHullResult.savedDamage} damage (${reactiveHullResult.rolls.join(", ")}).`
+        : "";
 
     await update(battleReference, {
         ...defenses,
-        message,
+        message: `${message}${saveMessage}`,
         updatedAt: serverTimestamp(),
         updatedBy: user.uid,
     });
+
+    return reactiveHullResult;
 };
 
 /**

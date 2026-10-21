@@ -34,6 +34,37 @@ export const applyWeaponDamage = (battleState, damage, maximums) => {
     };
 };
 
+/** Rolls a Necron reactive-hull save against each non-bypassing point of damage. */
+export const resolveReactiveHullDamage = (
+    damage,
+    save,
+    shieldBypassingDamage = 0,
+    random = Math.random,
+) => {
+    const incomingDamage = Number.isInteger(damage) && damage > 0 ? damage : 0;
+    const bypassingDamage = Math.min(
+        incomingDamage,
+        Math.max(0, Number(shieldBypassingDamage) || 0),
+    );
+    const saveThreshold = Number.parseInt(save, 10);
+
+    if (!Number.isInteger(saveThreshold) || saveThreshold < 2 || saveThreshold > 6) {
+        return { damage: incomingDamage, savedDamage: 0, rolls: [] };
+    }
+
+    const rolls = Array.from(
+        { length: incomingDamage - bypassingDamage },
+        () => Math.floor(random() * 6) + 1,
+    );
+    const savedDamage = rolls.filter((roll) => roll >= saveThreshold).length;
+
+    return {
+        damage: incomingDamage - savedDamage,
+        savedDamage,
+        rolls,
+    };
+};
+
 /**
  * Creates an unguessable 128-bit room identifier encoded as lowercase hex.
  *

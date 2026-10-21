@@ -5,6 +5,7 @@ import {
     createFleetSnapshot,
     createRoomId,
     createRoomRecord,
+    resolveReactiveHullDamage,
     advanceBattleTurn,
     getRoomSideForUser,
     maximumShipsPerFleet,
@@ -123,4 +124,23 @@ test("shield-bypassing weapon damage strikes hull before normal damage reaches s
         ),
         { hull: 6, shields: 2 },
     );
+});
+
+test("Necron reactive hulls save normal damage but not bypassing damage", () => {
+    const rolls = [0.5, 0.9, 0.1];
+    const result = resolveReactiveHullDamage(4, "4+", 1, () => rolls.shift());
+
+    assert.deepEqual(result, {
+        damage: 2,
+        savedDamage: 2,
+        rolls: [4, 6, 1],
+    });
+});
+
+test("invalid reactive saves leave incoming damage unchanged", () => {
+    assert.deepEqual(resolveReactiveHullDamage(3, null), {
+        damage: 3,
+        savedDamage: 0,
+        rolls: [],
+    });
 });

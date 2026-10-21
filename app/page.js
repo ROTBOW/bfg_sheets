@@ -253,6 +253,7 @@ const BattleTracker = () => {
             maximumHull: enemyVessel.profile.stats.hull,
             maximumShields: enemyVessel.profile.stats.shields,
             shieldBypassingDamage: entry.shieldBypassingDamage,
+            reactiveHullSave: enemyVessel.profile.stats.reactiveHullSave ?? null,
             message: `${vessel.name}'s ${entry.weaponName} inflicted ${entry.damage} damage.${bypassMessage}`,
         });
     };

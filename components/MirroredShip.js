@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import BattleStatus from "@/components/BattleStatus";
 import ShipDiagram from "@/components/ShipDiagram";
 import ShipName from "@/components/ShipName";
@@ -38,6 +38,16 @@ const MirroredShip = ({
         ["Armour", `${ship.stats.armour.front} / ${ship.stats.armour.other}`],
         ["Turrets", ship.stats.turrets],
     ];
+
+    /** Records the firing result and closes the inline attack controls. */
+    const recordAttack = async (entry) => {
+        await onDamageTarget(entry);
+        onUpdate((current) => ({
+            weaponFire: [...current.weaponFire, entry],
+            message: `${entry.weaponName} recorded: ${entry.hits} hits, ${entry.damage} damage.`,
+        }));
+        setSelectedWeaponIndex(null);
+    };
 
     return (
         <article className={`mirrored-ship ${isEnemy ? "is-enemy" : ""}`}>
@@ -94,60 +104,56 @@ const MirroredShip = ({
                                 ].filter(Boolean).join(" ");
 
                                 return (
-                                    <tr
-                                        key={`${weapon.name}-${weapon.rangeLabel || weapon.rangeCm}`}
-                                        className={weaponRowClass}
-                                    >
-                                        <td>
-                                            <span className="weapon-marker" aria-hidden="true">{weaponMarkers[weapon.type]}</span>
-                                            {!isEnemy ? (
-                                                <button
-                                                    type="button"
-                                                    className="weapon-select-button"
-                                                    disabled={!canSelect}
-                                                    aria-pressed={isSelected}
-                                                    onClick={() => setSelectedWeaponIndex(weaponIndex)}
-                                                >
-                                                    {weapon.name}
-                                                    {hasFired && <span> · Fired</span>}
-                                                </button>
-                                            ) : weapon.name}
-                                            <small>{weapon.type}</small>
-                                        </td>
-                                        <td>{weapon.rangeLabel || `${weapon.rangeCm} cm`}</td>
-                                        <td className="strength">
-                                            {weapon.strength}
-                                            {weapon.strengthUnit && <small>{weapon.strengthUnit}</small>}
-                                        </td>
-                                        <td><span className="arc">{weapon.arc}</span></td>
-                                    </tr>
+                                    <Fragment key={`${weapon.name}-${weapon.rangeLabel || weapon.rangeCm}`}>
+                                        <tr className={weaponRowClass}>
+                                            <td>
+                                                <span className="weapon-marker" aria-hidden="true">{weaponMarkers[weapon.type]}</span>
+                                                {!isEnemy ? (
+                                                    <button
+                                                        type="button"
+                                                        className="weapon-select-button"
+                                                        disabled={!canSelect}
+                                                        aria-pressed={isSelected}
+                                                        onClick={() => setSelectedWeaponIndex(weaponIndex)}
+                                                    >
+                                                        {weapon.name}
+                                                        {hasFired && <span> · Fired</span>}
+                                                    </button>
+                                                ) : weapon.name}
+                                                <small>{weapon.type}</small>
+                                            </td>
+                                            <td>{weapon.rangeLabel || `${weapon.rangeCm} cm`}</td>
+                                            <td className="strength">
+                                                {weapon.strength}
+                                                {weapon.strengthUnit && <small>{weapon.strengthUnit}</small>}
+                                            </td>
+                                            <td><span className="arc">{weapon.arc}</span></td>
+                                        </tr>
+                                        {!isEnemy && isSelected && target && (
+                                            <tr className="weapon-attack-row">
+                                                <td colSpan="4">
+                                                    <WeaponAttack
+                                                        key={`${vessel.id}-${weaponIndex}-${target.id}`}
+                                                        weapon={weapon}
+                                                        weaponIndex={weaponIndex}
+                                                        attacker={vessel}
+                                                        target={target}
+                                                        targetShip={targetShip}
+                                                        round={round}
+                                                        turnSide={turnSide}
+                                                        onClose={() => setSelectedWeaponIndex(null)}
+                                                        onRecord={recordAttack}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </Fragment>
                                 );
                             })}
                         </tbody>
                     </table>
                 </div>
             </section>
-            {!isEnemy && selectedWeaponIndex != null && target && (
-                <WeaponAttack
-                    key={`${vessel.id}-${selectedWeaponIndex}-${target.id}`}
-                    weapon={ship.weapons[selectedWeaponIndex]}
-                    weaponIndex={selectedWeaponIndex}
-                    attacker={vessel}
-                    target={target}
-                    targetShip={targetShip}
-                    round={round}
-                    turnSide={turnSide}
-                    onClose={() => setSelectedWeaponIndex(null)}
-                    onRecord={async (entry) => {
-                        await onDamageTarget(entry);
-                        onUpdate((current) => ({
-                            weaponFire: [...current.weaponFire, entry],
-                            message: `${entry.weaponName} recorded: ${entry.hits} hits, ${entry.damage} damage.`,
-                        }));
-                        setSelectedWeaponIndex(null);
-                    }}
-                />
-            )}
         </article>
     );
 };

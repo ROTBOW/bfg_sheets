@@ -680,6 +680,16 @@ td small {
     box-shadow: inset 3px 0 0 var(--accent);
 }
 
+.weapon-attack-row > td {
+    padding: 0 12px 12px;
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+    white-space: normal;
+}
+
+.weapon-attack-row .weapon-attack {
+    margin-top: 0;
+}
+
 .weapon-marker {
     display: inline-block;
     width: 29px;

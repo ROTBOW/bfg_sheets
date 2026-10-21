@@ -44,7 +44,7 @@ const GunneryReference = () => (
 );
 
 /** Center controls that reveal ship references and the shared Gunnery table. */
-const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide, activeOrdnance = [], ordnanceTargets = [], turnSide, onResolveOrdnance, onRoll, onClearRoll }) => {
+const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide, activeOrdnance = [], ordnanceTargets = [], turnSide, onResolveOrdnance, onRemoveOrdnance, onAdjustOrdnance, onRoll, onClearRoll }) => {
     const [openDrawer, setOpenDrawer] = useState("");
     const [isOrdnanceOpen, setIsOrdnanceOpen] = useState(false);
     const [diceTrayOpenedAt, setDiceTrayOpenedAt] = useState(0);
@@ -152,6 +152,8 @@ const ShipDrawers = ({ friendlyShip, enemyShip, liveRoll, localSide, activeOrdna
                         targets={ordnanceTargets}
                         turnSide={turnSide}
                         onResolve={onResolveOrdnance}
+                        onRemove={onRemoveOrdnance}
+                        onAdjustStrength={onAdjustOrdnance}
                         onRoll={onRoll}
                         onClearRoll={onClearRoll}
                     />

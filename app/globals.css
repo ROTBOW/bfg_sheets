@@ -3071,7 +3071,7 @@ footer {
     position: fixed;
     right: calc(var(--enemy-fleet-width) + clamp(14px, 1.5vw, 28px));
     top: 72px;
-    z-index: 29;
+    z-index: 45;
     width: clamp(420px, 31vw, 680px);
     max-height: calc(50dvh - 40px);
     min-height: 210px;
@@ -3118,6 +3118,20 @@ footer {
     font-weight: 700;
     letter-spacing: 0.8px;
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.active-ordnance-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.active-ordnance-actions input {
+    width: 64px;
+}
+
+.active-ordnance-actions button {
+    min-height: 34px;
 }
 
 .active-ordnance-confirm:hover:not(:disabled),
@@ -3173,6 +3187,18 @@ footer {
 .ordnance-attack > header small,
 .ordnance-attack > p {
     color: var(--muted);
+}
+
+.ordnance-massed-turrets {
+    display: grid;
+    gap: 5px;
+    margin: 0 12px 12px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.ordnance-massed-turrets small {
+    line-height: 1.4;
 }
 
 .ordnance-attack > header > button {

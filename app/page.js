@@ -31,6 +31,7 @@ import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { getShip, storageKey } from "@/lib/fleets.mjs";
 import { getProfileUrl, getVesselPoints } from "@/lib/ship-upgrades.mjs";
 import { countShipsThatCanFire } from "@/lib/turn-warning.mjs";
+import { getActiveAttackCraftStrength, getAttackCraftCapacity } from "@/lib/ordnance.mjs";
 
 /** Coordinates saved fleets, room synchronization, and the active ship views. */
 const BattleTracker = () => {
@@ -241,6 +242,9 @@ const BattleTracker = () => {
         && battleState.commandCheckRound === (connectedRoom?.turn?.round || 1)
         && battleState.commandCheckTurnSide === (connectedRoom?.turn?.activeSide || "")
     ));
+    const activeOrdnance = Object.values(connectedRoom?.activeOrdnance || {});
+    const attackCraftCapacity = getAttackCraftCapacity(vessels);
+    const activeAttackCraftStrength = getActiveAttackCraftStrength(activeOrdnance, connectedLocalSide);
 
     const selectFleet = (id) => {
         if (activeRoomId) {
@@ -330,11 +334,37 @@ const BattleTracker = () => {
 
     /** Launches ordnance without applying damage or binding it to the selected target. */
     const launchOrdnance = async (ordnance) => {
+        if (
+            ordnance.weaponType === "Launch Bay"
+            && activeAttackCraftStrength + ordnance.strength > attackCraftCapacity
+        ) {
+            throw new Error("Fleet attack-craft capacity exceeded.");
+        }
+
         await launchActiveOrdnance({ roomId: activeRoomId, ordnance });
         updateSelectedShip((current) => ({
             spentOrdnance: [...new Set([...current.spentOrdnance, ordnance.weaponIndex])],
             message: `${ordnance.weaponName} launched at strength ${ordnance.strength}.`,
         }));
+    };
+
+    /** Removes an owned marker when it is recalled, destroyed, or leaves the table. */
+    const removeOrdnance = async (ordnance) => {
+        await removeActiveOrdnance({ roomId: activeRoomId, ordnanceId: ordnance.id });
+    };
+
+    /** Records battlefield effects that reduce an owned marker's remaining strength. */
+    const adjustOrdnanceStrength = async (ordnance, strength) => {
+        if (strength <= 0) {
+            await removeOrdnance(ordnance);
+            return;
+        }
+
+        await updateActiveOrdnanceStrength({
+            roomId: activeRoomId,
+            ordnanceId: ordnance.id,
+            strength,
+        });
     };
 
     /** Applies an active-ordnance hit and removes its battlefield marker. */
@@ -435,13 +465,15 @@ const BattleTracker = () => {
                         isActiveTurn={connectedRoom.turn?.activeSide === connectedLocalSide}
                         hasEnemyOnSpecialOrders={enemyHasSpecialOrders}
                         commandChecksBlocked={commandChecksBlocked}
+                        attackCraftCapacity={attackCraftCapacity}
+                        activeAttackCraftStrength={activeAttackCraftStrength}
                     />
                     <ShipDrawers
                         friendlyShip={{ ship: friendlyShip, vessel, battleState: state, onUpdate: updateSelectedShip }}
                         enemyShip={{ ship: enemyShip, vessel: enemyVessel, battleState: enemyState }}
                         liveRoll={localLiveRoll || connectedRoom.liveRoll}
                         localSide={connectedLocalSide}
-                        activeOrdnance={Object.values(connectedRoom.activeOrdnance || {})}
+                        activeOrdnance={activeOrdnance}
                         ordnanceTargets={[
                             ...enemyVessels
                                 .filter((candidate) => candidate.profile)
@@ -452,6 +484,8 @@ const BattleTracker = () => {
                         ]}
                         turnSide={connectedRoom.turn?.activeSide || ""}
                         onResolveOrdnance={resolveOrdnance}
+                        onRemoveOrdnance={removeOrdnance}
+                        onAdjustOrdnance={adjustOrdnanceStrength}
                         onRoll={shareLiveRoll}
                         onClearRoll={dismissLiveRoll}
                     />

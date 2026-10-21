@@ -44,6 +44,8 @@ test("Necron lightning arcs always use the closing gunnery column", () => {
 
     assert.equal(profile.diceCount, 7);
     assert.equal(profile.hitThreshold, 5);
+    assert.match(profile.note, /closing Gunnery-table column/);
+    assert.match(profile.note, /target aspect.*armour value/);
 });
 
 test("Gauss particle whips use lance rolls and sixes bypass shields", () => {

@@ -6,6 +6,7 @@ import ShipDiagram from "@/components/ShipDiagram";
 import ShipName from "@/components/ShipName";
 import WeaponAttack from "@/components/WeaponAttack";
 import { weaponMarkers } from "@/lib/weapon-markers.mjs";
+import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
 
 /** Compact ship record used for each half of a connected mirrored battle. */
 const MirroredShip = ({
@@ -44,7 +45,9 @@ const MirroredShip = ({
         await onDamageTarget(entry);
         onUpdate((current) => ({
             weaponFire: [...current.weaponFire, entry],
-            message: `${entry.weaponName} recorded: ${entry.hits} hits, ${entry.damage} damage.`,
+            message: entry.weaponType === "Lightning arc"
+                ? `${entry.weaponName} ${entry.fireArc} arc (${entry.allocatedStrength} FP): ${entry.hits} hits, ${entry.damage} damage.`
+                : `${entry.weaponName} recorded: ${entry.hits} hits, ${entry.damage} damage.`,
         }));
         setSelectedWeaponIndex(null);
     };
@@ -91,13 +94,26 @@ const MirroredShip = ({
                         <thead><tr><th>Weapon system</th><th>Range</th><th>Strength</th><th>Arc</th></tr></thead>
                         <tbody>
                             {ship.weapons.map((weapon, weaponIndex) => {
-                                const hasFired = battleState.weaponFire.some((entry) => (
+                                const hasStandardWeaponFired = battleState.weaponFire.some((entry) => (
                                     entry.weaponIndex === weaponIndex
                                     && entry.round === round
                                     && entry.turnSide === turnSide
                                 ));
+                                const lightningAvailability = weapon.type === "Lightning arc"
+                                    ? getLightningArcAvailability({
+                                        weapon,
+                                        weaponIndex,
+                                        weaponFire: battleState.weaponFire,
+                                        round,
+                                        turnSide,
+                                    })
+                                    : null;
+                                const targetWasEngaged = lightningAvailability?.usedTargetIds.has(target?.id) || false;
+                                const hasFired = lightningAvailability
+                                    ? lightningAvailability.remainingStrength === 0 || lightningAvailability.availableArcs.length === 0
+                                    : hasStandardWeaponFired;
                                 const isSelected = selectedWeaponIndex === weaponIndex;
-                                const canSelect = !isEnemy && isActiveTurn && !hasFired && Boolean(target);
+                                const canSelect = !isEnemy && isActiveTurn && !hasFired && !targetWasEngaged && Boolean(target);
                                 const weaponRowClass = [
                                     canSelect ? "weapon-row-selectable" : "",
                                     isSelected ? "weapon-row-selected" : "",
@@ -118,6 +134,10 @@ const MirroredShip = ({
                                                     >
                                                         {weapon.name}
                                                         {hasFired && <span> · Fired</span>}
+                                                        {!hasFired && targetWasEngaged && <span> · Target already engaged</span>}
+                                                        {lightningAvailability && lightningAvailability.allocations.length > 0 && !hasFired && (
+                                                            <span> · {lightningAvailability.remainingStrength} FP remains</span>
+                                                        )}
                                                     </button>
                                                 ) : weapon.name}
                                                 <small>{weapon.type}</small>
@@ -139,6 +159,7 @@ const MirroredShip = ({
                                                         attacker={vessel}
                                                         target={target}
                                                         targetShip={targetShip}
+                                                        weaponFire={battleState.weaponFire}
                                                         round={round}
                                                         turnSide={turnSide}
                                                         onClose={() => setSelectedWeaponIndex(null)}

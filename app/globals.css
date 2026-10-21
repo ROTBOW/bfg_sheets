@@ -387,6 +387,41 @@ a.rules-link {
     background: transparent;
 }
 
+.lightning-allocation {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 14px 0;
+    padding: 14px;
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.lightning-allocation p {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.lightning-allocation label {
+    display: grid;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.lightning-allocation select,
+.lightning-allocation input {
+    min-width: 0;
+    padding: 9px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--foreground);
+    background: var(--background);
+}
+
 .battle-reports-page {
     max-width: 1240px;
 }

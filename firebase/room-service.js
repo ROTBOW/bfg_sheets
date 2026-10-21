@@ -301,7 +301,11 @@ export const updateShipBattleState = async ({ roomId, side, shipId, shipName, ro
 
     if (changes.weaponFire?.length > (previousState.weaponFire?.length || 0)) {
         const attack = changes.weaponFire.at(-1);
-        descriptions.push(`${attack.weaponName} fired at ${attack.targetName}: ${attack.hits} hits, ${attack.damage} damage`);
+        const allocation = attack.weaponType === "Lightning arc"
+            ? ` (${attack.allocatedStrength} FP, ${attack.fireArc} arc)`
+            : "";
+
+        descriptions.push(`${attack.weaponName}${allocation} fired at ${attack.targetName}: ${attack.hits} hits, ${attack.damage} damage`);
     }
 
     if (descriptions.length) {

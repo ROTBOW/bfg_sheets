@@ -9,6 +9,7 @@ import {
     resolveWeaponRolls,
     rollDice,
 } from "@/lib/gunnery.mjs";
+import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
 
 const subscribeToDistanceControl = (onChange) => {
     window.addEventListener("distancecontrolchange", onChange);
@@ -21,10 +22,19 @@ const getDistanceControlSnapshot = () =>
 const getServerDistanceControlSnapshot = () => false;
 
 /** Resolves and records one standard weapon firing at the selected enemy vessel. */
-const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, round, turnSide, onRecord, onClose }) => {
+const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, weaponFire = [], round, turnSide, onRecord, onClose }) => {
     const [direction, setDirection] = useState("closing");
     const [distance, setDistance] = useState("");
-    const initialAttackProfile = getWeaponAttackProfile(weapon, targetShip, "closing");
+    const isLightningArc = weapon.type === "Lightning arc";
+    const lightningAvailability = isLightningArc
+        ? getLightningArcAvailability({ weapon, weaponIndex, weaponFire, round, turnSide })
+        : null;
+    const [fireArc, setFireArc] = useState(lightningAvailability?.availableArcs[0]?.id || "");
+    const [allocatedStrength, setAllocatedStrength] = useState(lightningAvailability?.remainingStrength || weapon.strength);
+    const effectiveWeapon = isLightningArc
+        ? { ...weapon, strength: Number(allocatedStrength) }
+        : weapon;
+    const initialAttackProfile = getWeaponAttackProfile(effectiveWeapon, targetShip, "closing");
     const [mode, setMode] = useState(initialAttackProfile.supportsDigitalRoll ? "digital" : "manual");
     const [manualRolls, setManualRolls] = useState("");
     const [manualHits, setManualHits] = useState(0);
@@ -39,10 +49,25 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
     );
     const displayedDistance = usesDistanceSlider && distance === "" ? 5 : distance;
     const distanceCm = displayedDistance === "" ? null : Number(displayedDistance);
-    const attackProfile = getWeaponAttackProfile(weapon, targetShip, direction, distanceCm);
+    const attackProfile = getWeaponAttackProfile(effectiveWeapon, targetShip, direction, distanceCm);
     const { supportsDigitalRoll, diceCount, hitThreshold } = attackProfile;
 
     const resolveRolls = (rolls) => {
+        if (
+            isLightningArc
+            && (!Number.isInteger(Number(allocatedStrength))
+                || Number(allocatedStrength) < 1
+                || Number(allocatedStrength) > lightningAvailability.remainingStrength)
+        ) {
+            setError(`Allocate 1–${lightningAvailability.remainingStrength} Firepower to this arc.`);
+            return;
+        }
+
+        if (isLightningArc && !lightningAvailability.availableArcs.some((arc) => arc.id === fireArc)) {
+            setError("Choose an unused firing arc.");
+            return;
+        }
+
         if (!Number.isFinite(distanceCm) || distanceCm <= 0) {
             setError("Enter the distance to the target before resolving the attack.");
             return;
@@ -108,6 +133,10 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                 targetShipId: target.id,
                 targetName: target.name,
                 direction,
+                ...(isLightningArc ? {
+                    fireArc,
+                    allocatedStrength: Number(allocatedStrength),
+                } : {}),
                 mode,
                 rolls: result.rolls,
                 shots,
@@ -150,8 +179,14 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                     {usesDistanceSlider && <output>{displayedDistance} cm</output>}
                 </label>
                 <label>
-                    Target direction
-                    <select value={direction} onChange={(event) => { setDirection(event.target.value); setResult(null); }}>
+                    Target aspect
+                    <select
+                        value={direction}
+                        onChange={(event) => {
+                            setDirection(event.target.value);
+                            setResult(null);
+                        }}
+                    >
                         {gunneryDirections.map((option) => (
                             <option key={option.id} value={option.id}>{option.label}</option>
                         ))}
@@ -166,6 +201,33 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                 </label>
             </div>
             <p className="weapon-attack-note">{attackProfile.note}</p>
+            {isLightningArc && (
+                <div className="lightning-allocation">
+                    <p>
+                        <strong>{lightningAvailability.remainingStrength}</strong> Firepower remaining.
+                        Each firing arc and target may be used once this turn.
+                    </p>
+                    <label>
+                        Firing arc
+                        <select value={fireArc} onChange={(event) => { setFireArc(event.target.value); setResult(null); }}>
+                            {lightningAvailability.availableArcs.map((arc) => (
+                                <option key={arc.id} value={arc.id}>{arc.label}</option>
+                            ))}
+                        </select>
+                    </label>
+                    <label>
+                        Firepower allocated
+                        <input
+                            type="number"
+                            min="1"
+                            max={lightningAvailability.remainingStrength}
+                            step="1"
+                            value={allocatedStrength}
+                            onChange={(event) => { setAllocatedStrength(event.target.value); setResult(null); }}
+                        />
+                    </label>
+                </div>
+            )}
             {mode === "digital" && supportsDigitalRoll ? (
                 <button type="button" className="weapon-roll-button" onClick={rollAttack}>
                     Roll {diceCount}D6 · hits on {hitThreshold}+

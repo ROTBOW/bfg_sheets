@@ -77,13 +77,21 @@ const ShipDrawers = ({ friendlyShip, enemyShip }) => {
                 GUNNERY TABLE
             </button>
             {openDrawer === "gunnery" && (
-                <div className="rules-drawer rules-drawer-gunnery">
+                <div
+                    className="rules-drawer rules-drawer-gunnery"
+                    role="dialog"
+                    aria-label="Gunnery table"
+                >
                     <button type="button" className="rules-drawer-close" onClick={() => setOpenDrawer("")} aria-label="Close Gunnery table">×</button>
                     <GunneryReference />
                 </div>
             )}
             {openDrawer && openDrawer !== "gunnery" && activeShip && (
-                <div className={`rules-drawer rules-drawer-${drawerSide}`}>
+                <div
+                    className={`rules-drawer rules-drawer-${drawerSide}`}
+                    role="dialog"
+                    aria-label={`${drawerSide === "friendly" ? "Your" : "Enemy"} ${drawerType === "critical" ? "critical damage" : "special rules"}`}
+                >
                     <button type="button" className="rules-drawer-close" onClick={() => setOpenDrawer("")} aria-label={`Close ${drawerType === "critical" ? "critical damage" : "special rules"}`}>×</button>
                     {drawerType === "critical" ? (
                         <CriticalDamage

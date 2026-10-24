@@ -9,26 +9,60 @@ import {
 } from "@/lib/nova-cannon.mjs";
 import { parseDiceResults, rollDice } from "@/lib/gunnery.mjs";
 
-/** Resolves template scatter and records one Nova Cannon shot. */
-const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, round, turnSide, onRecord, onClose }) => {
+/** Resolves one Nova Cannon template and records every vessel caught beneath it. */
+const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, targets, round, turnSide, onRecord, onClose }) => {
+    const eligibleTargets = targets.map(({ vessel }) => vessel);
     const [distance, setDistance] = useState("");
     const [mode, setMode] = useState("digital");
     const [manualScatterResult, setManualScatterResult] = useState("hit");
     const [manualScatterAngle, setManualScatterAngle] = useState(0);
     const [manualRolls, setManualRolls] = useState("");
     const [result, setResult] = useState(null);
-    const [outcome, setOutcome] = useState("miss");
-    const [damage, setDamage] = useState(0);
+    const [selectedTargetIds, setSelectedTargetIds] = useState([target.id]);
+    const [targetDetails, setTargetDetails] = useState({
+        [target.id]: { outcome: "center", damage: 0 },
+    });
     const [error, setError] = useState("");
     const [isRecording, setIsRecording] = useState(false);
 
-    /** Applies the selected template outcome to a resolved scatter result. */
-    const updateOutcome = (nextOutcome, resolvedResult = result) => {
-        setOutcome(nextOutcome);
+    /** Resets the template coverage after resolving a new scatter roll. */
+    const resetTargetCoverage = (resolvedResult) => {
+        setSelectedTargetIds([target.id]);
+        setTargetDetails({
+            [target.id]: {
+                outcome: "center",
+                damage: getNovaCannonHits("center", resolvedResult.damageRoll),
+            },
+        });
+    };
 
-        if (resolvedResult) {
-            setDamage(getNovaCannonHits(nextOutcome, resolvedResult.damageRoll));
-        }
+    /** Adds or removes one vessel from the final template coverage. */
+    const toggleTarget = (targetId) => {
+        setSelectedTargetIds((current) => (
+            current.includes(targetId)
+                ? current.filter((id) => id !== targetId)
+                : [...current, targetId]
+        ));
+        setTargetDetails((current) => ({
+            ...current,
+            [targetId]: current[targetId] || {
+                outcome: "outer",
+                damage: result ? getNovaCannonHits("outer", result.damageRoll) : 0,
+            },
+        }));
+    };
+
+    /** Updates how one selected vessel intersects the Nova Cannon template. */
+    const updateTargetDetail = (targetId, changes) => {
+        setTargetDetails((current) => {
+            const nextDetail = { ...current[targetId], ...changes };
+
+            if (changes.outcome && result) {
+                nextDetail.damage = getNovaCannonHits(changes.outcome, result.damageRoll);
+            }
+
+            return { ...current, [targetId]: nextDetail };
+        });
     };
 
     /** Validates range and returns the required scatter-distance dice count. */
@@ -58,8 +92,7 @@ const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, round, turnSi
         };
 
         setResult(resolvedResult);
-        setOutcome("miss");
-        setDamage(0);
+        resetTargetCoverage(resolvedResult);
         setError("");
     };
 
@@ -96,8 +129,7 @@ const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, round, turnSi
             };
 
             setResult(resolvedResult);
-            setOutcome("miss");
-            setDamage(0);
+            resetTargetCoverage(resolvedResult);
             setError("");
         } catch (rollError) {
             setError(rollError instanceof Error ? rollError.message : String(rollError));
@@ -110,11 +142,23 @@ const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, round, turnSi
             return;
         }
 
-        const recordedDamage = Number(damage);
-        const resolvedHits = getNovaCannonHits(outcome, result.damageRoll);
+        const selectedTargets = eligibleTargets.filter((candidate) => selectedTargetIds.includes(candidate.id));
 
-        if (!Number.isInteger(recordedDamage) || recordedDamage < 0 || recordedDamage > resolvedHits) {
-            setError(`Damage must be a whole number from 0 to ${resolvedHits}.`);
+        if (!selectedTargets.length) {
+            setError("Choose at least one ship beneath the final template.");
+            return;
+        }
+
+        const hasInvalidDamage = selectedTargets.some((selectedTarget) => {
+            const detail = targetDetails[selectedTarget.id];
+            const resolvedHits = getNovaCannonHits(detail.outcome, result.damageRoll);
+            const recordedDamage = Number(detail.damage);
+
+            return !Number.isInteger(recordedDamage) || recordedDamage < 0 || recordedDamage > resolvedHits;
+        });
+
+        if (hasInvalidDamage) {
+            setError("Damage must be a whole number no greater than the hits for every selected ship.");
             return;
         }
 
@@ -122,29 +166,34 @@ const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, round, turnSi
         setError("");
 
         try {
-            await onRecord({
-                id: crypto.randomUUID(),
-                weaponIndex,
-                weaponName: weapon.name,
-                weaponType: weapon.type,
-                round,
-                turnSide,
-                targetShipId: target.id,
-                targetName: target.name,
-                direction: "closing",
-                mode,
-                rolls: [...result.scatterRolls, result.damageRoll],
-                shots: 1,
-                hits: resolvedHits,
-                damage: recordedDamage,
-                shieldBypassingDamage: 0,
-                accuracy: outcome === "miss" ? 0 : 1,
-                novaOutcome: outcome,
-                scatterResult: result.result,
-                scatterAngle: result.angleDegrees,
-                scatterDistance: result.scatterDistance,
-                createdAt: Date.now(),
-            });
+            await onRecord(selectedTargets.map((selectedTarget) => {
+                const detail = targetDetails[selectedTarget.id];
+                const resolvedHits = getNovaCannonHits(detail.outcome, result.damageRoll);
+
+                return {
+                    id: crypto.randomUUID(),
+                    weaponIndex,
+                    weaponName: weapon.name,
+                    weaponType: weapon.type,
+                    round,
+                    turnSide,
+                    targetShipId: selectedTarget.id,
+                    targetName: selectedTarget.name,
+                    direction: "closing",
+                    mode,
+                    rolls: [...result.scatterRolls, result.damageRoll],
+                    shots: 1,
+                    hits: resolvedHits,
+                    damage: Number(detail.damage),
+                    shieldBypassingDamage: 0,
+                    accuracy: 1,
+                    novaOutcome: detail.outcome,
+                    scatterResult: result.result,
+                    scatterAngle: result.angleDegrees,
+                    scatterDistance: result.scatterDistance,
+                    createdAt: Date.now(),
+                };
+            }));
         } catch (error) {
             console.error("Failed to record Nova Cannon attack.", error);
             setError("Damage could not be sent to your opponent. Check your connection and try again.");
@@ -158,7 +207,7 @@ const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, round, turnSi
                 <div>
                     <span className="eyebrow">FIRE NOVA CANNON</span>
                     <h3>{weapon.name}</h3>
-                    <small>{attacker.name} → {target.name}</small>
+                    <small>{attacker.name} → template area</small>
                 </div>
                 <button type="button" onClick={onClose} aria-label="Close weapon attack">×</button>
             </div>
@@ -240,26 +289,56 @@ const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, round, turnSi
                             : `${result.scatterDistance} cm at ${result.angleDegrees}°`}
                     </span>
                     <span>Damage roll: {result.damageRoll}</span>
-                    <label>
-                        Final template position
-                        <select value={outcome} onChange={(event) => updateOutcome(event.target.value)}>
-                            {novaCannonOutcomes.map((option) => (
-                                <option key={option.id} value={option.id}>{option.label}</option>
-                            ))}
-                        </select>
-                    </label>
-                    <strong>{getNovaCannonHits(outcome, result.damageRoll)} hits</strong>
-                    <label>
-                        Damage inflicted
-                        <input
-                            type="number"
-                            min="0"
-                            max={String(getNovaCannonHits(outcome, result.damageRoll))}
-                            step="1"
-                            value={damage}
-                            onChange={(event) => setDamage(event.target.value)}
-                        />
-                    </label>
+                    <p className="weapon-attack-note">
+                        Select every ship beneath the final template and choose whether its base is under the centre or outer area.
+                    </p>
+                    <div className="star-pulse-targets">
+                        {eligibleTargets.map((candidate) => {
+                            const isSelected = selectedTargetIds.includes(candidate.id);
+                            const detail = targetDetails[candidate.id] || { outcome: "outer", damage: 1 };
+                            const resolvedHits = getNovaCannonHits(detail.outcome, result.damageRoll);
+
+                            return (
+                                <fieldset key={candidate.id}>
+                                    <label className="star-pulse-target-toggle">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleTarget(candidate.id)}
+                                        />
+                                        <strong>{candidate.name}</strong>
+                                    </label>
+                                    {isSelected && (
+                                        <div className="weapon-attack-fields">
+                                            <label>
+                                                Template area
+                                                <select
+                                                    value={detail.outcome}
+                                                    onChange={(event) => updateTargetDetail(candidate.id, { outcome: event.target.value })}
+                                                >
+                                                    {novaCannonOutcomes.filter((option) => option.id !== "miss").map((option) => (
+                                                        <option key={option.id} value={option.id}>{option.label}</option>
+                                                    ))}
+                                                </select>
+                                            </label>
+                                            <span><strong>{resolvedHits} hits</strong></span>
+                                            <label>
+                                                Damage inflicted
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max={String(resolvedHits)}
+                                                    step="1"
+                                                    value={detail.damage}
+                                                    onChange={(event) => updateTargetDetail(candidate.id, { damage: event.target.value })}
+                                                />
+                                            </label>
+                                        </div>
+                                    )}
+                                </fieldset>
+                            );
+                        })}
+                    </div>
                     <button type="button" disabled={isRecording} onClick={recordAttack}>
                         {isRecording ? "Sending damage…" : "Record firing"}
                     </button>

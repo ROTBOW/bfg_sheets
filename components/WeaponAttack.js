@@ -148,7 +148,8 @@ const StarPulseAttack = ({ weapon, weaponIndex, attacker, targets, round, turnSi
                 accuracy: result.hits,
                 createdAt: Date.now(),
             })));
-        } catch {
+        } catch (error) {
+            console.error("Failed to record star-pulse attack.", error);
             setError("Damage could not be sent to your opponent. Check your connection and try again.");
             setIsRecording(false);
         }
@@ -443,7 +444,8 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
                 accuracy: shots ? result.hits / shots : 0,
                 createdAt: Date.now(),
             });
-        } catch {
+        } catch (error) {
+            console.error("Failed to record weapon attack.", error);
             setError("Damage could not be sent to your opponent. Check your connection and try again.");
             setIsRecording(false);
         }
@@ -655,7 +657,8 @@ const OrdnanceLaunch = ({
                 createdAt: Date.now(),
             });
             onClose();
-        } catch {
+        } catch (error) {
+            console.error("Failed to launch ordnance.", error);
             setError("The ordnance could not be placed on the battlefield. Check your connection and try again.");
             setIsLaunching(false);
         }

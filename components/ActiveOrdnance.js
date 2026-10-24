@@ -52,7 +52,8 @@ const ActiveOrdnanceAttack = ({ ordnance, target, turnSide, onResolve, onRoll, o
                 shieldBypassingHits: resolved.damage,
                 startedAt,
                 expiresAt: startedAt + 15000,
-            })).catch(() => {
+            })).catch((error) => {
+                console.error("Failed to share ordnance attack roll.", error);
                 setError("The attack was resolved locally but could not be shown to your opponent.");
             });
         }
@@ -72,7 +73,8 @@ const ActiveOrdnanceAttack = ({ ordnance, target, turnSide, onResolve, onRoll, o
                 remainingStrength: result.remainingStrength,
             });
             onClose();
-        } catch {
+        } catch (error) {
+            console.error("Failed to record ordnance attack.", error);
             setError("The ordnance result could not be recorded. Check your connection and try again.");
             setIsRecording(false);
         }

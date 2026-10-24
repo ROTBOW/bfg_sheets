@@ -145,7 +145,8 @@ const NovaCannonAttack = ({ weapon, weaponIndex, attacker, target, round, turnSi
                 scatterDistance: result.scatterDistance,
                 createdAt: Date.now(),
             });
-        } catch {
+        } catch (error) {
+            console.error("Failed to record Nova Cannon attack.", error);
             setError("Damage could not be sent to your opponent. Check your connection and try again.");
             setIsRecording(false);
         }

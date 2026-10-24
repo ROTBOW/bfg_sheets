@@ -488,15 +488,6 @@ export const damageEnemyShip = async ({
         targetFaction,
         targetType === "Escort",
     );
-    const criticalDamage = [
-        ...(currentBattleState?.criticalDamage || []),
-        ...criticalResult.criticals.map(({ id, typeId, source, status }) => ({
-            id,
-            typeId,
-            source,
-            status,
-        })),
-    ];
     const finalHull = criticalResult.escortDestroyed
         ? 0
         : Math.max(0, defenses.hull - criticalResult.extraDamage);
@@ -511,14 +502,25 @@ export const damageEnemyShip = async ({
                 ? ` Critical checks ${criticalResult.criticalChecks.join(", ")}: no critical damage.`
                 : "";
 
-    await update(battleReference, {
+    const battleUpdates = {
         ...defenses,
         hull: finalHull,
-        criticalDamage,
         message: `${message}${saveMessage}${criticalMessage}`,
         updatedAt: serverTimestamp(),
         updatedBy: user.uid,
-    });
+    };
+    const existingCriticalCount = currentBattleState?.criticalDamage?.length || 0;
+
+    for (const [index, critical] of criticalResult.criticals.entries()) {
+        battleUpdates[`criticalDamage/${existingCriticalCount + index}`] = {
+            id: critical.id,
+            typeId: critical.typeId,
+            source: critical.source,
+            status: critical.status,
+        };
+    }
+
+    await update(battleReference, battleUpdates);
 
     return { ...reactiveHullResult, criticalResult };
 };

@@ -1,10 +1,10 @@
 "use client";
 
-import BattleStatus from "@/components/BattleStatus";
-import CriticalDamage from "@/components/CriticalDamage";
-import ShipDiagram from "@/components/ShipDiagram";
-import ShipName from "@/components/ShipName";
-import SpecialRules from "@/components/SpecialRules";
+import BattleStatus from "@/components/ship/BattleStatus";
+import CriticalDamage from "@/components/ship/CriticalDamage";
+import ShipDiagram from "@/components/ship/ShipDiagram";
+import ShipName from "@/components/ship/ShipName";
+import SpecialRules from "@/components/ship/SpecialRules";
 import { getShip } from "@/lib/fleets.mjs";
 import { getUpgradeOptions } from "@/lib/ship-upgrades.mjs";
 import { weaponMarkers } from "@/lib/weapon-markers.mjs";

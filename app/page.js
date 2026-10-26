@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import FleetMenu from "@/components/FleetMenu";
-import MirroredShip from "@/components/MirroredShip";
-import ShipDrawers from "@/components/ShipDrawers";
-import ShipViewer from "@/components/ShipViewer";
-import TurnCounter from "@/components/TurnCounter";
+import FleetMenu from "@/components/fleet/FleetMenu";
+import MirroredShip from "@/components/ship/MirroredShip";
+import ShipDrawers from "@/components/ship/ShipDrawers";
+import ShipViewer from "@/components/ship/ShipViewer";
+import TurnCounter from "@/components/battle/TurnCounter";
 import {
     getActiveRoomFleetId,
     getActiveRoomId,

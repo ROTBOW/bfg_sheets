@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DiceTray from "@/components/DiceTray";
+import DiceTray from "@/components/combat/DiceTray";
 import { getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 
 /** Presents one local or remote weapon roll inside the shared dice tray. */

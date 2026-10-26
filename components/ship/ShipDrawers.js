@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import CriticalDamage from "@/components/CriticalDamage";
-import ActiveOrdnance from "@/components/ActiveOrdnance";
-import LiveRollViewer from "@/components/LiveRollViewer";
-import SpecialRules from "@/components/SpecialRules";
+import CriticalDamage from "@/components/ship/CriticalDamage";
+import ActiveOrdnance from "@/components/combat/ActiveOrdnance";
+import LiveRollViewer from "@/components/combat/LiveRollViewer";
+import SpecialRules from "@/components/ship/SpecialRules";
 import { gunneryTable } from "@/lib/gunnery.mjs";
 import { getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 

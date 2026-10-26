@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import DiceTray from "@/components/DiceTray";
+import DiceTray from "@/components/combat/DiceTray";
 import { createRollDurations, getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 import { resolveOrdnanceHit } from "@/lib/ordnance.mjs";
 

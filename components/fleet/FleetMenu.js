@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import HullWarning from "@/components/HullWarning";
-import ShipName from "@/components/ShipName";
+import HullWarning from "@/components/ship/HullWarning";
+import ShipName from "@/components/ship/ShipName";
 
 const FleetMenu = ({
     fleets = [],

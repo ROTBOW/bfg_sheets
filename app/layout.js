@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navigation/Navbar";
 import "./globals.css";
 import { themeInitializationScript } from "./theme";
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import ShipCatalog from "@/components/ShipCatalog";
-import FleetRoster from "@/components/FleetRoster";
+import ShipCatalog from "@/components/fleet/ShipCatalog";
+import FleetRoster from "@/components/fleet/FleetRoster";
 import {
     commanders, createFleet, fleetFactions, getFleetIssues, getFleetPoints,
     getReserveAllowances, getRerollCosts, storageKey,

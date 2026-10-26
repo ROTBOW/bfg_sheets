@@ -1,6 +1,6 @@
 import { getShip } from "@/lib/fleets.mjs";
 import { getVesselPoints } from "@/lib/ship-upgrades.mjs";
-import ShipUpgrades from "@/components/ShipUpgrades";
+import ShipUpgrades from "@/components/fleet/ShipUpgrades";
 
 const FleetRoster = ({ fleet, onChange }) => {
     const updateShip = (id, changes) => {

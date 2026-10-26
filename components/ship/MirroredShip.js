@@ -1,10 +1,10 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import BattleStatus from "@/components/BattleStatus";
-import ShipDiagram from "@/components/ShipDiagram";
-import ShipName from "@/components/ShipName";
-import WeaponAttack from "@/components/WeaponAttack";
+import BattleStatus from "@/components/ship/BattleStatus";
+import ShipDiagram from "@/components/ship/ShipDiagram";
+import ShipName from "@/components/ship/ShipName";
+import WeaponAttack from "@/components/combat/WeaponAttack";
 import { weaponMarkers } from "@/lib/weapon-markers.mjs";
 import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
 import {

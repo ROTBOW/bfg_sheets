@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import NovaCannonAttack from "@/components/NovaCannonAttack";
+import NovaCannonAttack from "@/components/combat/NovaCannonAttack";
 import {
     getWeaponAttackProfile,
     gunneryDirections,

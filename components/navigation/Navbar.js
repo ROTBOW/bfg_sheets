@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { flushSync } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import BattleLog from "@/components/BattleLog";
+import BattleLog from "@/components/battle/BattleLog";
 import {
     accentCookieName,
     defaultAccent,

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import HullWarning from "@/components/HullWarning";
+import HullWarning from "@/components/ship/HullWarning";
 import { resolveCommandCheck, rollLeadership } from "@/lib/leadership.mjs";
 import { createRollDurations, getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 

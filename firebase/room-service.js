@@ -26,6 +26,7 @@ import {
     startBattleTurn,
 } from "./room-schema.mjs";
 import { resolveAutomaticCriticals } from "../lib/critical-damage.mjs";
+import { commandCheckFields } from "../lib/command-checks.mjs";
 
 /**
  * Returns the database path for a capability-style room identifier.
@@ -397,6 +398,49 @@ export const clearStartingSpecialOrders = async ({ roomId, side }) => {
     if (Object.keys(updates).length) {
         await update(sideReference, updates);
     }
+};
+
+/** Clears only the owned fleet's Command-check result metadata and records the reset. */
+export const resetFleetCommandChecks = async ({ roomId, side, round = 1 }) => {
+    const user = await ensureAnonymousUser();
+    const { database } = getFirebaseServices();
+    const sideReference = ref(database, `${roomPath(roomId)}/sides/${side}`);
+    const sideData = (await get(sideReference)).val();
+
+    if (sideData?.ownerUid !== user.uid) {
+        throw new Error("Only the fleet owner can reset its Leadership checks.");
+    }
+
+    const updates = {};
+
+    for (const [shipId, battleState] of Object.entries(sideData.battle || {})) {
+        const hasCommandCheckMetadata = commandCheckFields.some((field) => (
+            battleState[field] !== undefined
+        ));
+
+        if (!hasCommandCheckMetadata) {
+            continue;
+        }
+
+        for (const field of commandCheckFields) {
+            updates[`battle/${shipId}/${field}`] = null;
+        }
+
+        updates[`battle/${shipId}/updatedAt`] = serverTimestamp();
+        updates[`battle/${shipId}/updatedBy`] = user.uid;
+    }
+
+    if (Object.keys(updates).length) {
+        await update(sideReference, updates);
+    }
+
+    await appendBattleEvent({
+        roomId,
+        type: "leadership-checks-reset",
+        message: `${sideData.fleet?.name || "Fleet"}: Leadership checks reset by its owner.`,
+        round,
+        side,
+    });
 };
 
 /** Removes Brace for Impact orders after the owning fleet completes its turn. */

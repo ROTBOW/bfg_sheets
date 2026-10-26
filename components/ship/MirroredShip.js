@@ -113,6 +113,7 @@ const MirroredShip = ({
                 isReadOnly={isEnemy}
                 hasEnemyOnSpecialOrders={hasEnemyOnSpecialOrders}
                 commandChecksBlocked={commandChecksBlocked}
+                canIssueOrders={isActiveTurn}
                 round={round}
                 turnSide={turnSide}
             />

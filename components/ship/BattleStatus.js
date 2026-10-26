@@ -92,6 +92,7 @@ const BattleStatus = ({
     isReadOnly = false,
     hasEnemyOnSpecialOrders = false,
     commandChecksBlocked = false,
+    canIssueOrders = true,
     round = 1,
     turnSide = "",
 }) => {
@@ -288,7 +289,7 @@ const BattleStatus = ({
                             </button>
                         )}
                     </div>
-                ) : !isReadOnly && hasCurrentCommandCheck ? (
+                ) : !isReadOnly && canIssueOrders && hasCurrentCommandCheck ? (
                     <div className="special-order-grid" aria-label="Choose a special order">
                         {availableOrders.map((specialOrder) => (
                             <button
@@ -303,7 +304,7 @@ const BattleStatus = ({
                             </button>
                         ))}
                     </div>
-                ) : !isReadOnly ? (
+                ) : !isReadOnly && canIssueOrders ? (
                     <button
                         type="button"
                         className="command-check-button"
@@ -311,8 +312,10 @@ const BattleStatus = ({
                     >
                         {commandChecksBlocked ? "Leadership check for Brace for Impact" : "Leadership check"}
                     </button>
-                ) : (
+                ) : isReadOnly ? (
                     <p>No special orders</p>
+                ) : (
+                    <p>Leadership checks are available during your turn.</p>
                 )}
             </div>
             {!isReadOnly && (

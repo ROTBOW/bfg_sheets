@@ -21,6 +21,7 @@ import {
     launchActiveOrdnance,
     publishLiveRoll,
     removeActiveOrdnance,
+    resetFleetCommandChecks,
     updateActiveOrdnanceStrength,
     subscribeToRoom,
     updateShipBattleState,
@@ -33,6 +34,11 @@ import { getShip, storageKey } from "@/lib/fleets.mjs";
 import { getProfileUrl, getVesselPoints } from "@/lib/ship-upgrades.mjs";
 import { countShipsThatCanFire } from "@/lib/turn-warning.mjs";
 import { getActiveAttackCraftStrength, getAttackCraftCapacity } from "@/lib/ordnance.mjs";
+import {
+    areFleetCommandChecksBlocked,
+    clearFleetCommandCheckMetadata,
+    getRoomBattleStateUpdates,
+} from "@/lib/command-checks.mjs";
 
 /** Coordinates saved fleets, room synchronization, and the active ship views. */
 const BattleTracker = () => {
@@ -125,16 +131,7 @@ const BattleTracker = () => {
                         setLocalSide(getRoomSideForUser(nextRoom, user.uid));
 
                         if (nextRoom?.sides) {
-                            const roomBattleStates = {};
-
-                            for (const side of ["host", "guest"]) {
-                                const sideFleet = nextRoom.sides[side]?.fleet;
-
-                                if (sideFleet?.id) {
-                                    roomBattleStates[sideFleet.id] = nextRoom.sides[side]?.battle || {};
-                                }
-                            }
-
+                            const roomBattleStates = getRoomBattleStateUpdates(nextRoom);
                             setBattleStates((previous) => ({ ...previous, ...roomBattleStates }));
                         }
                     },
@@ -238,11 +235,11 @@ const BattleTracker = () => {
     const enemyHasSpecialOrders = Object.values(enemyBattleStates).some((battleState) => (
         battleState.order && battleState.order !== "No special orders"
     ));
-    const commandChecksBlocked = Object.values(fleetBattleStates).some((battleState) => (
-        battleState.commandCheckFailed === true
-        && battleState.commandCheckRound === (connectedRoom?.turn?.round || 1)
-        && battleState.commandCheckTurnSide === (connectedRoom?.turn?.activeSide || "")
-    ));
+    const commandChecksBlocked = areFleetCommandChecksBlocked(
+        fleetBattleStates,
+        connectedRoom?.turn,
+        connectedLocalSide,
+    );
     const activeOrdnance = Object.values(connectedRoom?.activeOrdnance || {});
     const attackCraftCapacity = getAttackCraftCapacity(vessels);
     const activeAttackCraftStrength = getActiveAttackCraftStrength(activeOrdnance, connectedLocalSide);
@@ -368,6 +365,20 @@ const BattleTracker = () => {
         });
     };
 
+    /** Clears fleet-wide Command-check results locally and in the connected room. */
+    const resetLeadershipChecks = async () => {
+        await resetFleetCommandChecks({
+            roomId: activeRoomId,
+            side: connectedLocalSide,
+            round: connectedRoom?.turn?.round || 1,
+        });
+
+        setBattleStates((previous) => ({
+            ...previous,
+            [fleet.id]: clearFleetCommandCheckMetadata(previous[fleet.id]),
+        }));
+    };
+
     /** Applies an active-ordnance hit and removes its battlefield marker. */
     const resolveOrdnance = async (ordnance, attack, targetSide) => {
         const targetFleet = targetSide === connectedLocalSide ? vessels : enemyVessels;
@@ -442,6 +453,7 @@ const BattleTracker = () => {
                         friendlyName={fleet.name}
                         enemyName={enemyFleet.name}
                         shipsThatCanFire={shipsThatCanFire}
+                        onResetLeadershipChecks={resetLeadershipChecks}
                     />
                     <MirroredShip
                         ship={friendlyShip}

@@ -21,9 +21,11 @@ const TurnCounter = ({
     friendlyName,
     enemyName,
     shipsThatCanFire = 0,
+    onResetLeadershipChecks,
 }) => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [turnError, setTurnError] = useState("");
+    const [isResettingLeadership, setIsResettingLeadership] = useState(false);
     const round = turn?.round || 1;
     const activeSide = turn?.activeSide || "";
     const friendlyDatabaseSide = localSide;
@@ -65,6 +67,20 @@ const TurnCounter = ({
         changeTurn({ action: "advance" });
     };
 
+    /** Clears fleet-wide Command-check outcomes without changing any ship trackers. */
+    const resetLeadershipChecks = async () => {
+        setIsResettingLeadership(true);
+        setTurnError("");
+
+        try {
+            await onResetLeadershipChecks?.();
+        } catch (error) {
+            setTurnError(error instanceof Error ? error.message : String(error));
+        } finally {
+            setIsResettingLeadership(false);
+        }
+    };
+
     return (
         <section className="turn-counter turn-counter-compact" aria-labelledby="turn-counter-title">
             <span className="sr-only">Game turn</span>
@@ -103,6 +119,14 @@ const TurnCounter = ({
                     </div>
                 </>
             )}
+            <button
+                type="button"
+                className="turn-counter-secondary-action"
+                disabled={isResettingLeadership}
+                onClick={resetLeadershipChecks}
+            >
+                {isResettingLeadership ? "Resetting…" : "Reset leadership checks"}
+            </button>
             {turnError && <small className="turn-counter-error" role="alert">{turnError}</small>}
         </section>
     );

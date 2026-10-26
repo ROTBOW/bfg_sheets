@@ -13,7 +13,7 @@ import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
 import { createRollDurations, getLiveRollTimestamp } from "@/lib/live-roll.mjs";
 import {
     canLockOnReroll,
-    getOrderedWeaponStrength,
+    getEffectiveWeaponStrength,
     ordnanceWeaponTypes,
 } from "@/lib/special-orders.mjs";
 
@@ -241,7 +241,7 @@ const StarPulseAttack = ({ weapon, weaponIndex, attacker, targets, round, turnSi
 };
 
 /** Resolves and records one standard weapon firing at the selected enemy vessel. */
-const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, weaponFire = [], order, round, turnSide, onRoll, onClearRoll, onRecord, onClose }) => {
+const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShip, weaponFire = [], order, currentHull, maximumHull, round, turnSide, onRoll, onClearRoll, onRecord, onClose }) => {
     const [direction, setDirection] = useState("closing");
     const [distance, setDistance] = useState("");
     const isLightningArc = weapon.type === "Lightning arc";
@@ -250,12 +250,12 @@ const StandardWeaponAttack = ({ weapon, weaponIndex, attacker, target, targetShi
         : null;
     const [fireArc, setFireArc] = useState(lightningAvailability?.availableArcs[0]?.id || "");
     const [allocatedStrength, setAllocatedStrength] = useState(lightningAvailability?.remainingStrength || weapon.strength);
-    const orderedStrength = getOrderedWeaponStrength(weapon, order);
+    const effectiveStrength = getEffectiveWeaponStrength(weapon, order, currentHull, maximumHull);
     const effectiveWeapon = {
         ...weapon,
         strength: isLightningArc
-            ? Math.min(Number(allocatedStrength), orderedStrength)
-            : orderedStrength,
+            ? Math.min(Number(allocatedStrength), effectiveStrength)
+            : effectiveStrength,
     };
     const initialAttackProfile = getWeaponAttackProfile(effectiveWeapon, targetShip, "closing");
     const [mode, setMode] = useState(initialAttackProfile.supportsDigitalRoll ? "digital" : "manual");
@@ -622,12 +622,14 @@ const OrdnanceLaunch = ({
     turnSide,
     attackCraftCapacity,
     activeAttackCraftStrength,
+    currentHull,
+    maximumHull,
     onLaunch,
     onClose,
 }) => {
     const [isLaunching, setIsLaunching] = useState(false);
     const [error, setError] = useState("");
-    const strength = getOrderedWeaponStrength(weapon, order);
+    const strength = getEffectiveWeaponStrength(weapon, order, currentHull, maximumHull);
     const isAttackCraft = weapon.type === "Launch Bay";
     const availableAttackCraft = Math.max(0, attackCraftCapacity - activeAttackCraftStrength);
     const exceedsFleetCapacity = isAttackCraft && strength > availableAttackCraft;

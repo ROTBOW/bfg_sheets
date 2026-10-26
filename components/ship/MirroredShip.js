@@ -9,8 +9,9 @@ import { weaponMarkers } from "@/lib/weapon-markers.mjs";
 import { getLightningArcAvailability } from "@/lib/lightning-arc.mjs";
 import {
     getOrderedMovement,
-    getOrderedWeaponStrength,
-    isWeaponDisabledByOrder,
+    getEffectiveWeaponStrength,
+    getWeaponStrengthExplanation,
+    isWeaponDisabled,
     ordnanceWeaponTypes,
 } from "@/lib/special-orders.mjs";
 
@@ -127,11 +128,27 @@ const MirroredShip = ({
                         <thead><tr><th>Weapon system</th><th>Range</th><th>Strength</th><th>Arc</th></tr></thead>
                         <tbody>
                             {ship.weapons.map((weapon, weaponIndex) => {
-                                const orderedStrength = getOrderedWeaponStrength(weapon, battleState.order);
-                                const isOrderModified = orderedStrength !== weapon.strength;
+                                const effectiveStrength = getEffectiveWeaponStrength(
+                                    weapon,
+                                    battleState.order,
+                                    battleState.hull,
+                                    ship.stats.hull,
+                                );
+                                const strengthExplanation = getWeaponStrengthExplanation(
+                                    weapon,
+                                    battleState.order,
+                                    battleState.hull,
+                                    ship.stats.hull,
+                                );
+                                const isStrengthModified = effectiveStrength !== weapon.strength;
                                 const isOrdnanceSpent = ordnanceWeaponTypes.has(weapon.type)
                                     && battleState.spentOrdnance.includes(weaponIndex);
-                                const isDisabledByOrder = isWeaponDisabledByOrder(weapon, battleState.order);
+                                const isWeaponUnavailable = isWeaponDisabled(
+                                    weapon,
+                                    battleState.order,
+                                    battleState.hull,
+                                    ship.stats.hull,
+                                );
                                 const hasStandardWeaponFired = battleState.weaponFire.some((entry) => (
                                     entry.weaponIndex === weaponIndex
                                     && entry.round === round
@@ -156,7 +173,7 @@ const MirroredShip = ({
                                     && !hasFired
                                     && !targetWasEngaged
                                     && !isOrdnanceSpent
-                                    && !isDisabledByOrder
+                                    && !isWeaponUnavailable
                                     && (ordnanceWeaponTypes.has(weapon.type) || Boolean(target));
                                 const weaponRowClass = [
                                     canSelect ? "weapon-row-selectable" : "",
@@ -179,7 +196,7 @@ const MirroredShip = ({
                                                         {weapon.name}
                                                         {hasFired && <span> · Fired</span>}
                                                         {isOrdnanceSpent && <span> · Reload required</span>}
-                                                        {isDisabledByOrder && <span> · Blocked by orders</span>}
+                                                        {isWeaponUnavailable && <span> · Unable to fire</span>}
                                                         {!hasFired && targetWasEngaged && <span> · Target already engaged</span>}
                                                         {lightningAvailability && lightningAvailability.allocations.length > 0 && !hasFired && (
                                                             <span> · {lightningAvailability.remainingStrength} FP remains</span>
@@ -190,9 +207,9 @@ const MirroredShip = ({
                                             </td>
                                             <td>{weapon.rangeLabel || `${weapon.rangeCm} cm`}</td>
                                             <td className="strength">
-                                                <span title={isOrderModified ? `Strength halved by ${battleState.order}; fractions round up.` : undefined}>
-                                                    {isOrderModified && <del>({weapon.strength})</del>}
-                                                    {orderedStrength}
+                                                <span title={strengthExplanation || undefined}>
+                                                    {isStrengthModified && <del>({weapon.strength})</del>}
+                                                    {effectiveStrength}
                                                 </span>
                                                 {weapon.strengthUnit && <small>{weapon.strengthUnit}</small>}
                                             </td>
@@ -215,6 +232,8 @@ const MirroredShip = ({
                                                         turnSide={turnSide}
                                                         attackCraftCapacity={attackCraftCapacity}
                                                         activeAttackCraftStrength={activeAttackCraftStrength}
+                                                        currentHull={battleState.hull}
+                                                        maximumHull={ship.stats.hull}
                                                         onClose={() => setSelectedWeaponIndex(null)}
                                                         onRoll={onRoll}
                                                         onClearRoll={onClearRoll}

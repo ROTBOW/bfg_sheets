@@ -8,7 +8,11 @@ import SpecialRules from "@/components/ship/SpecialRules";
 import { getShip } from "@/lib/fleets.mjs";
 import { getUpgradeOptions } from "@/lib/ship-upgrades.mjs";
 import { weaponMarkers } from "@/lib/weapon-markers.mjs";
-import { getOrderedMovement, getOrderedWeaponStrength } from "@/lib/special-orders.mjs";
+import {
+    getEffectiveWeaponStrength,
+    getOrderedMovement,
+    getWeaponStrengthExplanation,
+} from "@/lib/special-orders.mjs";
 
 /** Displays the complete standalone tracker for one selected ship. */
 const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership }) => {
@@ -93,8 +97,19 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                                 </thead>
                                 <tbody>
                                     {ship.weapons.map((weapon) => {
-                                        const orderedStrength = getOrderedWeaponStrength(weapon, battleState.order);
-                                        const isOrderModified = orderedStrength !== weapon.strength;
+                                        const effectiveStrength = getEffectiveWeaponStrength(
+                                            weapon,
+                                            battleState.order,
+                                            hull,
+                                            shipStats.hull,
+                                        );
+                                        const strengthExplanation = getWeaponStrengthExplanation(
+                                            weapon,
+                                            battleState.order,
+                                            hull,
+                                            shipStats.hull,
+                                        );
+                                        const isStrengthModified = effectiveStrength !== weapon.strength;
 
                                         return (
                                         <tr key={`${weapon.name}-${weapon.rangeLabel || weapon.rangeCm}`}>
@@ -107,9 +122,9 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                                             </td>
                                             <td>{weapon.rangeLabel || `${weapon.rangeCm} cm`}</td>
                                             <td className="strength">
-                                                <span title={isOrderModified ? `Strength halved by ${battleState.order}; fractions round up.` : undefined}>
-                                                    {isOrderModified && <del>({weapon.strength})</del>}
-                                                    {orderedStrength}
+                                                <span title={strengthExplanation || undefined}>
+                                                    {isStrengthModified && <del>({weapon.strength})</del>}
+                                                    {effectiveStrength}
                                                 </span>
                                                 {weapon.strengthUnit && <small>{weapon.strengthUnit}</small>}
                                             </td>

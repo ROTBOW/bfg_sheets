@@ -121,8 +121,8 @@ const ShipViewer = ({ ship, vessel, battleState, updateSelectedShip, leadership 
                             </table>
                         </div>
                         <div className="panel-footnote">
-                            {ship.isDemo ? "Illustrative" : "Source"} base profile shown. Damage and purchased
-                            upgrades do not modify these weapon values yet. Active special orders are reflected above.
+                            {ship.isDemo ? "Illustrative" : "Source"} profile shown with purchased upgrades and active
+                            special orders applied.
                         </div>
                     </section>
                     {vessel.upgrades?.length > 0 && (

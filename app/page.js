@@ -27,6 +27,7 @@ import {
 } from "@/firebase/room-service";
 import { getRoomSideForUser } from "@/firebase/room-schema.mjs";
 import { battleProfiles, createShipBattleState } from "@/lib/battle-profiles";
+import { deriveBattleProfile } from "@/lib/derived-battle-profile.mjs";
 import { getDefaultFleetId, loadFleetLibrary } from "@/lib/fleet-storage.mjs";
 import { getShip, storageKey } from "@/lib/fleets.mjs";
 import { getProfileUrl, getVesselPoints } from "@/lib/ship-upgrades.mjs";
@@ -178,7 +179,7 @@ const BattleTracker = () => {
     const fleet = fleets.find((entry) => entry.id === selectedFleetId);
     const vessels = (fleet?.ships || []).map((vessel, index) => {
         const catalogShip = getShip(vessel.classId);
-        const profile = battleProfiles[vessel.classId];
+        const profile = deriveBattleProfile(battleProfiles[vessel.classId], vessel);
 
         return {
             ...vessel,
@@ -211,7 +212,7 @@ const BattleTracker = () => {
     const enemyFleet = enemySide ? connectedRoom?.sides?.[enemySide]?.fleet : null;
     const enemyVessels = (enemyFleet?.ships || []).map((enemyVessel, index) => {
         const catalogShip = getShip(enemyVessel.classId);
-        const profile = battleProfiles[enemyVessel.classId];
+        const profile = deriveBattleProfile(battleProfiles[enemyVessel.classId], enemyVessel);
 
         return {
             ...enemyVessel,
